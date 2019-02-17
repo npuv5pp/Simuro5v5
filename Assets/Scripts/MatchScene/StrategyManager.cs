@@ -15,8 +15,6 @@ namespace Simuro5v5.Strategy
     using System.Collections.Generic;
     using System.Text;
 
-    public enum Side { Blue, Yellow };
-
     /// <summary>
     /// 策略管理器
     /// 提供对红蓝方策略的管理，包括加载、卸载、重载、运行以及查错等操作，是该模块对外的唯一接口。

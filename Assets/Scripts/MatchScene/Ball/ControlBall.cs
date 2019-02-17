@@ -1,7 +1,5 @@
 ﻿using UnityEngine;
 using Simuro5v5;
-using LinearVelocity = UnityEngine.Vector3;
-using AngularVelocity = System.Double;
 
 public class ControlBall : MonoBehaviour
 {
@@ -19,18 +17,20 @@ public class ControlBall : MonoBehaviour
 
     public void SetPlacement(Ball ball)
     {
-        Vector3 pos;
-        pos.x = ball.pos.x;
-        pos.z = ball.pos.y;
-        pos.y = ball.pos.z;
+        Vector3 pos = new Vector3
+        {
+            x = ball.pos.x,
+            z = ball.pos.y,
+            y = Const.Ball.HBL
+        };
         transform.position = pos;
     }
 
     public void Revert(Ball ball)
     {
         SetPlacement(ball);
-        //rb.velocity = ball.linearVelocity.GetUnityVector3();
-        //rb.angularVelocity = ball.angularVelocity.GetUnityVector3();
+        rb.velocity = ball.GetLinearVelocityVector3();
+        rb.angularVelocity = ball.GetAngularVelocityVector3();
     }
 
     public void SetStill()

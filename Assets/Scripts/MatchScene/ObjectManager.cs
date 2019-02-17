@@ -139,49 +139,38 @@ namespace Simuro5v5
 
             ball.pos.x = 0;
             ball.pos.y = 0;
-            ball.pos.z = 2.521712F;
 
             blueInfo[0].pos.x = 102.5F;
             blueInfo[0].pos.y = 0;
-            blueInfo[0].pos.z = 0;
             blueInfo[0].rotation = -90;
             blueInfo[1].pos.x = 81.2F;
             blueInfo[1].pos.y = -48F;
-            blueInfo[1].pos.z = 0;
             blueInfo[1].rotation = 180;
 
             blueInfo[2].pos.x = 81.2F;
             blueInfo[2].pos.y = 48F;
-            blueInfo[2].pos.z = 0;
             blueInfo[2].rotation = 180;
             blueInfo[3].pos.x = 29.8F;
             blueInfo[3].pos.y = -48F;
-            blueInfo[3].pos.z = 0;
             blueInfo[3].rotation = 180;
             blueInfo[4].pos.x = 29.8F;
             blueInfo[4].pos.y = 48F;
-            blueInfo[4].pos.z = 0;
             blueInfo[4].rotation = 180;
 
             yellowInfo[0].pos.x = -102.5F;
             yellowInfo[0].pos.y = 0;
-            yellowInfo[0].pos.z = 0;
             yellowInfo[0].rotation = 90;
             yellowInfo[1].pos.x = -81.2F;
             yellowInfo[1].pos.y = 48F;
-            yellowInfo[1].pos.z = 0;
             yellowInfo[1].rotation = 0;
             yellowInfo[2].pos.x = -81.2F;
             yellowInfo[2].pos.y = -48F;
-            yellowInfo[2].pos.z = 0;
             yellowInfo[2].rotation = 0;
             yellowInfo[3].pos.x = -29.8F;
             yellowInfo[3].pos.y = 48F;
-            yellowInfo[3].pos.z = 0;
             yellowInfo[3].rotation = 0;
             yellowInfo[4].pos.x = -29.8F;
             yellowInfo[4].pos.y = -48F;
-            yellowInfo[4].pos.z = 0;
             yellowInfo[4].rotation = 0;
             SetBallPlacement(ball);
             SetBluePlacement(blueInfo);
@@ -201,7 +190,7 @@ namespace Simuro5v5
             {
                 blueComponent[i].Revert(matchInfo.BlueRobot[i]);
                 yellowComponent[i].Revert(matchInfo.YellowRobot[i]);
-                ballComponent.Revert(matchInfo.CurrentBall);
+                ballComponent.Revert(matchInfo.Ball);
             }
         }
 

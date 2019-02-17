@@ -121,34 +121,34 @@ public class Referee
         switch (statespace.gameState)
         {
             case PlayMode.PM_FreeBall_LeftTop:
-                matchInfo.UpdateState(GameState.FreeBallTop, Side.OffensiveSide);
+                matchInfo.UpdateState(GameState.FreeBallTop, Side.Blue);
                 break;
             case PlayMode.PM_FreeBall_LeftBot:
-                matchInfo.UpdateState(GameState.FreeBallBottom, Side.OffensiveSide);
+                matchInfo.UpdateState(GameState.FreeBallBottom, Side.Blue);
                 break;
             case PlayMode.PM_FreeBall_RightTop:
-                matchInfo.UpdateState(GameState.FreeBallTop, Side.DefensiveSide);
+                matchInfo.UpdateState(GameState.FreeBallTop, Side.Yellow);
                 break;
             case PlayMode.PM_FreeBall_RightBot:
-                matchInfo.UpdateState(GameState.FreeBallBottom, Side.DefensiveSide);
+                matchInfo.UpdateState(GameState.FreeBallBottom, Side.Yellow);
                 break;
             case PlayMode.PM_PlaceKick_Yellow:
-                matchInfo.UpdateState(GameState.PlaceKick, Side.DefensiveSide);
+                matchInfo.UpdateState(GameState.PlaceKick, Side.Yellow);
                 break;
             case PlayMode.PM_PlaceKick_Blue:
-                matchInfo.UpdateState(GameState.PlaceKick, Side.OffensiveSide);
+                matchInfo.UpdateState(GameState.PlaceKick, Side.Blue);
                 break;
             case PlayMode.PM_PenaltyKick_Yellow:
-                matchInfo.UpdateState(GameState.Plenalty, Side.DefensiveSide);
+                matchInfo.UpdateState(GameState.Plenalty, Side.Yellow);
                 break;
             case PlayMode.PM_PenaltyKick_Blue:
-                matchInfo.UpdateState(GameState.Plenalty, Side.OffensiveSide);
+                matchInfo.UpdateState(GameState.Plenalty, Side.Blue);
                 break;
             case PlayMode.PM_GoalKick_Yellow:
-                matchInfo.UpdateState(GameState.GoalKick, Side.DefensiveSide);  //黄方门球蓝方进攻
+                matchInfo.UpdateState(GameState.GoalKick, Side.Yellow);  //黄方门球蓝方进攻
                 break;
             case PlayMode.PM_GoalKick_Blue:
-                matchInfo.UpdateState(GameState.GoalKick, Side.OffensiveSide);
+                matchInfo.UpdateState(GameState.GoalKick, Side.Blue);
                 break;
             default:
                 matchInfo.UpdateState(GameState.NormalMatch, (Side)matchInfo.WhosBall);
@@ -213,7 +213,7 @@ public class Referee
     /// <param name="a"></param>
     /// <param name="b"></param>
     /// <returns></returns>
-    private double GetLength(Vector3D a, Vector3D b)
+    private double GetLength(Vector2D a, Vector2D b)
     {
         double disx = a.x - b.x;
         double disy = a.y - b.y;

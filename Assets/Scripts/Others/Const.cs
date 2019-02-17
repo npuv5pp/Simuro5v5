@@ -85,39 +85,9 @@ namespace Simuro5v5
             public readonly static int stepsAbove = 1;                  // 1
         }
 
-        // 规定rot∈(-180, 180]
-        // 扩展方法谨慎使用
-        // 按照旧的标准规整角度
-        public static float FormatOld(this float rot)
-        {
-            while (rot > 180.0f)
-            {
-                rot -= 360.0f;
-            }
-
-            while (rot < -180.0f)
-            {
-                rot += 360.0f;
-            }
-
-            return rot;
-        }
-
-        // 从Unity标准规整角度到旧标准
-        public static float FormatUnity2Old(this float rot)
-        {
-            return 90.0f - rot;
-        }
-
-        // 从Unity标准规整角度到旧标准
-        public static float FormatOld2Unity(this float rot)
-        {
-            return 90.0f - rot;
-        }
-
         public static void DebugLog(string message)
         {
-            //Debug.Log(message);
+            Debug.Log(message);
         }
 
         public static void DebugLog2(string message)

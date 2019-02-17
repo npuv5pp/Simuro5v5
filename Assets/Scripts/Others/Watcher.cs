@@ -37,7 +37,7 @@ namespace Simuro5v5
                 var matchInfo = _matchinfo as MatchInfo;
                 if (matchInfo != null)
                 {
-                    Const.DebugLog("GlobalMatchInfo updated: ball: " + matchInfo.CurrentBall.pos.x);
+                    Const.DebugLog("GlobalMatchInfo updated: ball: " + matchInfo.Ball.pos.x);
                 }
             });
             Event.Register(Event.EventType2.WheelSetUpdate, OnWheelUpdate);

@@ -175,7 +175,19 @@ public class MatchMain : MonoBehaviour
                 InRound = false;
                 InPlacement = true;
                 GlobalMatchInfo.Referee = new Referee();
-                Event.Send(Event.EventType1.LogUpdate, "Foul : " + GlobalMatchInfo.GameState.ToString() + ". Blue team is" + ((Simuro5v5.Side)GlobalMatchInfo.WhosBall).ToString());
+
+                string log;
+                if (GlobalMatchInfo.WhosBall == Side.Blue)
+                {
+                    log = string.Format("Foul: {0}. <b><color=\"#0057FF\">Blue</color></b> team is offensive side",
+                         GlobalMatchInfo.GameState, GlobalMatchInfo.WhosBall);
+                }
+                else
+                {
+                    log = string.Format("Foul: {0}. <b><color=\"#F8FF00\">Yellow</color></b> team is offensive side",
+                         GlobalMatchInfo.GameState, GlobalMatchInfo.WhosBall);
+                }
+                Event.Send(Event.EventType1.LogUpdate, log);
             }
             else
             {

@@ -15,4 +15,4 @@ obj
 *.unityproj
 *.DS_Store
 
-match.log
+*.log

@@ -12,7 +12,6 @@ public class ControlRobot : MonoBehaviour
     float velocityLeft;         // 左轮速，标量，因为方向和rotation一致
     float velocityRight;        // 右轮速，标量，因为方向和rotation一致
 
-    Wheel wheel;
     Rigidbody rb;
 
     // 数据记录
@@ -107,13 +106,13 @@ public class ControlRobot : MonoBehaviour
     /// <param name="robot"></param>
     public void SetPlacement(Robot robot)
     {
-
         // Note: 设置刚体的坐标，会在下一拍才会显示到屏幕上，应该直接设置物体的
-        Vector3 pos;
         Quaternion rot = new Quaternion();
-        pos.x = robot.pos.x;
-        pos.z = robot.pos.y;
-        pos.y = robot.pos.z;
+        Vector3 pos = new Vector3
+        {
+            x = robot.pos.x,
+            z = robot.pos.y,
+        };
         transform.position = pos;
         rot.eulerAngles = new Vector3
         {
@@ -138,9 +137,10 @@ public class ControlRobot : MonoBehaviour
             int _i = 0;
             _i++;
         }
+
         // 设置刚体的线速度和角速度
-        rb.velocity = robot.linearVelocity.GetUnityVector3();
-        rb.angularVelocity = robot.angularVelocity.GetUnityVector3();
+        rb.velocity = robot.GetLinearVelocityVector3();
+        rb.angularVelocity = robot.GetAngularVelocityVector3();
 
         // 设置轮速。会在之后影响到扭矩。
         velocityLeft = (float)robot.velocityLeft;
@@ -149,8 +149,7 @@ public class ControlRobot : MonoBehaviour
 
     public void SetStill()
     {
-        wheel.left = 0;
-        wheel.right = 0;
+        velocityLeft = velocityRight = 0;
         rb.Sleep();
         rb.WakeUp();
     }

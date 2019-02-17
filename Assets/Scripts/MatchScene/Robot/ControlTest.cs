@@ -23,7 +23,7 @@ public class ControlTest : MonoBehaviour
     Wheel wheel;
     Rigidbody rb;
     PhysicMaterial phyMat;
-    Vector3D velocity;
+    Vector2D velocity;
 
     // 规律属性
     float kwDym { get { return 1 / (Const.Robot.k1Dym * rb.angularVelocity.y * Mathf.Rad2Deg + Const.Robot.k2Dym); } }// 一个修正引擎角速度非线性规律的系数
