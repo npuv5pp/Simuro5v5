@@ -1,0 +1,25 @@
+fileFormatVersion: 2
+guid: a2de7972f4802fa4f8b3f69140e39c69
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: DejaVu Sans Mono for Powerline
+  fontNames:
+  - DejaVu Sans Mono for Powerline
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: 34c70b4119d4cc1439a9d00d6a0130a3, type: 3}
+  - {fileID: 12800000, guid: 4f2adf51a95066048bd7fff1d46d0f2d, type: 3}
+  - {fileID: 12800000, guid: 995d127b29dc5284e93b8b47a296ae46, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
