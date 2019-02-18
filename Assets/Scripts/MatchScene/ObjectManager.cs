@@ -17,11 +17,18 @@ namespace Simuro5v5
 
         public static MatchInfo OutputMatchInfo { get; private set; }
 
+        /// <summary>
+        /// 重新绑定一个用来输出的MatchInfo
+        /// </summary>
+        /// <param name="matchInfo"></param>
         public static void RebindMatchInfo(MatchInfo matchInfo)
         {
             OutputMatchInfo = matchInfo;
         }
 
+        /// <summary>
+        /// 重新绑定场景中的对象
+        /// </summary>
         public static void RebindObject()
         {
             ballObject = GameObject.Find("Ball");
@@ -57,7 +64,12 @@ namespace Simuro5v5
             };
         }
 
-        public static void SetBlueWheelInfo(WheelInfo ws)
+        public static void SetToDefault()
+        {
+            RevertScene(MatchInfo.DefaultMatch);
+        }
+
+        public static void SetBlueWheels(WheelInfo ws)
         {
             for (int i = 0; i < 5; i++)
             {
@@ -67,7 +79,7 @@ namespace Simuro5v5
             }
         }
 
-        public static void SetYellowWheelInfo(WheelInfo ws)
+        public static void SetYellowWheels(WheelInfo ws)
         {
             for (int i = 0; i < 5; i++)
             {
@@ -129,57 +141,6 @@ namespace Simuro5v5
             ballComponent.SetStill();
         }
 
-        public static void SetDefaultPostion()
-        {
-            // 这三个结构体是对于策略来说的，使用的策略坐标系
-            // 在下面的SetPlacement系列函数中，会自动转为平台坐标系
-            Ball ball = new Ball();
-            Robot[] blueInfo = new Robot[5];
-            Robot[] yellowInfo = new Robot[5];
-
-            ball.pos.x = 0;
-            ball.pos.y = 0;
-
-            blueInfo[0].pos.x = 102.5F;
-            blueInfo[0].pos.y = 0;
-            blueInfo[0].rotation = -90;
-            blueInfo[1].pos.x = 81.2F;
-            blueInfo[1].pos.y = -48F;
-            blueInfo[1].rotation = 180;
-
-            blueInfo[2].pos.x = 81.2F;
-            blueInfo[2].pos.y = 48F;
-            blueInfo[2].rotation = 180;
-            blueInfo[3].pos.x = 29.8F;
-            blueInfo[3].pos.y = -48F;
-            blueInfo[3].rotation = 180;
-            blueInfo[4].pos.x = 29.8F;
-            blueInfo[4].pos.y = 48F;
-            blueInfo[4].rotation = 180;
-
-            yellowInfo[0].pos.x = -102.5F;
-            yellowInfo[0].pos.y = 0;
-            yellowInfo[0].rotation = 90;
-            yellowInfo[1].pos.x = -81.2F;
-            yellowInfo[1].pos.y = 48F;
-            yellowInfo[1].rotation = 0;
-            yellowInfo[2].pos.x = -81.2F;
-            yellowInfo[2].pos.y = -48F;
-            yellowInfo[2].rotation = 0;
-            yellowInfo[3].pos.x = -29.8F;
-            yellowInfo[3].pos.y = 48F;
-            yellowInfo[3].rotation = 0;
-            yellowInfo[4].pos.x = -29.8F;
-            yellowInfo[4].pos.y = -48F;
-            yellowInfo[4].rotation = 0;
-            SetBallPlacement(ball);
-            SetBluePlacement(blueInfo);
-            SetYellowPlacement(yellowInfo);
-            SetStill();
-
-            UpdateFromScene();
-        }
-
         /// <summary>
         /// 从指定MatchInfo还原场景
         /// </summary>
@@ -202,22 +163,31 @@ namespace Simuro5v5
             RevertScene(OutputMatchInfo);
         }
 
+        /// <summary>
+        /// 从场景更新到绑定的MatchInfo中
+        /// </summary>
         public static void UpdateFromScene()
         {
             OutputMatchInfo.UpdateEntity(ballObject, blueObject, yellowObject);
         }
 
+        /// <summary>
+        /// 继续运行世界
+        /// </summary>
         public static void Resume()
         {
             Time.timeScale = Const.TimeScale;
         }
 
+        /// <summary>
+        /// 暂停世界
+        /// </summary>
         public static void Pause()
         {
             Time.timeScale = 0.0f;
         }
 
-        public static void RegisterRePlay()
+        public static void RegisterReplay()
         {
             Event.Register(Event.EventType1.ReplayInfoUpdate, SetReplayInfo);
         }

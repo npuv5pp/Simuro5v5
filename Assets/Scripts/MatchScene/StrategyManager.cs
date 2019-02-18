@@ -1,19 +1,11 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Diagnostics;
-using System.IO;
+﻿using System;
 using System.Net;
-using System.Net.Sockets;
-using System.Threading;
-using Debug = UnityEngine.Debug;
 
 namespace Simuro5v5.Strategy
 {
     using ServerMessage;
-    using Simuro5v5.Config;
     using Simuro5v5.EventSystem;
     using System.Collections.Generic;
-    using System.Text;
 
     /// <summary>
     /// 策略管理器
@@ -236,7 +228,7 @@ namespace Simuro5v5.Strategy
                 dllpath);
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             RemoveBlueDll();
             RemoveYellowDll();

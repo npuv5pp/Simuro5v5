@@ -180,12 +180,12 @@ public class MatchMain : MonoBehaviour
                 if (GlobalMatchInfo.WhosBall == Side.Blue)
                 {
                     log = string.Format("Foul: {0}. <b><color=\"#0057FF\">Blue</color></b> team is offensive side",
-                         GlobalMatchInfo.GameState, GlobalMatchInfo.WhosBall);
+                         GlobalMatchInfo.GameState);
                 }
                 else
                 {
                     log = string.Format("Foul: {0}. <b><color=\"#F8FF00\">Yellow</color></b> team is offensive side",
-                         GlobalMatchInfo.GameState, GlobalMatchInfo.WhosBall);
+                         GlobalMatchInfo.GameState);
                 }
                 Event.Send(Event.EventType1.LogUpdate, log);
             }
@@ -210,7 +210,7 @@ public class MatchMain : MonoBehaviour
     {
         StartedMatch = false;
 
-        ObjectManager.SetDefaultPostion();
+        ObjectManager.SetToDefault();
         GlobalMatchInfo.Score = new MatchScore();
         GlobalMatchInfo.PlayTime = 0;
         GlobalMatchInfo.Referee = new Referee();
@@ -309,8 +309,8 @@ public class MatchMain : MonoBehaviour
         wheelsblue.Normalize();     //轮速规整化
         wheelsyellow.Normalize();   //轮速规整化
 
-        ObjectManager.SetBlueWheelInfo(wheelsblue);
-        ObjectManager.SetYellowWheelInfo(wheelsyellow);
+        ObjectManager.SetBlueWheels(wheelsblue);
+        ObjectManager.SetYellowWheels(wheelsyellow);
     }
 
     void UpdatePlacementToScene()

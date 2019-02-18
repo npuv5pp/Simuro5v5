@@ -68,7 +68,7 @@ public class GUI_Replay : MonoBehaviour {
         }
         obj1.SetActive(false);
 
-        ObjectManager.RegisterRePlay();
+        ObjectManager.RegisterReplay();
     }
 	
 	// Update is called once per frame

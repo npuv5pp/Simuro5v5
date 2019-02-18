@@ -40,12 +40,12 @@ namespace Simuro5v5
     {
         public Robot[] BlueRobot { get; set; }
         public Robot[] YellowRobot { get; set; }
-        public Ball Ball { get; set; }
+        public Ball Ball;
 
-        public int PlayTime { get; set; }
+        public int PlayTime;
 
-        public GameState GameState { get; set; }
-        public Side WhosBall { get; set; }
+        public GameState GameState;
+        public Side WhosBall;
 
         public MatchScore Score;
         public ControlState ControlState;
@@ -67,6 +67,56 @@ namespace Simuro5v5
             Referee = new Referee();
 
             UpdateEntity(ball, blue, yellow);
+        }
+
+        public static MatchInfo DefaultMatch
+        {
+            get
+            {
+                // 这三个结构体是对于策略来说的，使用的策略坐标系
+                // 在下面的SetPlacement系列函数中，会自动转为平台坐标系
+                var rv = new MatchInfo();
+
+                Robot[] blueInfo = new Robot[5];
+                Robot[] yellowInfo = new Robot[5];
+
+                rv.Ball.pos.x = 0;
+                rv.Ball.pos.y = 0;
+
+                rv.BlueRobot[0].pos.x = 102.5F;
+                rv.BlueRobot[0].pos.y = 0;
+                rv.BlueRobot[0].rotation = -90;
+                rv.BlueRobot[1].pos.x = 81.2F;
+                rv.BlueRobot[1].pos.y = -48F;
+                rv.BlueRobot[1].rotation = 180;
+                rv.BlueRobot[2].pos.x = 81.2F;
+                rv.BlueRobot[2].pos.y = 48F;
+                rv.BlueRobot[2].rotation = 180;
+                rv.BlueRobot[3].pos.x = 29.8F;
+                rv.BlueRobot[3].pos.y = -48F;
+                rv.BlueRobot[3].rotation = 180;
+                rv.BlueRobot[4].pos.x = 29.8F;
+                rv.BlueRobot[4].pos.y = 48F;
+                rv.BlueRobot[4].rotation = 180;
+
+                rv.YellowRobot[0].pos.x = -102.5F;
+                rv.YellowRobot[0].pos.y = 0;
+                rv.YellowRobot[0].rotation = 90;
+                rv.YellowRobot[1].pos.x = -81.2F;
+                rv.YellowRobot[1].pos.y = 48F;
+                rv.YellowRobot[1].rotation = 0;
+                rv.YellowRobot[2].pos.x = -81.2F;
+                rv.YellowRobot[2].pos.y = -48F;
+                rv.YellowRobot[2].rotation = 0;
+                rv.YellowRobot[3].pos.x = -29.8F;
+                rv.YellowRobot[3].pos.y = 48F;
+                rv.YellowRobot[3].rotation = 0;
+                rv.YellowRobot[4].pos.x = -29.8F;
+                rv.YellowRobot[4].pos.y = -48F;
+                rv.YellowRobot[4].rotation = 0;
+
+                return rv;
+            }
         }
 
         public MatchInfo Clone()
