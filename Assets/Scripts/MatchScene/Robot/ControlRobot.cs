@@ -4,6 +4,7 @@ using Simuro5v5;
 public class ControlRobot : MonoBehaviour
 {
     public bool Debugging;
+    public string role = "";
 
     WheelCollider leftWheel;
     WheelCollider rightWheel;
@@ -49,8 +50,8 @@ public class ControlRobot : MonoBehaviour
         if (Debugging)
         {
             Debug.Log(string.Format(
-                "rpm: {0}, {1}; v: {2}, {3}",
-                leftWheel.rpm, rightWheel.rpm, rb.velocity, rb.angularVelocity));
+                "{4} rpm: {0}, {1}; v: {2}, {3}",
+                leftWheel.rpm, rightWheel.rpm, rb.velocity, rb.angularVelocity, role));
         }
     }
 
@@ -84,6 +85,13 @@ public class ControlRobot : MonoBehaviour
 
     public void SetWheelVelocity(Wheel ws)
     {
+        if (Debugging)
+        {
+            int _i = 0;
+            _i++;
+            Debug.Log(string.Format("{0} setting wheels: {1} {2}", role, ws.left, ws.right));
+        }
+
         velocityLeft = (float)ws.left;
         velocityRight = (float)ws.right;
 
@@ -145,6 +153,12 @@ public class ControlRobot : MonoBehaviour
         // 设置轮速。会在之后影响到扭矩。
         velocityLeft = (float)robot.velocityLeft;
         velocityRight = (float)robot.velocityRight;
+
+        leftWheel.motorTorque = GetMotor(velocityLeft);
+        rightWheel.motorTorque = GetMotor(velocityRight);
+
+        leftWheel.brakeTorque = velocityLeft == 0 ? Const.Wheel.brakeTorque : 0;
+        rightWheel.brakeTorque = velocityRight == 0 ? Const.Wheel.brakeTorque : 0;
     }
 
     public void SetStill()

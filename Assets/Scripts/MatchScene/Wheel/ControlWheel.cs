@@ -4,10 +4,17 @@ using Simuro5v5;
 public class ControlWheel : MonoBehaviour
 {
     WheelCollider wheel;
+    public bool Debugging;
 
     void Start ()
     {
         wheel = GetComponent<WheelCollider>();
+
+        if (Debugging)
+        {
+            return;
+        }
+
         wheel.ConfigureVehicleSubsteps(Const.Wheel.criticalSpeed, Const.Wheel.stepsBelow, Const.Wheel.stepsAbove);
         wheel.mass = Const.Wheel.mass;
         wheel.radius = Const.Wheel.radius;

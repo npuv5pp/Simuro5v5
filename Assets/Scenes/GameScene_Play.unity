@@ -152,6 +152,11 @@ Prefab:
       propertyPath: m_RootOrder
       value: 4
       objectReference: {fileID: 0}
+    - target: {fileID: 65723753338500328, guid: 90e3e2587c646284094c0c952d4bf6bd,
+        type: 2}
+      propertyPath: m_Center.y
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 90e3e2587c646284094c0c952d4bf6bd, type: 2}
   m_IsPrefabAsset: 0
@@ -637,12 +642,97 @@ Prefab:
     - target: {fileID: 114291182147273128, guid: 7929cc027cf5f824ebca19d56566b66f,
         type: 2}
       propertyPath: Debugging
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 114816010386920680, guid: 7929cc027cf5f824ebca19d56566b66f,
         type: 2}
       propertyPath: Debugging
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 54170669089196992, guid: 7929cc027cf5f824ebca19d56566b66f,
+        type: 2}
+      propertyPath: m_AngularDrag
+      value: 0.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 114775874511200094, guid: 7929cc027cf5f824ebca19d56566b66f,
+        type: 2}
+      propertyPath: Debugging
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114595767277117640, guid: 7929cc027cf5f824ebca19d56566b66f,
+        type: 2}
+      propertyPath: Debugging
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 146319253703500776, guid: 7929cc027cf5f824ebca19d56566b66f,
+        type: 2}
+      propertyPath: m_WheelDampingRate
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 146553402623243488, guid: 7929cc027cf5f824ebca19d56566b66f,
+        type: 2}
+      propertyPath: m_WheelDampingRate
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 146319253703500776, guid: 7929cc027cf5f824ebca19d56566b66f,
+        type: 2}
+      propertyPath: m_Mass
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 146319253703500776, guid: 7929cc027cf5f824ebca19d56566b66f,
+        type: 2}
+      propertyPath: m_ForwardFriction.m_ExtremumSlip
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 146319253703500776, guid: 7929cc027cf5f824ebca19d56566b66f,
+        type: 2}
+      propertyPath: m_ForwardFriction.m_ExtremumValue
+      value: 0.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 146319253703500776, guid: 7929cc027cf5f824ebca19d56566b66f,
+        type: 2}
+      propertyPath: m_ForwardFriction.m_AsymptoteSlip
+      value: 0.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 146319253703500776, guid: 7929cc027cf5f824ebca19d56566b66f,
+        type: 2}
+      propertyPath: m_ForwardFriction.m_AsymptoteValue
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 146319253703500776, guid: 7929cc027cf5f824ebca19d56566b66f,
+        type: 2}
+      propertyPath: m_ForwardFriction.m_Stiffness
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 146553402623243488, guid: 7929cc027cf5f824ebca19d56566b66f,
+        type: 2}
+      propertyPath: m_Mass
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 146553402623243488, guid: 7929cc027cf5f824ebca19d56566b66f,
+        type: 2}
+      propertyPath: m_ForwardFriction.m_ExtremumSlip
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 146553402623243488, guid: 7929cc027cf5f824ebca19d56566b66f,
+        type: 2}
+      propertyPath: m_ForwardFriction.m_ExtremumValue
+      value: 0.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 146553402623243488, guid: 7929cc027cf5f824ebca19d56566b66f,
+        type: 2}
+      propertyPath: m_ForwardFriction.m_Stiffness
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 114291182147273128, guid: 7929cc027cf5f824ebca19d56566b66f,
+        type: 2}
+      propertyPath: role
+      value: Blue0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114816010386920680, guid: 7929cc027cf5f824ebca19d56566b66f,
+        type: 2}
+      propertyPath: role
+      value: Yellow0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7929cc027cf5f824ebca19d56566b66f, type: 2}
