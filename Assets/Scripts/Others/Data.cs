@@ -2,6 +2,7 @@
 using UnityEngine;
 using Simuro5v5.Config;
 using Simuro5v5.Strategy;
+using System;
 
 namespace Simuro5v5
 {
@@ -326,6 +327,7 @@ namespace Simuro5v5
         public Ball Ball = new Ball();
     }
 
+    [Serializable]
     [JsonObject(MemberSerialization.OptIn)]
     public class WheelInfo
     {
@@ -367,6 +369,7 @@ namespace Simuro5v5
         }
     }
 
+    [Serializable]
     [JsonObject(MemberSerialization.OptIn)]
     public struct Wheel
     {

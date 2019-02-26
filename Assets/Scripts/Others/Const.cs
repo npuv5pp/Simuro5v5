@@ -26,7 +26,8 @@ namespace Simuro5v5
             public readonly static float RL = 7.8670658f;                   // 机器人边长         // 有舍入误差
             public readonly static float HRL = 3.9335329f;                  // 机器人半边长       // 有舍入误差
             public readonly static float maxVelocity = 125.0f;              // 机器人最大线速度
-            public readonly static float maxAngularVelocity = 70.07121363f; // 机器人最大角速度，角度制
+            //public readonly static float maxAngularVelocity = 70.07121363f; // 机器人最大角速度，角度制
+            public readonly static float maxAngularVelocity = 4024.07121363f; // 机器人最大角速度，角度制
             public readonly static float kv = 66.0f;                        // 使加速度为1时需要乘的系数
             public readonly static float kv1 = 75.81f;                      // 使加速度为1时需要乘的系数，f=1.0
             public readonly static float kv2 = 71.88599f;                   // 使加速度为1时需要乘的系数，f=0.6
@@ -55,34 +56,35 @@ namespace Simuro5v5
 
         public static class Wheel
         {
-            public readonly static float mass = 100.0f;
-            public readonly static float radius = 3.54018f;
+            public readonly static float mass = 10f;
+            public readonly static float radius = 3.54018f * 10;
 
-            public readonly static float wheelDampingRate = 0.25f;      // 0.25
+            public readonly static float wheelDampingRate = 0.0001f;      // 0.25
             public readonly static float suspensionDistance = 0.0f;     // 0.0
-            public readonly static float forceAppPointDistance = 0.3f;  // 0.3
+            public readonly static float forceAppPointDistance = 0.0f;  // 0.3
 
             public readonly static float brakeTorque = 30000f;          // 30000
 
-            public readonly static float extremumSlip_fF = 2.0f;        // 0.4
-            public readonly static float extremumValue_fF = 0.8f;       // 1.0
-            public readonly static float asymptoteSlip_fF = 0.8f;       // 0.8
-            public readonly static float asymptoteValue_fF = 0.5f;      // 0.5
-            public readonly static float stiffness_fF = 3.0f;           // 1.0
+            public readonly static float extremumSlip_fF = 100f;        // 0.4
+            public readonly static float extremumValue_fF = 10f;       // 1.0
+            public readonly static float asymptoteSlip_fF = 100f;       // 0.8
+            public readonly static float asymptoteValue_fF = 10f;      // 0.5
+            public readonly static float stiffness_fF = 15f;           // 1.0
 
             public readonly static float extremumSlip_sF = 0.2f;        // 0.2
             public readonly static float extremumValue_sF = 1.0f;       // 1.0
             public readonly static float asymptoteSlip_sF = 0.5f;       // 0.5
             public readonly static float asymptoteValue_sF = 0.75f;     // 0.75
-            public readonly static float stiffness_sF = 1.0f;           // 1.0
+            public readonly static float stiffness_sF = 0.0f;           // 1.0
 
-            public readonly static float damper = 4500f;                // 4500
-            public readonly static float spring = 35000f;               // 35000
-            public readonly static float targetPosition = 0.5f;
+            public readonly static float damper = 0;                // 4500
+            public readonly static float spring = 0;               // 35000
+            public readonly static float targetPosition = 0;
 
-            public readonly static float criticalSpeed = 5.0f;          // 5.0
-            public readonly static int stepsBelow = 5;                  // 5
-            public readonly static int stepsAbove = 1;                  // 1
+            // 低速时容易震动，所以多迭代几次
+            public readonly static float criticalSpeed = 25f;          // 5.0
+            public readonly static int stepsBelow = 8;                  // 5
+            public readonly static int stepsAbove = 8;                  // 1
         }
 
         public static void DebugLog(string message)

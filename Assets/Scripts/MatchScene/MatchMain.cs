@@ -9,6 +9,9 @@ using Event = Simuro5v5.EventSystem.Event;
 
 public class MatchMain : MonoBehaviour
 {
+    public bool Debugging;
+    public Wheel[] DebugWheels;
+
     // 比赛已经开始
     public bool StartedMatch
     {
@@ -292,7 +295,23 @@ public class MatchMain : MonoBehaviour
     public void LoadStrategy()
     {
         LoadSucceed = false;
-        StrategyManager.LoadLastSaved();
+        if (Debugging)
+        {
+            if (DebugWheels == null)
+            {
+                StrategyManager.LoadBlueDebugStrategy();
+                StrategyManager.LoadYellowDebugStrategy();
+            }
+            else
+            {
+                StrategyManager.LoadBlueDebugStrategy(new WheelInfo { Wheels = DebugWheels });
+                StrategyManager.LoadYellowDebugStrategy(new WheelInfo { Wheels = DebugWheels });
+            }
+        }
+        else
+        {
+            StrategyManager.LoadLastSaved();
+        }
         LoadSucceed = true;
     }
 

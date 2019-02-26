@@ -12,9 +12,16 @@ public class ControlWheel : MonoBehaviour
 
         if (Debugging)
         {
-            return;
         }
+        SetParameter();
+    }
 
+    public void ResetCollider()
+    {
+    }
+
+    void SetParameter()
+    {
         wheel.ConfigureVehicleSubsteps(Const.Wheel.criticalSpeed, Const.Wheel.stepsBelow, Const.Wheel.stepsAbove);
         wheel.mass = Const.Wheel.mass;
         wheel.radius = Const.Wheel.radius;
@@ -44,5 +51,6 @@ public class ControlWheel : MonoBehaviour
         sS.spring = Const.Wheel.spring;
         sS.targetPosition = Const.Wheel.targetPosition;
         wheel.suspensionSpring = sS;
+        Debug.Log("Parameter setted");
     }
 }

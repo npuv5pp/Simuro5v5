@@ -96,7 +96,55 @@ namespace Simuro5v5.Strategy
 
             YellowPath = dllpath;
             yellow = GetLocalDllStrategyFromPath(dllpath, Side.Yellow);
-            Event.Send(Event.EventType1.StrategyBlueLoaded, yellow);
+            Event.Send(Event.EventType1.StrategyYellowLoaded, yellow);
+        }
+
+        public void LoadBlueDebugStrategy()
+        {
+            if (blue != null)
+            {
+                blue.Free();
+            }
+
+            BluePath = "Debug";
+            blue = new DebugStrategy();
+            Event.Send(Event.EventType1.StrategyBlueLoaded, blue);
+        }
+
+        public void LoadYellowDebugStrategy()
+        {
+            if (yellow != null)
+            {
+                yellow.Free();
+            }
+
+            YellowPath = "Debug";
+            yellow = new DebugStrategy();
+            Event.Send(Event.EventType1.StrategyYellowLoaded, yellow);
+        }
+
+        public void LoadBlueDebugStrategy(WheelInfo wi)
+        {
+            if (blue != null)
+            {
+                blue.Free();
+            }
+
+            BluePath = "Debug";
+            blue = new DebugStrategy(wi);
+            Event.Send(Event.EventType1.StrategyBlueLoaded, blue);
+        }
+
+        public void LoadYellowDebugStrategy(WheelInfo wi)
+        {
+            if (yellow != null)
+            {
+                yellow.Free();
+            }
+
+            YellowPath = "Debug";
+            yellow = new DebugStrategy(wi);
+            Event.Send(Event.EventType1.StrategyYellowLoaded, yellow);
         }
 
         /// <summary>
@@ -375,6 +423,66 @@ namespace Simuro5v5.Strategy
         public void SendExit()
         {
             Conn.SendThenRecv(new Message(MessageType.MSG_exit, null));
+        }
+    }
+
+    class DebugStrategy : IStrategy
+    {
+        WheelInfo output_wheelinfo;
+
+        public DebugStrategy(WheelInfo wi)
+        {
+            output_wheelinfo = new WheelInfo
+            {
+                Wheels = new Wheel[5]
+            {
+                wi.Wheels[0],
+                wi.Wheels[1],
+                wi.Wheels[2],
+                wi.Wheels[3],
+                wi.Wheels[4],
+            }
+            };
+        }
+
+        public DebugStrategy()
+        {
+            var wi = new WheelInfo { Wheels = new Wheel[5] };
+            wi.Wheels[0] = new Wheel { left = 40, right = 40 };
+            wi.Wheels[1] = new Wheel { left = 40, right = 40 };
+            wi.Wheels[2] = new Wheel { left = 40, right = 40 };
+            wi.Wheels[3] = new Wheel { left = 40, right = 40 };
+            wi.Wheels[4] = new Wheel { left = 40, right = 40 };
+            output_wheelinfo = wi;
+        }
+
+        public string Description { get { return "Debug Strategy"; } }
+
+        public void CheckReady_ex() { }
+
+        public void Free() { }
+
+        public bool IsConnected()
+        {
+            return true;
+        }
+
+        public void SendBegin(SideInfo sideInfo) { }
+
+        public WheelInfo SendNext(SideInfo sideInfo)
+        {
+            return output_wheelinfo;
+        }
+
+        public void SendOver(SideInfo sideInfo) { }
+
+        public PlacementInfo SendPlacement(SideInfo sideInfo)
+        {
+            return new PlacementInfo
+            {
+                Robot = sideInfo.home,
+                Ball = sideInfo.currentBall
+            };
         }
     }
 
