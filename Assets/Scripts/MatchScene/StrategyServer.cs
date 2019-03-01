@@ -36,35 +36,78 @@ public class StrategyServer : MonoBehaviour
     // 平台的锁文件，策略服务器会通过此文件判断平台是否在运行
     static FileStream LockFile { get; set; }
 
-    // 进程锁
-    static object BlueServerLock { get; set; }
-    static object YellowServerLock { get; set; }
     static Process BlueServer { get; set; }
     static Process YellowServer { get; set; }
+
     // 服务器正在正常退出
     static bool NormalExiting { get; set; }
 
-    // Use this for initialization
     void Start()
     {
         if (!Entered)
         {
             DontDestroyOnLoad(this);
-            BlueServerLock = new object();
-            YellowServerLock = new object();
-            CreateLockFile();
-            StartBothServer(true);
-            Establish();
+            if (StrategyConfig.RunStrategyServer)
+            {
+                CreateLockFile();
+                StartBothServer(true);
+            }
+            EstablishConnection();
             Entered = true;
         }
     }
 
-    void OnApplicationQuit()
+    /// <summary>
+    /// 尝试与策略建立连接
+    /// </summary>
+    public static void EstablishConnection()
     {
-        StopStrategyServer();
+        Logger.MainLogger.LogInfo("Establishing connection...");
+
+        if (StrategyConfig.UseUdp)
+        {
+            if (BlueHandle == null || !BlueHandle.Established)
+            {
+                BlueHandle = new UDPConnectionHandle(IPAddress.Loopback, StrategyConfig.BlueStrategyPort);
+                BlueHandle.Connect(8, 500);
+            }
+            if (YellowHandle == null || !YellowHandle.Established)
+            {
+                YellowHandle = new UDPConnectionHandle(IPAddress.Loopback, StrategyConfig.YellowStrategyPort);
+                YellowHandle.Connect(8, 500);
+            }
+        }
+        else
+        {
+            if (BlueHandle == null || !BlueHandle.Established)
+            {
+                BlueHandle = new TCPConnectionHandle(IPAddress.Loopback, StrategyConfig.BlueStrategyPort);
+                BlueHandle.Connect(3, 200);
+            }
+            if (YellowHandle == null || !YellowHandle.Established)
+            {
+                YellowHandle = new TCPConnectionHandle(IPAddress.Loopback, StrategyConfig.YellowStrategyPort);
+                YellowHandle.Connect(3, 200);
+            }
+        }
     }
 
-    private static void CreateLockFile()
+    /// <summary>
+    /// 断开连接
+    /// </summary>
+    public static void DestroyConnection()
+    {
+        if (BlueHandle != null && BlueHandle.Established)
+        {
+            BlueHandle.Close();
+        }
+        if (YellowHandle != null && YellowHandle.Established)
+        {
+            YellowHandle.Close();
+        }
+    }
+
+    static void CreateLockFile()
     {
         if (LockFile != null)
         {
@@ -112,22 +155,22 @@ public class StrategyServer : MonoBehaviour
     }
 
     /// <summary>
-    /// 启动两个策略服务器，同时与其建立连接
+    /// 启动两个策略服务器
     /// </summary>
     /// <param name="autoreboot"></param>
-    static void StartBothServer(bool autoreboot)
+    public static void StartBothServer(bool autoreboot)
     {
         new Thread(delegate ()
         {
             try
             {
-                lock (BlueServerLock)
-                {
+                //lock (BlueServerLock)
+                //{
                     Logger.MainLogger.Log("Starting Blue Side Server");
                     BlueServer = CreateServer("Blue", StrategyConfig.BlueStrategyLogFile,
                         StrategyConfig.BlueStrategyPort, autoreboot);
                     BlueServer.Start();
-                }
+                //}
             }
             catch (Exception ex)
             {
@@ -140,14 +183,13 @@ public class StrategyServer : MonoBehaviour
         {
             try
             {
-                lock (YellowServerLock)
-                {
+                //lock (YellowServerLock)
+                //{
                     Logger.MainLogger.Log("Starting Yellow Side Server");
                     YellowServer = CreateServer("Yellow", StrategyConfig.YellowStrategyLogFile,
                         StrategyConfig.YellowStrategyPort, autoreboot);
                     YellowServer.Start();
-                }
-
+                //}
             }
             catch (Exception ex)
             {
@@ -157,86 +199,26 @@ public class StrategyServer : MonoBehaviour
     }
 
     /// <summary>
-    /// 尝试与策略建立连接
+    /// 关闭策略服务器
     /// </summary>
-    static void Establish()
-    {
-        Logger.MainLogger.LogInfo("Establishing connection...");
-
-        if (StrategyConfig.UseUdp)
-        {
-            if (BlueHandle == null || !BlueHandle.Established)
-            {
-                BlueHandle = new UDPConnectionHandle(IPAddress.Loopback, StrategyConfig.BlueStrategyPort);
-                BlueHandle.Connect(8, 500);
-            }
-            if (YellowHandle == null || !YellowHandle.Established)
-            {
-                YellowHandle = new UDPConnectionHandle(IPAddress.Loopback, StrategyConfig.YellowStrategyPort);
-                YellowHandle.Connect(8, 500);
-            }
-        }
-        else
-        {
-            if (BlueHandle == null || !BlueHandle.Established)
-            {
-                BlueHandle = new TCPConnectionHandle(IPAddress.Loopback, StrategyConfig.BlueStrategyPort);
-                BlueHandle.Connect(3, 200);
-            }
-            if (YellowHandle == null || !YellowHandle.Established)
-            {
-                YellowHandle = new TCPConnectionHandle(IPAddress.Loopback, StrategyConfig.YellowStrategyPort);
-                YellowHandle.Connect(3, 200);
-            }
-        }
-    }
-
-    /// <summary>
-    /// 断开连接，关闭策略服务器
-    /// </summary>
-    static void StopStrategyServer()
+    public static void StopStrategyServer()
     {
         // 断开连接
-        BlueHandle.Close();
-        YellowHandle.Close();
+        DestroyConnection();
 
         NormalExiting = true;
-        //lock (BlueServerLock)
-        //{
-        //    if (BlueServer != null)
-        //    {
-        //        try
-        //        {
-        //            BlueServer.Kill();
-        //            BlueServer.WaitForExit();
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            Logger.MainLogger.LogError(ex.ToString());
-        //            Debug.LogError(ex);
-        //        }
-        //    }
-        //}
-
-        //lock (YellowServerLock)
-        //{
-        //    if (YellowServer != null)
-        //    {
-        //        try
-        //        {
-        //            YellowServer.Kill();
-        //            YellowServer.WaitForExit();
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            Logger.MainLogger.LogError(ex.ToString());
-        //            Debug.LogError(ex);
-        //        }
-        //    }
-        //}
 
         LockFile.Close();
         File.Delete(LockFile.Name);
+    }
+
+    void OnApplicationQuit()
+    {
+        DestroyConnection();
+        if (StrategyConfig.RunStrategyServer)
+        {
+            StopStrategyServer();
+        }
     }
 }
 

@@ -22,6 +22,8 @@ namespace Simuro5v5.Config
     {
         public static int BlueStrategyPort { get; set; }
         public static int YellowStrategyPort { get; set; }
+
+        public static bool RunStrategyServer { get; set; }
         public static bool EnableStrategyLog { get; set; }
         public static string BlueStrategyLogFile { get; set; }
         public static string YellowStrategyLogFile { get; set; }
@@ -34,6 +36,7 @@ namespace Simuro5v5.Config
             BlueStrategyPort = 20000;
             YellowStrategyPort = 20001;
 
+            RunStrategyServer = true;
             EnableStrategyLog = true;
             BlueStrategyLogFile = @"BlueStrategy.log";
             YellowStrategyLogFile = @"YellowStrategy.log";
