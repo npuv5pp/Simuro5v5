@@ -86,10 +86,10 @@ public class MatchMain : MonoBehaviour
 
         // 暂停世界
         // 等待当前帧渲染完毕后暂停，确保还原后的场景显示到屏幕上
-        yield return _pauseAfterFrame();
+        yield return pauseAfterFrame();
     }
 
-    IEnumerator _pauseAfterFrame()
+    IEnumerator pauseAfterFrame()
     {
         // 等待当前帧渲染完毕后暂停，确保当前帧已经显示在屏幕上
         yield return new WaitForEndOfFrame();

@@ -3,54 +3,75 @@ using Simuro5v5;
 
 public class ControlWheel : MonoBehaviour
 {
-    WheelCollider wheel;
-    public bool Debugging;
+    WheelCollider wheelParameter;
+    WheelCollider wheelCollider;
+    const float wheelMultiplier = 197000 / 125;
 
     void Start ()
     {
-        wheel = GetComponent<WheelCollider>();
+        wheelCollider = GetComponent<WheelCollider>();
+        wheelParameter = GameObject.Find("Parameter").GetComponent<WheelCollider>();
 
-        if (Debugging)
-        {
-        }
-        SetParameter();
+        InitParameter();
     }
 
-    public void ResetCollider()
+    public float rpm { get { return wheelCollider.rpm; } }
+    public float motor { get { return wheelCollider.motorTorque; } }
+    public float brake { get { return wheelCollider.brakeTorque; } }
+
+    public void SetVelocity(float v)
     {
+        wheelCollider.motorTorque = GetMotor((float)v);
+        wheelCollider.brakeTorque = v == 0 ? Const.Wheel.brakeTorque : 0;
     }
 
-    void SetParameter()
+    public void ResetWheel()
     {
-        wheel.ConfigureVehicleSubsteps(Const.Wheel.criticalSpeed, Const.Wheel.stepsBelow, Const.Wheel.stepsAbove);
-        wheel.mass = Const.Wheel.mass;
-        wheel.radius = Const.Wheel.radius;
+        DestroyImmediate(wheelCollider);
+        wheelCollider = gameObject.AddComponent<WheelCollider>();
+    }
 
-        wheel.wheelDampingRate = Const.Wheel.wheelDampingRate;
-        wheel.suspensionDistance = Const.Wheel.suspensionDistance;
-        wheel.forceAppPointDistance = Const.Wheel.forceAppPointDistance;
+    public void ResetWheel(float v)
+    {
+        DestroyImmediate(wheelCollider);
+        wheelCollider = gameObject.AddComponent<WheelCollider>();
+        SetVelocity(v);
+    }
 
-        WheelFrictionCurve fF = new WheelFrictionCurve();
-        fF.extremumSlip = Const.Wheel.extremumSlip_fF;
-        fF.extremumValue = Const.Wheel.extremumValue_fF;
-        fF.asymptoteSlip = Const.Wheel.asymptoteSlip_fF;
-        fF.asymptoteValue = Const.Wheel.asymptoteValue_fF;
-        fF.stiffness = Const.Wheel.stiffness_fF;
-        wheel.forwardFriction = fF;
+    float GetMotor(float power)
+    {
+        return power * wheelMultiplier;
+    }
 
-        WheelFrictionCurve sF = new WheelFrictionCurve();
-        sF.extremumSlip = Const.Wheel.extremumSlip_sF;
-        sF.extremumValue = Const.Wheel.extremumValue_sF;
-        sF.asymptoteSlip = Const.Wheel.asymptoteSlip_sF;
-        sF.asymptoteValue = Const.Wheel.asymptoteValue_sF;
-        sF.stiffness = Const.Wheel.stiffness_sF;
-        wheel.sidewaysFriction = sF;
-
-        JointSpring sS = new JointSpring();
-        sS.damper = Const.Wheel.damper;
-        sS.spring = Const.Wheel.spring;
-        sS.targetPosition = Const.Wheel.targetPosition;
-        wheel.suspensionSpring = sS;
+    void InitParameter()
+    {
+        wheelCollider.ConfigureVehicleSubsteps(Const.Wheel.criticalSpeed, Const.Wheel.stepsBelow, Const.Wheel.stepsAbove);
+        wheelCollider.mass = Const.Wheel.mass;
+        wheelCollider.radius = Const.Wheel.radius;
+        wheelCollider.mass = wheelParameter.mass;
+        wheelCollider.radius = wheelParameter.radius;
+        wheelCollider.wheelDampingRate = wheelParameter.wheelDampingRate;
+        wheelCollider.suspensionDistance = wheelParameter.suspensionDistance;
+        wheelCollider.suspensionSpring = wheelParameter.suspensionSpring;
+        wheelCollider.center = wheelParameter.center;
+        wheelCollider.forceAppPointDistance = wheelParameter.forceAppPointDistance;
+        wheelCollider.forwardFriction = wheelParameter.forwardFriction;
+        wheelCollider.sidewaysFriction = wheelParameter.sidewaysFriction;
         Debug.Log("Parameter setted");
     }
+
+    //float GetMotor(float power)
+    //{
+    //    //float motor = 0;
+    //    //float velocity = rb.velocity.magnitude;
+    //    //float k = 1.0f / 600.0f;
+    //    //float offset = 2.0f;
+
+    //    //motor = (power - velocity) / ((velocity + offset) * k);
+    //    //Debug.Log("PlayTime=" + PlayTime + " power=" + power + " velocity=" + velocity + " motor=" + motor + " name=" + transform.name);
+
+    //    //Debug.LogWarning(motor);
+    //    //return motor;
+    //    return power * wheelMultiplier;
+    //}
 }
