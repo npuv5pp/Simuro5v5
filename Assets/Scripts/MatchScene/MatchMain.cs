@@ -44,6 +44,7 @@ public class MatchMain : MonoBehaviour
         set { GlobalMatchInfo.ControlState.InPlacement = value; }
     }
 
+    public static bool Created { get; set; }
     public static bool CreateNewScene { get; set; }
     public static StrategyManager StrategyManager { get; private set; }
     public static MatchInfo GlobalMatchInfo { get; private set; }
@@ -57,34 +58,38 @@ public class MatchMain : MonoBehaviour
 
     IEnumerator Start()
     {
+        if (Created)
+        {
+            Destroy(gameObject);
+            yield break;
+        }
+        Created = true;
+        DontDestroyOnLoad(GameObject.Find("/Entity"));
+
+        Debug.Log("start");
+
         ConfigManager.ReadConfigFile("config.json");
 
         Time.fixedDeltaTime = Const.Zeit;
 
         // 绑定物体
         ObjectManager.RebindObject();
-        if (GlobalMatchInfo != null && !CreateNewScene)
+        if (GlobalMatchInfo == null || CreateNewScene)
+        {
+            // 新建场景
+            NewMatch();
+        }
+        else
         {
             // 还原场景
             ObjectManager.RevertScene(GlobalMatchInfo);
             Debug.Log("Reverting");
-        }
-        else
-        {
-            // 新建场景
-            NewMatch();
         }
         // 绑定MatchInfo
         ObjectManager.RebindMatchInfo(GlobalMatchInfo);
 
         // 暂停世界
         // 等待当前帧渲染完毕后暂停，确保还原后的场景显示到屏幕上
-        yield return pauseAfterFrame();
-    }
-
-    IEnumerator pauseAfterFrame()
-    {
-        // 等待当前帧渲染完毕后暂停，确保当前帧已经显示在屏幕上
         yield return new WaitForEndOfFrame();
         ObjectManager.Pause();
     }
@@ -92,10 +97,6 @@ public class MatchMain : MonoBehaviour
     void FixedUpdate()
     {
         ObjectManager.UpdateFromScene();
-        if (TimedPausing)
-        {
-            return;
-        }
         if (LoadSucceed && StartedMatch)
         {
             if (InRound)
@@ -107,15 +108,12 @@ public class MatchMain : MonoBehaviour
             {
                 // 回合结束
                 // 自动摆位
-
-                GlobalMatchInfo.PlayTime++;
-                AutoPlacement();
-
-                PauseForTime(2, delegate ()
+                PauseForTime(3, delegate ()
                 {
+                    AutoPlacement();
+                    GlobalMatchInfo.PlayTime++;
                     InPlacement = false;
                     StartRound();
-                    ResumeRound();
                 });
             }
         }
@@ -219,9 +217,7 @@ public class MatchMain : MonoBehaviour
 
     public void StopMatch()
     {
-        StartedMatch = false;
-        StopRound();
-        InPlacement = false;
+        GlobalMatchInfo.ControlState.Reset();
         ObjectManager.Pause();
         Event.Send(Event.EventType0.MatchStop);
     }
@@ -293,7 +289,6 @@ public class MatchMain : MonoBehaviour
         if (StartedMatch)
         {
             Debug.Log("auto placementing");
-            StopRound();
             UpdatePlacementToScene();
         }
     }
@@ -344,6 +339,7 @@ public class MatchMain : MonoBehaviour
 
     void UpdatePlacementToScene()
     {
+        ObjectManager.UpdateFromScene();
         PlacementInfo blueInfo = StrategyManager.PlacementBlue(GlobalMatchInfo);
         PlacementInfo yellowInfo = StrategyManager.PlacementYellow(GlobalMatchInfo);
         ObjectManager.SetBluePlacement(blueInfo);

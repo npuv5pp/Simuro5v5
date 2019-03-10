@@ -55,6 +55,10 @@ public class StrategyServer : MonoBehaviour
             EstablishConnection();
             Entered = true;
         }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 
     /// <summary>

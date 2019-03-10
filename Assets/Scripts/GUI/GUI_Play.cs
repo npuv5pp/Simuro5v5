@@ -107,6 +107,7 @@ public class GUI_Play : MonoBehaviour
         UnloadObj.GetComponent<Button>().onClick.AddListener(delegate ()
         {
             matchMain.RemoveStrategy();
+            matchMain.StopMatch();
         });
 
         ReplayObj.GetComponent<Button>().interactable = false;
@@ -115,10 +116,10 @@ public class GUI_Play : MonoBehaviour
             SceneManager.LoadScene("MainScene");
         });
 
-        //Event.Register(Event.EventType0.RoundStart, delegate ()
-        //{
-        //    Popup.Show("Round", "Round start", 1500);
-        //});
+        Event.Register(Event.EventType0.RoundStart, delegate ()
+        {
+            SetRefereeInfo("Waiting For <b>Referee</b>");
+        });
         //Event.Register(Event.EventType0.RoundResume, delegate ()
         //{
         //    Popup.Show("Round", "Round resume", 1500);
@@ -131,7 +132,7 @@ public class GUI_Play : MonoBehaviour
         //{
         //    Popup.Show("Round", "Round stop", 1500);
         //});
-        //Event.Register(Event.EventType1.LogUpdate, SetRefereeInfo);
+        Event.Register(Event.EventType1.LogUpdate, SetRefereeInfo);
     }
 
     void InitObjects()
@@ -191,9 +192,12 @@ public class GUI_Play : MonoBehaviour
             }
             else
             {
-                matchMain.PauseRound();
-                PushMenu(MenuObj_Main);
-                OpenMenu();
+                if (!matchMain.InPlacement)
+                {
+                    matchMain.PauseRound();
+                    PushMenu(MenuObj_Main);
+                    OpenMenu();
+                }
             }
         }
         if (Input.GetMouseButtonDown(0))
