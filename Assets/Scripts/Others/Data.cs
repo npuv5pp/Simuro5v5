@@ -326,6 +326,21 @@ namespace Simuro5v5
         public Robot[] Robot = new Robot[5];
         [JsonProperty("ball")]
         public Ball Ball = new Ball();
+
+        public void Normalize()
+        {
+            // TODO 保证不会出界、不会重叠
+            for (int i = 0; i < 5; i++)
+            {
+                Robot[i].Normalize(
+                    Const.Field.Right - 10 * i + 1,
+                    Const.Field.Left - 10 * i + 1,
+                    Const.Field.Top - 10 * i + 1,
+                    Const.Field.Bottom - 10 * i + 1
+                    );
+            }
+            Ball.Normalize();
+        }
     }
 
     [Serializable]
@@ -339,14 +354,11 @@ namespace Simuro5v5
 
         public void Normalize()
         {
-            Wheel w;
             for (int i = 0; i < 5; i++)
             {
-                w = Wheels[i];
-                if (w.left > Const.max_vec) { w.left = Const.max_vec; }
-                if (w.right > Const.max_vec) { w.right = Const.max_vec; }
-                w.left *= Const.inch2cm;
-                w.right *= Const.inch2cm;
+                Wheels[i].Normalize();
+                //w.left *= Const.inch2cm;
+                //w.right *= Const.inch2cm;
             }
         }
     }
@@ -358,15 +370,43 @@ namespace Simuro5v5
         public float x;
         [JsonProperty("y")]
         public float y;
-        public float rotation { get { return Mathf.Atan2(y, x) * Mathf.Rad2Deg; } }// 根据x,y坐标计算的相对原点的方向
+        public float rotation
+        {
+            get
+            {
+                return Mathf.Atan2(y, x) * Mathf.Rad2Deg;
+            }
+        }// 根据x,y坐标计算的相对原点的方向
 
         public Vector3 GetUnityVector3()
         {
-            return new Vector3
+            return new Vector3 { x = x, z = y };
+        }
+
+        public void NormalizeAsPosition(float right, float left, float top, float bottom)
+        {
+            // normalize to the specified box
+            if (x > right)
             {
-                x = x,
-                z = y,
-            };
+                x = right;
+            }
+            else if (x < left)
+            {
+                x = left;
+            }
+            if (y > top)
+            {
+                y = top;
+            }
+            else if (y < bottom)
+            {
+                y = bottom;
+            }
+        }
+
+        public void NormalizeAsPosition()
+        {
+            NormalizeAsPosition(Const.Field.Right, Const.Field.Left, Const.Field.Top, Const.Field.Bottom);
         }
     }
 
@@ -378,6 +418,12 @@ namespace Simuro5v5
         public double left;
         [JsonProperty("velocityRight")]
         public double right;
+
+        public void Normalize()
+        {
+            if (left > Const.max_vec) { left = Const.max_vec; }
+            if (right > Const.max_vec) { right = Const.max_vec; }
+        }
     }
 
     [JsonObject(MemberSerialization.OptIn)]
@@ -394,6 +440,24 @@ namespace Simuro5v5
         public double velocityRight;
         public Vector2D linearVelocity;
         public float angularVelocity;  
+
+        public void Normalize(float right, float left, float top, float bottom)
+        {
+            pos.NormalizeAsPosition(right, left, top, bottom);
+            var wv = new Wheel { left = velocityLeft, right = velocityRight };
+            wv.Normalize();
+            velocityLeft = wv.left;
+            velocityRight = wv.right;
+        }
+
+        public void Normalize()
+        {
+            pos.NormalizeAsPosition();
+            var wv = new Wheel { left = velocityLeft, right = velocityRight };
+            wv.Normalize();
+            velocityLeft = wv.left;
+            velocityRight = wv.right;
+        }
 
         public Vector3 GetLinearVelocityVector3() { return linearVelocity.GetUnityVector3(); }
         public Vector3 GetAngularVelocityVector3() { return new Vector3 { y = angularVelocity }; }
@@ -426,11 +490,11 @@ namespace Simuro5v5
 
         public WhichDoor IsInDoor()
         {
-            if (pos.x > 110)
+            if (pos.x > Const.Field.Right)
             {
                 return WhichDoor.BlueDoor;
             }
-            else if (pos.x < -110)
+            else if (pos.x < Const.Field.Left)
             {
                 return WhichDoor.YellowDoor;
             }
@@ -440,24 +504,14 @@ namespace Simuro5v5
             }
         }
 
+        public void Normalize(float right, float left, float top, float bottom)
+        {
+            pos.NormalizeAsPosition(right, left, top, bottom);
+        }
+
         public void Normalize()
         {
-            if (pos.x > 110)
-            {
-                pos.x = 110;
-            }
-            else if (pos.x < -110)
-            {
-                pos.x = -110;
-            }
-            if (pos.y > 90)
-            {
-                pos.y = 90;
-            }
-            else if (pos.y < -90)
-            {
-                pos.y = -90;
-            }
+            pos.NormalizeAsPosition();
         }
 
         public Vector3 GetLinearVelocityVector3() { return linearVelocity.GetUnityVector3(); }

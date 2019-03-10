@@ -66,8 +66,6 @@ public class MatchMain : MonoBehaviour
         Created = true;
         DontDestroyOnLoad(GameObject.Find("/Entity"));
 
-        Debug.Log("start");
-
         ConfigManager.ReadConfigFile("config.json");
 
         Time.fixedDeltaTime = Const.Zeit;
@@ -121,14 +119,15 @@ public class MatchMain : MonoBehaviour
 
     void NewMatch()
     {
-        Debug.Log("new match");
         if (StrategyManager != null)
         {
             StrategyManager.Dispose();
         }
 
         StrategyManager = new StrategyManager();
-        GlobalMatchInfo = new MatchInfo();
+        GlobalMatchInfo = MatchInfo.DefaultMatch;
+        ObjectManager.SetToDefault();
+        ObjectManager.SetStill();
 
         Event.Register(Event.EventType1.Goal, delegate (object obj)
         {
@@ -342,6 +341,8 @@ public class MatchMain : MonoBehaviour
         ObjectManager.UpdateFromScene();
         PlacementInfo blueInfo = StrategyManager.PlacementBlue(GlobalMatchInfo);
         PlacementInfo yellowInfo = StrategyManager.PlacementYellow(GlobalMatchInfo);
+        blueInfo.Normalize();
+        yellowInfo.Normalize();
         ObjectManager.SetBluePlacement(blueInfo);
         ObjectManager.SetYellowPlacement(yellowInfo);
 
