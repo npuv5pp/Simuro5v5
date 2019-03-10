@@ -57,7 +57,7 @@ public class ControlWheel : MonoBehaviour
         wheelCollider.forceAppPointDistance = wheelParameter.forceAppPointDistance;
         wheelCollider.forwardFriction = wheelParameter.forwardFriction;
         wheelCollider.sidewaysFriction = wheelParameter.sidewaysFriction;
-        Debug.Log("Parameter setted");
+        //Debug.Log("Parameter setted");
     }
 
     //float GetMotor(float power)

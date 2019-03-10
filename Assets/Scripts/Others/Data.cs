@@ -74,12 +74,7 @@ namespace Simuro5v5
         {
             get
             {
-                // 这三个结构体是对于策略来说的，使用的策略坐标系
-                // 在下面的SetPlacement系列函数中，会自动转为平台坐标系
                 var rv = new MatchInfo();
-
-                Robot[] blueInfo = new Robot[5];
-                Robot[] yellowInfo = new Robot[5];
 
                 rv.Ball.pos.x = 0;
                 rv.Ball.pos.y = 0;
@@ -236,14 +231,21 @@ namespace Simuro5v5
     {
         // 比赛已经开始
         public bool StartedMatch { get; set; }
-        // 策略已经加载成功
-        public bool LoadSucceed { get; set; }
         // 回合已经开始
         public bool InRound { get; set; }
         // 回合已经暂停
         public bool PausedRound { get; set; }
         // 在摆位中
         public bool InPlacement { get; set; }
+
+        public void Reset()
+        {
+            StartedMatch = false;
+            //LoadSucceed = false;
+            InRound = false;
+            PausedRound = true;
+            InPlacement = false;
+        }
 
         public static ControlState DefaultState
         {
@@ -253,7 +255,6 @@ namespace Simuro5v5
                 {
 
                     StartedMatch = false,
-                    LoadSucceed = false,
                     InRound = false,
                     PausedRound = true,
                     InPlacement = false,

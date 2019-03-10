@@ -23,6 +23,9 @@ namespace Simuro5v5.Strategy
 
         public StrategyManager() { }
 
+        public bool IsBlueReady { get { return blue != null && blue.IsConnected(); } }
+        public bool IsYellowReady { get { return yellow != null && yellow.IsConnected(); } }
+
         public void CheckBlueReady_ex()
         {
             if (blue == null)

@@ -38,7 +38,8 @@ public class GUI_Play : MonoBehaviour
 
     // main menu items
     static GameObject StrategyMenuBtnObj { get; set; }   // button on main menu to strategy menu
-    static GameObject StartObj { get; set; }
+    static GameObject NewMatchObj { get; set; }
+    static GameObject NewRoundObj { get; set; }
     static GameObject ResumeObj { get; set; }
     static GameObject ReplayObj { get; set; }
     static GameObject ExitObj { get; set; }
@@ -46,8 +47,8 @@ public class GUI_Play : MonoBehaviour
     // strategy menu items
     static InputField BlueInputField { get; set; }
     static InputField YellowInputField { get; set; }
-    static GameObject OkObj { get; set; }
-    static GameObject ReturnObj { get; set; }
+    static GameObject BeginObj { get; set; }
+    static GameObject UnloadObj { get; set; }
 
     // other ui items
     static GameObject BlueScoreObj { get; set; }
@@ -75,10 +76,12 @@ public class GUI_Play : MonoBehaviour
         PushMenu(MenuObj_Main);
         OpenMenu();
 
-        StartObj.GetComponent<Button>().onClick.AddListener(delegate ()
+        NewMatchObj.GetComponent<Button>().onClick.AddListener(delegate ()
         {
-            matchMain.LoadStrategy();
             matchMain.StartMatch();
+        });
+        NewRoundObj.GetComponent<Button>().onClick.AddListener(delegate ()
+        {
             matchMain.StartRound();
         });
         ResumeObj.GetComponent<Button>().onClick.AddListener(delegate
@@ -99,16 +102,16 @@ public class GUI_Play : MonoBehaviour
             MenuStack[MenuStack.Count - 1].SetActive(true);
         });
 
-        OkObj.GetComponent<Button>().onClick.AddListener(delegate ()
+        BeginObj.GetComponent<Button>().onClick.AddListener(delegate ()
         {
-            LoadInfo.SaveInfo(BlueInputField.text.Trim(), YellowInputField.text.Trim());
+            matchMain.LoadStrategy(BlueInputField.text.Trim(), YellowInputField.text.Trim());
         });
-        ReturnObj.GetComponent<Button>().onClick.AddListener(delegate ()
+        UnloadObj.GetComponent<Button>().onClick.AddListener(delegate ()
         {
-            PopMenu();
+            matchMain.RemoveStrategy();
         });
 
-        ReplayObj.GetComponent<Button>().enabled = false;
+        ReplayObj.GetComponent<Button>().interactable = false;
         ExitObj.GetComponent<Button>().onClick.AddListener(delegate
         {
             SceneManager.LoadScene("MainScene");
@@ -146,7 +149,8 @@ public class GUI_Play : MonoBehaviour
 
         MenuObj_Main = GameObject.Find("/Canvas/Menu/Main");
         StrategyMenuBtnObj = GameObject.Find("/Canvas/Menu/Main/Strategy");
-        StartObj = GameObject.Find("/Canvas/Menu/Main/Start");
+        NewMatchObj = GameObject.Find("/Canvas/Menu/Main/NewMatch");
+        NewRoundObj = GameObject.Find("/Canvas/Menu/Main/NewRound");
         ResumeObj = GameObject.Find("/Canvas/Menu/Main/Resume");
         ReplayObj = GameObject.Find("/Canvas/Menu/Main/Replay");
         ExitObj = GameObject.Find("/Canvas/Menu/Main/Exit");
@@ -154,8 +158,8 @@ public class GUI_Play : MonoBehaviour
         MenuObj_Strategy = GameObject.Find("/Canvas/Menu/Strategy");
         BlueInputField = GameObject.Find("/Canvas/Menu/Strategy/BlueInput").GetComponent<InputField>();
         YellowInputField = GameObject.Find("/Canvas/Menu/Strategy/YellowInput").GetComponent<InputField>();
-        OkObj = GameObject.Find("/Canvas/Menu/Strategy/OkBtn");
-        ReturnObj = GameObject.Find("/Canvas/Menu/Strategy/ReturnBtn");
+        BeginObj = GameObject.Find("/Canvas/Menu/Strategy/BeginBtn");
+        UnloadObj = GameObject.Find("/Canvas/Menu/Strategy/UnloadBtn");
 
         BlueScoreObj = GameObject.Find("/Canvas/Score/Blue");
         YellowScoreObj = GameObject.Find("/Canvas/Score/Yellow");
@@ -180,9 +184,7 @@ public class GUI_Play : MonoBehaviour
             Close_GUI_Camera();
             GUI_on_Camera = false;
         }
-        if (cameras.GetComponent<Camera>().enabled == true)
-        {
-        }
+        if (cameras.GetComponent<Camera>().enabled == true) { }
 
         if (Input.GetMouseButtonDown(1))
         {
@@ -220,6 +222,21 @@ public class GUI_Play : MonoBehaviour
 
         UpdateTimeText();
         UpdateScoreText();
+        UpdateButtons();
+    }
+
+    void UpdateButtons()
+    {
+        // update buttons' status
+        if (matchMain.InRound && matchMain.PausedRound)
+        {
+            ResumeObj.GetComponent<Button>().interactable = true;
+        }
+        else
+        {
+            ResumeObj.GetComponent<Button>().interactable = false;
+        }
+        ReplayObj.GetComponent<Button>().interactable = false;
     }
 
     void PushMenu(GameObject new_menu)
@@ -227,9 +244,7 @@ public class GUI_Play : MonoBehaviour
         if (menu_open)
         {
             CloseMenu();
-            //MenuStack[MenuStack.Count - 1].SetActive(false);
             MenuStack.Add(new_menu);
-            //MenuStack[MenuStack.Count - 1].SetActive(true);
             OpenMenu();
         }
         else
@@ -251,27 +266,6 @@ public class GUI_Play : MonoBehaviour
         {
             OpenMenu();
         }
-
-        //if (MenuStack.Count >= 2)
-        //{
-        //    var curr = MenuStack[MenuStack.Count - 1];
-        //    MenuStack.Remove(curr);
-        //    if (menu_open)
-        //    {
-        //        curr.SetActive(false);
-        //        MenuStack[MenuStack.Count - 1].SetActive(true);
-        //    }
-        //}
-        //else if (MenuStack.Count == 1)
-        //{
-        //    var curr = MenuStack[MenuStack.Count - 1];
-        //    MenuStack.Remove(curr);
-        //    if (menu_open)
-        //    {
-        //        curr.SetActive(false);
-        //        menu_open = false;
-        //    }
-        //}
     }
 
     void OpenMenu()

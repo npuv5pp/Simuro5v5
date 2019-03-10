@@ -207,7 +207,7 @@ public class GUI_Replay : MonoBehaviour {
         {
             Debug.Log("Text Object.");
         }
-        Text text_esc = (Text)obj1.GetComponent<Text>();
+        //Text text_esc = (Text)obj1.GetComponent<Text>();
 
         if (Input.GetKeyUp(KeyCode.Escape))
         {
@@ -419,7 +419,7 @@ public class GUI_Replay : MonoBehaviour {
         {
             Debug.Log("Slider Object.");
         }
-        Slider mainslider = (Slider)obj.GetComponent<Slider>();
+        //Slider mainslider = (Slider)obj.GetComponent<Slider>();
 
         GameObject obj1 = GameObject.Find("play");
         if (obj1 == null)

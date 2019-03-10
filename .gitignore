@@ -16,3 +16,10 @@ obj
 *.DS_Store
 
 *.log
+/StrategyServer/dll1.dll
+/StrategyServer/Strategy.dll
+/StrategyServer/NWPUc.dll
+/StrategyServer/dll456_x64.dll
+/StrategyServer/dll2.dll
+/StrategyServer/dll123_x64.dll
+/dlltest.dll

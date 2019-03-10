@@ -174,8 +174,8 @@ public class StrategyServer : MonoBehaviour
             }
             catch (Exception ex)
             {
-                Logger.MainLogger.LogError(ex.ToString());
-                Debug.LogError(ex);
+                Debug.LogError(ex.Message);
+                throw;
             }
         }).Start();
 
@@ -193,7 +193,8 @@ public class StrategyServer : MonoBehaviour
             }
             catch (Exception ex)
             {
-                Debug.LogError(ex);
+                Debug.LogError(ex.Message);
+                throw;
             }
         }).Start();
     }

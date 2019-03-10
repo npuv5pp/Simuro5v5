@@ -21,8 +21,9 @@ public class MatchMain : MonoBehaviour
     // 策略已经加载成功
     public bool LoadSucceed
     {
-        get { return GlobalMatchInfo.ControlState.LoadSucceed; }
-        set { GlobalMatchInfo.ControlState.LoadSucceed = value; }
+        get { return StrategyManager.IsBlueReady && StrategyManager.IsYellowReady; }
+        //get { return GlobalMatchInfo.ControlState.LoadSucceed; }
+        //set { GlobalMatchInfo.ControlState.LoadSucceed = value; }
     }
     // 回合已经开始
     public bool InRound
@@ -96,6 +97,10 @@ public class MatchMain : MonoBehaviour
         ObjectManager.Pause();
     }
 
+    private void Update()
+    {
+    }
+
     void FixedUpdate()
     {
         ObjectManager.UpdateFromScene();
@@ -120,11 +125,9 @@ public class MatchMain : MonoBehaviour
                     StartRound();
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 StopMatch();
-                LoadSucceed = false;
-                logger.LogError(ex.Message);
                 throw;  // 直接抛出，让Unity3d处理
             }
         }
@@ -153,7 +156,6 @@ public class MatchMain : MonoBehaviour
                 GlobalMatchInfo.Score.YellowScore++;
             }
         });
-        //LoadInfo.SaveInfo("StrategyServer/dlltest/debug/dlltest.dll", "StrategyServer/dll2.dll");
     }
 
     public void InRoundLoop()
@@ -178,6 +180,7 @@ public class MatchMain : MonoBehaviour
                 InRound = false;
                 InPlacement = true;
                 GlobalMatchInfo.Referee = new Referee();
+                Debug.Log("Update");
 
                 string log;
                 if (GlobalMatchInfo.WhosBall == Side.Blue)
@@ -211,6 +214,7 @@ public class MatchMain : MonoBehaviour
     /// </summary>
     public void StartMatch()
     {
+        GlobalMatchInfo.ControlState.Reset();
         StartedMatch = false;
 
         ObjectManager.SetToDefault();
@@ -292,9 +296,14 @@ public class MatchMain : MonoBehaviour
         }
     }
 
+    public void LoadStrategy(string blue, string yellow)
+    {
+        StrategyManager.LoadBlueDll(blue);
+        StrategyManager.LoadYellowDll(yellow);
+    }
+
     public void LoadStrategy()
     {
-        LoadSucceed = false;
         if (Debugging)
         {
             if (DebugWheels == null)
@@ -312,7 +321,6 @@ public class MatchMain : MonoBehaviour
         {
             StrategyManager.LoadLastSaved();
         }
-        LoadSucceed = true;
     }
 
     public void RemoveStrategy()
