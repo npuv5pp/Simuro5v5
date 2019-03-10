@@ -231,19 +231,27 @@ public class GUI_Play : MonoBehaviour
         {
             SetStatusInfo("Waiting for new game");
         }
-        else if (!matchMain.InRound)
+        else
         {
-            SetStatusInfo("Waiting for new round");
-        }
-        else {
-            // In round
-            if (matchMain.PausedRound)
+            if (matchMain.InPlacement)
             {
-                SetStatusInfo("Paused round");
+                SetStatusInfo("Auto placementing");
+            }
+            else if (matchMain.InRound)
+            {
+                // In round
+                if (matchMain.PausedRound)
+                {
+                    SetStatusInfo("Paused round");
+                }
+                else
+                {
+                    SetStatusInfo("In playing");
+                }
             }
             else
             {
-                SetStatusInfo("In playing");
+                SetStatusInfo("Waiting for new round");
             }
         }
     }
@@ -251,9 +259,10 @@ public class GUI_Play : MonoBehaviour
     void UpdateButtons()
     {
         // update buttons' status
-        ReplayObj.GetComponent<Button>().interactable = false;
-        ResumeObj.GetComponent<Button>().interactable = matchMain.InRound && matchMain.PausedRound;
+        NewMatchObj.GetComponent<Button>().interactable = matchMain.LoadSucceed;
         NewRoundObj.GetComponent<Button>().interactable = matchMain.StartedMatch;
+        ResumeObj.GetComponent<Button>().interactable = matchMain.InRound && matchMain.PausedRound;
+        ReplayObj.GetComponent<Button>().interactable = false;
     }
 
     void UpdateTimeText()

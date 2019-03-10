@@ -44,30 +44,22 @@ public class MatchMain : MonoBehaviour
         set { GlobalMatchInfo.ControlState.InPlacement = value; }
     }
 
-    private int PauseTime { get; set; }
-
-    private bool PauseAfterUpdate { get; set; }
     public static bool CreateNewScene { get; set; }
     public static StrategyManager StrategyManager { get; private set; }
     public static MatchInfo GlobalMatchInfo { get; private set; }
-    //public static GameObject Entity { get; private set; }
+
+    public delegate void TimedPauseCallback();
+    static bool TimedPausing { get; set; }
+    static readonly object TimedPausingLock = new object();
 
     static Watcher Watcher { get; set; }
-    Logger logger { get; set; }
+    Logger MainLogger { get { return Logger.MainLogger; } }
 
     IEnumerator Start()
     {
-        // TODO 第一时间读取配置文件
         ConfigManager.ReadConfigFile("config.json");
 
         Time.fixedDeltaTime = Const.Zeit;
-
-        logger = Logger.MainLogger;
-        if (Watcher == null)
-        {
-            Watcher = new Watcher();
-            // Watcher.RegisterHook();
-        }
 
         // 绑定物体
         ObjectManager.RebindObject();
@@ -97,38 +89,34 @@ public class MatchMain : MonoBehaviour
         ObjectManager.Pause();
     }
 
-    private void Update()
-    {
-    }
-
     void FixedUpdate()
     {
         ObjectManager.UpdateFromScene();
+        if (TimedPausing)
+        {
+            return;
+        }
         if (LoadSucceed && StartedMatch)
         {
-            try
+            if (InRound)
             {
-                if (InRound)
-                {
-                    // 回合进行中
-                    InRoundLoop();
-                }
-                else if (InPlacement)
-                {
-                    // 回合结束
-                    // 自动摆位
-                    Debug.Log("InPlacement");
+                // 回合进行中
+                InRoundLoop();
+            }
+            else if (InPlacement)
+            {
+                // 回合结束
+                // 自动摆位
 
-                    GlobalMatchInfo.PlayTime++;
-                    AutoPlacement();
+                GlobalMatchInfo.PlayTime++;
+                AutoPlacement();
+
+                PauseForTime(2, delegate ()
+                {
                     InPlacement = false;
                     StartRound();
-                }
-            }
-            catch (Exception)
-            {
-                StopMatch();
-                throw;  // 直接抛出，让Unity3d处理
+                    ResumeRound();
+                });
             }
         }
     }
@@ -180,7 +168,6 @@ public class MatchMain : MonoBehaviour
                 InRound = false;
                 InPlacement = true;
                 GlobalMatchInfo.Referee = new Referee();
-                Debug.Log("Update");
 
                 string log;
                 if (GlobalMatchInfo.WhosBall == Side.Blue)
@@ -259,13 +246,28 @@ public class MatchMain : MonoBehaviour
         }
     }
 
-    public void PauseForTime(int time)
+    public void PauseForTime(int sec, TimedPauseCallback callback)
     {
-        if (time > 0)
+        if (sec > 0)
         {
             ObjectManager.Pause();
-            PauseTime = time;
+            StartCoroutine(PauseCoroutine(sec, callback));
         }
+    }
+
+    IEnumerator PauseCoroutine(float sec, TimedPauseCallback callback)
+    {
+        yield return new WaitUntil(delegate ()
+        {
+            lock (TimedPausingLock)
+            {
+                return TimedPausing == false;
+            }
+        });
+        TimedPausing = true;
+        yield return new WaitForSecondsRealtime(sec);
+        callback();
+        TimedPausing = false;
     }
 
     public void ResumeRound()

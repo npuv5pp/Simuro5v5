@@ -128,7 +128,9 @@ namespace Simuro5v5
 
         public static void SetBallPlacement(Ball ball)
         {
-            ballComponent.SetPlacement(ball);
+            var b = ball;
+            b.Normalize();
+            ballComponent.SetPlacement(b);
         }
 
         public static void SetStill()

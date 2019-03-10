@@ -411,11 +411,54 @@ namespace Simuro5v5
     [JsonObject(MemberSerialization.OptIn)]
     public struct Ball
     {
+        public enum WhichDoor
+        {
+            BlueDoor,
+            YellowDoor,
+            None,
+        }
+
         public float mass;
         [JsonProperty("pos")]
         public Vector2D pos;
         public Vector2D linearVelocity;
         public float angularVelocity;
+
+        public WhichDoor IsInDoor()
+        {
+            if (pos.x > 110)
+            {
+                return WhichDoor.BlueDoor;
+            }
+            else if (pos.x < -110)
+            {
+                return WhichDoor.YellowDoor;
+            }
+            else
+            {
+                return WhichDoor.None;
+            }
+        }
+
+        public void Normalize()
+        {
+            if (pos.x > 110)
+            {
+                pos.x = 110;
+            }
+            else if (pos.x < -110)
+            {
+                pos.x = -110;
+            }
+            if (pos.y > 90)
+            {
+                pos.y = 90;
+            }
+            else if (pos.y < -90)
+            {
+                pos.y = -90;
+            }
+        }
 
         public Vector3 GetLinearVelocityVector3() { return linearVelocity.GetUnityVector3(); }
         public Vector3 GetAngularVelocityVector3() { return new Vector3 { y = angularVelocity }; }
