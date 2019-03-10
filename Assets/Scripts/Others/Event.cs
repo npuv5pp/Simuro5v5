@@ -67,6 +67,7 @@ namespace Simuro5v5.EventSystem
         {
             // 事件名称
             PlatformStarted,
+            PlatformExiting,
 
             MatchStart,
             MatchStop,

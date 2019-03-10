@@ -51,13 +51,11 @@ public class GUI_Play : MonoBehaviour
     static GameObject UnloadObj { get; set; }
 
     // other ui items
-    static GameObject BlueScoreObj { get; set; }
-    static GameObject YellowScoreObj { get; set; }
-    static GameObject TimeObj { get; set; }
     static Text BlueScoreText { get; set; }
     static Text YellowScoreText { get; set; }
     static Text TimeText { get; set; }
     static Text RefereeLogText { get; set; }
+    static Text StatusText { get; set; }
 
     static List<GameObject> MenuStack { get; set; }
 
@@ -117,28 +115,28 @@ public class GUI_Play : MonoBehaviour
             SceneManager.LoadScene("MainScene");
         });
 
-        Event.Register(Event.EventType0.RoundStart, delegate ()
-        {
-            Popup.Show("Round", "Round start", 1500);
-        });
-        Event.Register(Event.EventType0.RoundResume, delegate ()
-        {
-            Popup.Show("Round", "Round resume", 1500);
-        });
-        Event.Register(Event.EventType0.RoundPause, delegate ()
-        {
-            Popup.Show("Round", "Round pause", 1500);
-        });
-        Event.Register(Event.EventType0.RoundStop, delegate ()
-        {
-            Popup.Show("Round", "Round stop", 1500);
-        });
-        Event.Register(Event.EventType1.LogUpdate, SetRefereeInfo);
+        //Event.Register(Event.EventType0.RoundStart, delegate ()
+        //{
+        //    Popup.Show("Round", "Round start", 1500);
+        //});
+        //Event.Register(Event.EventType0.RoundResume, delegate ()
+        //{
+        //    Popup.Show("Round", "Round resume", 1500);
+        //});
+        //Event.Register(Event.EventType0.RoundPause, delegate ()
+        //{
+        //    Popup.Show("Round", "Round pause", 1500);
+        //});
+        //Event.Register(Event.EventType0.RoundStop, delegate ()
+        //{
+        //    Popup.Show("Round", "Round stop", 1500);
+        //});
+        //Event.Register(Event.EventType1.LogUpdate, SetRefereeInfo);
     }
 
     void InitObjects()
     {
-        matchMain = GetComponent<MatchMain>();
+        matchMain = GameObject.Find("/Entity").GetComponent<MatchMain>();
         Popup = GameObject.Find("/Canvas/Popup").GetComponent<Popup>();
 
         SceneObj = GameObject.Find("MatchScene");
@@ -161,14 +159,11 @@ public class GUI_Play : MonoBehaviour
         BeginObj = GameObject.Find("/Canvas/Menu/Strategy/BeginBtn");
         UnloadObj = GameObject.Find("/Canvas/Menu/Strategy/UnloadBtn");
 
-        BlueScoreObj = GameObject.Find("/Canvas/Score/Blue");
-        YellowScoreObj = GameObject.Find("/Canvas/Score/Yellow");
-        BlueScoreText = BlueScoreObj.GetComponent<Text>();
-        YellowScoreText = YellowScoreObj.GetComponent<Text>();
-
-        TimeObj = GameObject.Find("/Canvas/Time");
-        TimeText = TimeObj.GetComponent<Text>();
+        BlueScoreText  = GameObject.Find("/Canvas/Score/Blue").GetComponent<Text>();
+        YellowScoreText = GameObject.Find("/Canvas/Score/Yellow").GetComponent<Text>();
+        TimeText = GameObject.Find("/Canvas/Time").GetComponent<Text>();
         RefereeLogText = GameObject.Find("/Canvas/Log/Referee").GetComponent<Text>();
+        StatusText = GameObject.Find("/Canvas/Status").GetComponent<Text>();
     }
 
     void Update()
@@ -223,20 +218,53 @@ public class GUI_Play : MonoBehaviour
         UpdateTimeText();
         UpdateScoreText();
         UpdateButtons();
+        UpdateStatusText();
+    }
+
+    void UpdateStatusText()
+    {
+        if (!matchMain.LoadSucceed)
+        {
+            SetStatusInfo("Waiting for strategies");
+        }
+        else if (!matchMain.StartedMatch)
+        {
+            SetStatusInfo("Waiting for new game");
+        }
+        else if (!matchMain.InRound)
+        {
+            SetStatusInfo("Waiting for new round");
+        }
+        else {
+            // In round
+            if (matchMain.PausedRound)
+            {
+                SetStatusInfo("Paused round");
+            }
+            else
+            {
+                SetStatusInfo("In playing");
+            }
+        }
     }
 
     void UpdateButtons()
     {
         // update buttons' status
-        if (matchMain.InRound && matchMain.PausedRound)
-        {
-            ResumeObj.GetComponent<Button>().interactable = true;
-        }
-        else
-        {
-            ResumeObj.GetComponent<Button>().interactable = false;
-        }
         ReplayObj.GetComponent<Button>().interactable = false;
+        ResumeObj.GetComponent<Button>().interactable = matchMain.InRound && matchMain.PausedRound;
+        NewRoundObj.GetComponent<Button>().interactable = matchMain.StartedMatch;
+    }
+
+    void UpdateTimeText()
+    {
+        SetTimeText(matchInfo.PlayTime);
+    }
+
+    void UpdateScoreText()
+    {
+        SetBlueScoreText(matchInfo.Score.BlueScore);
+        SetBlueScoreText(matchInfo.Score.YellowScore);
     }
 
     void PushMenu(GameObject new_menu)
@@ -313,21 +341,20 @@ public class GUI_Play : MonoBehaviour
         TimeText.text = i.ToString();
     }
 
-    void UpdateTimeText()
+    void SetRefereeInfo(string info)
     {
-        SetTimeText(matchInfo.PlayTime);
-    }
-
-    void UpdateScoreText()
-    {
-        SetBlueScoreText(matchInfo.Score.BlueScore);
-        SetBlueScoreText(matchInfo.Score.YellowScore);
+        RefereeLogText.text = info;
     }
 
     void SetRefereeInfo(object obj)
     {
         var info = obj as string;
-        RefereeLogText.text = info;
+        SetRefereeInfo(info);
+    }
+
+    void SetStatusInfo(string info)
+    {
+        StatusText.text = info;
     }
 
     void Open_GUI_Camera()

@@ -358,4 +358,9 @@ public class MatchMain : MonoBehaviour
 
         Event.Send(Event.EventType1.MatchInfoUpdate, GlobalMatchInfo);
     }
+
+    private void OnApplicationQuit()
+    {
+        Event.Send(Event.EventType0.PlatformExiting);
+    }
 }

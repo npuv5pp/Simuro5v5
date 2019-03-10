@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using UnityEngine;
+using Event = Simuro5v5.EventSystem.Event;
 
 namespace Simuro5v5
 {
@@ -11,7 +12,7 @@ namespace Simuro5v5
         static Logger()
         {
             var now = DateTime.Now;
-            string filename = string.Format("{0}_{1}_{2}_{3}_{4}_{5}.log", now.Year, now.Month, now.Day, now.Hour, now.Minute, now.Second);
+            string filename = string.Format("log/{0}_{1}_{2}_{3}_{4}_{5}.log", now.Year, now.Month, now.Day, now.Hour, now.Minute, now.Second);
             MainLogger = new Logger(filename);
         }
 
@@ -20,21 +21,28 @@ namespace Simuro5v5
 
         public Logger(string logFilePath)
         {
+            var dir = Path.GetDirectoryName(Path.GetFullPath(logFilePath));
             try
             {
+                if (!Directory.Exists(dir))
+                {
+                    Directory.CreateDirectory(dir);
+                }
                 LogFile = new FileStream(logFilePath, FileMode.Append, FileAccess.Write, FileShare.Read);
-            }
-            catch
-            {
-                LogFile = null;
-                throw;
-            }
-            finally
-            {
                 LogWriter = new StreamWriter(LogFile)
                 {
                     AutoFlush = true
                 };
+
+                Event.Register(Event.EventType0.PlatformExiting, delegate ()
+                {
+                    Close();
+                });
+            }
+            catch (Exception ex)
+            {
+                LogFile = null;
+                Debug.Log(ex);
             }
         }
 
@@ -65,6 +73,7 @@ namespace Simuro5v5
         {
             if (LogFile != null)
             {
+                text = text.Trim();
                 LogWriter.Write("ERROR {0}: {1}\n", DateTime.Now.ToString(), text);
             }
         }
@@ -73,6 +82,8 @@ namespace Simuro5v5
         {
             if (LogFile != null)
             {
+                text = text.Trim();
+                remark = remark.Trim();
                 LogWriter.Write("ERROR {0} ({1}): {2}\n", DateTime.Now.ToString(), remark, text);
             }
         }
@@ -81,6 +92,7 @@ namespace Simuro5v5
         {
             if (LogFile != null)
             {
+                text = text.Trim();
                 LogWriter.Write("INFO {0}: {1}\n", DateTime.Now.ToString(), text);
             }
         }
@@ -89,6 +101,8 @@ namespace Simuro5v5
         {
             if (LogFile != null)
             {
+                text = text.Trim();
+                remark = remark.Trim();
                 LogWriter.Write("INFO {0} ({1}): {2}\n", DateTime.Now.ToString(), remark, text);
             }
         }
