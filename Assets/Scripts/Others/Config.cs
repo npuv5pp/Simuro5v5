@@ -29,6 +29,7 @@ namespace Simuro5v5.Config
         public static string YellowStrategyLogFile { get; set; }
         public static string StrategyServer { get; set; }
         public static string StrategyServerScript { get; set; }
+        public static int ConnectTimeout { get; set; }
         public static bool UseUdp { get; set; }
 
         static StrategyConfig()
@@ -43,6 +44,7 @@ namespace Simuro5v5.Config
 
             StrategyServer = @"StrategyServer\dist\server\server.exe";
             StrategyServerScript = @"";
+            ConnectTimeout = 3000;
             UseUdp = false;
         }
     }

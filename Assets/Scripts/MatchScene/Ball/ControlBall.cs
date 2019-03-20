@@ -21,7 +21,7 @@ public class ControlBall : MonoBehaviour
         {
             x = ball.pos.x,
             z = ball.pos.y,
-            y = Const.Ball.HBL
+            y = Const.Ball.HBL + Const.Field.Height
         };
         transform.position = pos;
     }

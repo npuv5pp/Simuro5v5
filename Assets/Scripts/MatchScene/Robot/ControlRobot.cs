@@ -3,52 +3,68 @@ using Simuro5v5;
 
 public class ControlRobot : MonoBehaviour
 {
-    public bool Debugging;
-    public string role = "";
+    public float ForwardFactor;
+    public float TorqueFactor;
+    public float Drag;
+    public float AngularDrag;
 
-    RobotParameter RobotParameter;
+    public bool Debugging;
+
+    float LastLeftVelocity, LastRightVelocity;
+    float LeftVelocity { get; set; }
+    float RightVelocity { get; set; }
+
+    Vector3 forward_force, forward_drag;
+    Vector3 torque, angular_drag;
 
     Rigidbody rb;
-    ControlWheel leftWheelController;
-    ControlWheel rightWheelController;
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         rb.maxAngularVelocity = (Const.Robot.maxAngularVelocity * Mathf.Deg2Rad);
 
-        leftWheelController = transform.Find("WheelL").gameObject.GetComponent<ControlWheel>();
-        rightWheelController = transform.Find("WheelR").gameObject.GetComponent<ControlWheel>();
-        RobotParameter = GameObject.Find("Parameter").GetComponent<RobotParameter>();
-
         InitRobotParameter();
     }
 
     void FixedUpdate()
     {
+        forward_force = -transform.up * (LeftVelocity + RightVelocity) * ForwardFactor;
+        forward_drag = rb.velocity * -Drag;
+        rb.AddForce(forward_force + forward_drag);
+        //rb.AddRelativeForce(forward_force + forward_drag);
+
+        torque = Vector3.up * (LeftVelocity - RightVelocity) * TorqueFactor;
+        angular_drag = rb.angularVelocity * -AngularDrag;
+        rb.AddTorque(torque + angular_drag);
+        //rb.AddRelativeTorque(torque + angular_drag);
+    }
+
+    private void LateUpdate()
+    {
         if (Debugging)
         {
-            Debug.Log(string.Format(
-                "{4} motor: {5} {6}; brake: {7}, {8}; rpm: {0}, {1}; v: {2}, {3}",
-                leftWheelController.rpm, rightWheelController.rpm, rb.velocity, rb.angularVelocity, role,
-                leftWheelController.motor, rightWheelController.motor, leftWheelController.brake, rightWheelController.brake));
+            Debug.Log($"{transform.up}, {transform.forward}");
         }
+        Debug.DrawRay(transform.position, transform.forward * 10, Color.red);
+        Debug.DrawRay(transform.position, transform.up * 10, Color.black);
     }
 
     public void SetWheelVelocity(Wheel ws)
     {
-        leftWheelController.SetVelocity((float)ws.left);
-        rightWheelController.SetVelocity((float)ws.right);
+        SetWheelVelocity((float)ws.left, (float)ws.right);
     }
 
     public void SetWheelVelocity(float left, float right)
     {
-        leftWheelController.SetVelocity(left);
-        rightWheelController.SetVelocity(right);
+        LastLeftVelocity = LeftVelocity;
+        LastRightVelocity = RightVelocity;
+        LeftVelocity = left;
+        RightVelocity = right;
     }
 
     /// <summary>
-    /// 设置位置，不包括速度
+    /// 设置位置，速度设为0
     /// </summary>
     /// <param name="robot"></param>
     public void SetPlacement(Robot robot)
@@ -59,15 +75,17 @@ public class ControlRobot : MonoBehaviour
         {
             x = robot.pos.x,
             z = robot.pos.y,
+            y = 0
         };
         transform.position = pos;
         rot.eulerAngles = new Vector3
         {
-            x = 0,
+            x = -90,
             y = ((float)robot.rotation).FormatOld().FormatOld2Unity(),
             z = 0,
         };
         transform.rotation = rot;
+        SetStill();
     }
 
     public void SetStill()
@@ -83,14 +101,8 @@ public class ControlRobot : MonoBehaviour
     /// <param name="robot"></param>
     public void Revert(Robot robot)
     {
-        // 设置位置信息
+        // 设置位置信息，并静止
         SetPlacement(robot);
-
-        if (Debugging)
-        {
-            int _i = 0;
-            _i++;
-        }
 
         // 设置刚体的线速度和角速度
         rb.velocity = robot.GetLinearVelocityVector3();
@@ -101,8 +113,20 @@ public class ControlRobot : MonoBehaviour
 
     void InitRobotParameter()
     {
-        rb.mass = RobotParameter.RobotMass;
-        rb.drag = RobotParameter.RobotDrag;
-        rb.angularDrag = RobotParameter.RobotAngularDrag;
+        rb.mass = Const.Robot.Mass;
+        rb.drag = rb.angularDrag = 0;
+        rb.useGravity = true;
+        rb.isKinematic = false;
+        rb.interpolation = RigidbodyInterpolation.None;
+        rb.collisionDetectionMode = CollisionDetectionMode.Discrete;
+        rb.constraints = RigidbodyConstraints.FreezePositionY |
+            RigidbodyConstraints.FreezeRotationX |
+            RigidbodyConstraints.FreezeRotationY;
+
+        ForwardFactor = Const.Robot.ForwardForceFactor;
+        TorqueFactor = Const.Robot.TorqueFactor;
+        Drag = Const.Robot.DragFactor;
+        AngularDrag = Const.Robot.AngularDragFactor;
+        rb.maxAngularVelocity = Const.Robot.maxAngularVelocity;
     }
 }

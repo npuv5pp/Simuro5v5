@@ -73,12 +73,12 @@ public class StrategyServer : MonoBehaviour
             if (BlueHandle == null || !BlueHandle.Established)
             {
                 BlueHandle = new UDPConnectionHandle(IPAddress.Loopback, StrategyConfig.BlueStrategyPort);
-                BlueHandle.Connect(8, 500);
+                BlueHandle.Connect(8, StrategyConfig.ConnectTimeout);
             }
             if (YellowHandle == null || !YellowHandle.Established)
             {
                 YellowHandle = new UDPConnectionHandle(IPAddress.Loopback, StrategyConfig.YellowStrategyPort);
-                YellowHandle.Connect(8, 500);
+                YellowHandle.Connect(8, StrategyConfig.ConnectTimeout);
             }
         }
         else
@@ -86,12 +86,12 @@ public class StrategyServer : MonoBehaviour
             if (BlueHandle == null || !BlueHandle.Established)
             {
                 BlueHandle = new TCPConnectionHandle(IPAddress.Loopback, StrategyConfig.BlueStrategyPort);
-                BlueHandle.Connect(3, 200);
+                BlueHandle.Connect(3, StrategyConfig.ConnectTimeout);
             }
             if (YellowHandle == null || !YellowHandle.Established)
             {
                 YellowHandle = new TCPConnectionHandle(IPAddress.Loopback, StrategyConfig.YellowStrategyPort);
-                YellowHandle.Connect(3, 200);
+                YellowHandle.Connect(3, StrategyConfig.ConnectTimeout);
             }
         }
     }
@@ -542,7 +542,7 @@ namespace ServerMessage
 
             public Message(MessageType msgtype, object data)
             {
-                object objtype = data == null ? null : data.GetType();
+                var objtype = data?.GetType();
                 if (msgtype.DataType != objtype)
                 {
                     // 检查类型是否匹配

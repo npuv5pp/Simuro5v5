@@ -7,14 +7,14 @@ namespace Simuro5v5
     {
         public readonly static int max_vec = 125;
         public readonly static int min_vec = -125;
-        public readonly static int FPS = 66;                                // 模拟频率(其实不应该叫FPS)
-        public readonly static float Zeit = (1.0f / 66.0f);                 // 模拟频率的倒数，即一拍的时间
+        public readonly static float Zeit = (1.0f / 50.0f);                 // 模拟频率的倒数，即一拍的时间
         public readonly static float TimeScale = 1.0f;                      // 默认时间流速
         public readonly static float inch2cm = 2.54f;                       // 英寸转化成厘米
         public readonly static float cm2inch = 1.0f / 2.54f;                // 厘米转化成英寸
 
         public static class Field
         {
+            public readonly static float Height = -3.933533f;
             public readonly static float Top = 90.0f;
             public readonly static float Bottom = -90.0f;
             public readonly static float Left = -110.0f;
@@ -23,11 +23,17 @@ namespace Simuro5v5
 
         public static class Robot
         {
+            public readonly static float ForwardForceFactor = 47.5f;
+            public readonly static float TorqueFactor = 304;
+            public readonly static float DragFactor = 50;
+            public readonly static float AngularDragFactor = 1300;
+            public readonly static float Mass = 10;
+
             public readonly static float RL = 7.8670658f;                   // 机器人边长         // 有舍入误差
             public readonly static float HRL = 3.9335329f;                  // 机器人半边长       // 有舍入误差
             public readonly static float maxVelocity = 125.0f;              // 机器人最大线速度
-            //public readonly static float maxAngularVelocity = 70.07121363f; // 机器人最大角速度，角度制
-            public readonly static float maxAngularVelocity = 4024.07121363f; // 机器人最大角速度，角度制
+            public readonly static float maxAngularVelocity = 70.07121363f; // 机器人最大角速度，角度制
+            //public readonly static float maxAngularVelocity = 4024.07121363f; // 机器人最大角速度，角度制
             public readonly static float kv = 66.0f;                        // 使加速度为1时需要乘的系数
             public readonly static float kv1 = 75.81f;                      // 使加速度为1时需要乘的系数，f=1.0
             public readonly static float kv2 = 71.88599f;                   // 使加速度为1时需要乘的系数，f=0.6

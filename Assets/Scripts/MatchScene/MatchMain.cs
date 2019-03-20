@@ -126,8 +126,6 @@ public class MatchMain : MonoBehaviour
 
         StrategyManager = new StrategyManager();
         GlobalMatchInfo = MatchInfo.DefaultMatch;
-        ObjectManager.SetToDefault();
-        ObjectManager.SetStill();
 
         Event.Register(Event.EventType1.Goal, delegate (object obj)
         {
@@ -201,7 +199,11 @@ public class MatchMain : MonoBehaviour
         GlobalMatchInfo.ControlState.Reset();
         StartedMatch = false;
 
-        ObjectManager.SetToDefault();
+        if (!Debugging)
+        {
+            ObjectManager.SetToDefault();
+            ObjectManager.SetStill();
+        }
         GlobalMatchInfo.Score = new MatchScore();
         GlobalMatchInfo.PlayTime = 0;
         GlobalMatchInfo.Referee = new Referee();
@@ -294,8 +296,24 @@ public class MatchMain : MonoBehaviour
 
     public void LoadStrategy(string blue, string yellow)
     {
-        StrategyManager.LoadBlueDll(blue);
-        StrategyManager.LoadYellowDll(yellow);
+        if (Debugging)
+        {
+            if (DebugWheels == null)
+            {
+                StrategyManager.LoadBlueDebugStrategy();
+                StrategyManager.LoadYellowDebugStrategy();
+            }
+            else
+            {
+                StrategyManager.LoadBlueDebugStrategy(new WheelInfo { Wheels = DebugWheels });
+                StrategyManager.LoadYellowDebugStrategy(new WheelInfo { Wheels = DebugWheels });
+            }
+        }
+        else
+        {
+            StrategyManager.LoadBlueDll(blue);
+            StrategyManager.LoadYellowDll(yellow);
+        }
     }
 
     public void LoadStrategy()
