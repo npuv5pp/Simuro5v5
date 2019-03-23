@@ -135,6 +135,7 @@ namespace Simuro5v5
 
         public static void SetStill()
         {
+            Debug.Log("set still");
             for (int i = 0; i < 5; i++)
             {
                 blueComponent[i].SetStill();
@@ -153,16 +154,9 @@ namespace Simuro5v5
             {
                 blueComponent[i].Revert(matchInfo.BlueRobot[i]);
                 yellowComponent[i].Revert(matchInfo.YellowRobot[i]);
-                ballComponent.Revert(matchInfo.Ball);
             }
-        }
-
-        /// <summary>
-        /// 从默认MatchInfo还原场景
-        /// </summary>
-        public static void RevertScene()
-        {
-            RevertScene(OutputMatchInfo);
+            ballComponent.Revert(matchInfo.Ball);
+            OutputMatchInfo.Update(matchInfo);
         }
 
         /// <summary>

@@ -78,6 +78,8 @@ namespace Simuro5v5
 
                 rv.Ball.pos.x = 0;
                 rv.Ball.pos.y = 0;
+                rv.Ball.angularVelocity = 0;
+                rv.Ball.linearVelocity = Vector2D.zero;
 
                 rv.BlueRobot[0].pos.x = 102.5F;
                 rv.BlueRobot[0].pos.y = 0;
@@ -94,6 +96,11 @@ namespace Simuro5v5
                 rv.BlueRobot[4].pos.x = 29.8F;
                 rv.BlueRobot[4].pos.y = 48F;
                 rv.BlueRobot[4].rotation = 180;
+                for (int i = 0; i < 5; i++)
+                {
+                    rv.BlueRobot[i].velocityLeft = rv.BlueRobot[i].velocityRight = 0;
+                    rv.BlueRobot[i].linearVelocity = Vector2D.zero;
+                }
 
                 rv.YellowRobot[0].pos.x = -102.5F;
                 rv.YellowRobot[0].pos.y = 0;
@@ -110,6 +117,11 @@ namespace Simuro5v5
                 rv.YellowRobot[4].pos.x = -29.8F;
                 rv.YellowRobot[4].pos.y = -48F;
                 rv.YellowRobot[4].rotation = 0;
+                for (int i = 0; i < 5; i++)
+                {
+                    rv.YellowRobot[i].velocityLeft = rv.YellowRobot[i].velocityRight = 0;
+                    rv.YellowRobot[i].linearVelocity = Vector2D.zero;
+                }
 
                 return rv;
             }
@@ -133,6 +145,22 @@ namespace Simuro5v5
                 rv.YellowRobot[i] = YellowRobot[i];
             }
             return rv;
+        }
+        
+        public void Update(MatchInfo matchInfo)
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                BlueRobot[i] = matchInfo.BlueRobot[i];
+                YellowRobot[i] = matchInfo.YellowRobot[i];
+            }
+            Ball = matchInfo.Ball;
+            PlayTime = matchInfo.PlayTime;
+            GameState = matchInfo.GameState;
+            WhosBall = matchInfo.WhosBall;
+            Score = matchInfo.Score;
+            ControlState = matchInfo.ControlState;
+            Referee = matchInfo.Referee;
         }
 
         public void UpdateEntity(GameObject ball, GameObject[] blue, GameObject[] yellow)
@@ -222,7 +250,9 @@ namespace Simuro5v5
             }
             // 转换坐标
             if (GeneralConfig.EnableConvertYellowData)
+            {
                 rv.ConvertToOtherSide();
+            }
             return rv;
         }
     }
@@ -341,6 +371,28 @@ namespace Simuro5v5
             }
             Ball.Normalize();
         }
+
+        public void ConvertToOtherSide()
+        {
+            float ht = Const.Field.Right + Const.Field.Left;
+            float vt = Const.Field.Bottom + Const.Field.Top;
+
+            Ball.pos.x = ht - Ball.pos.x;
+            Ball.pos.y = vt - Ball.pos.y;
+            for (int i = 0; i < 5; i++)
+            {
+                Robot[i].pos.x = ht - Robot[i].pos.x;
+                Robot[i].pos.y = vt - Robot[i].pos.y;
+                if (Robot[i].rotation > 0)
+                {
+                    Robot[i].rotation = Robot[i].rotation - 180;
+                }
+                else if (Robot[i].rotation <= 0)
+                {
+                    Robot[i].rotation = Robot[i].rotation + 180;
+                }
+            }
+        }
     }
 
     [Serializable]
@@ -377,6 +429,8 @@ namespace Simuro5v5
                 return Mathf.Atan2(y, x) * Mathf.Rad2Deg;
             }
         }// 根据x,y坐标计算的相对原点的方向
+
+        public static Vector2D zero { get { return new Vector2D(); } }
 
         public Vector3 GetUnityVector3()
         {

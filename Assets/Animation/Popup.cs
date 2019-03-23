@@ -8,7 +8,13 @@ public class Popup : MonoBehaviour {
     Text Content { get; set; }
 
     Animator Animator { get; set; }
-    bool Shown;
+    bool Shown
+    {
+        get
+        {
+            return Animator.GetBool("show");
+        }
+    }
 
 	void Start () {
         Animator = gameObject.GetComponent<Animator>();
@@ -29,14 +35,12 @@ public class Popup : MonoBehaviour {
 
     IEnumerator _show(string title, string content, int millseconds)
     {
-        Shown = true;
         Title.text = title;
         Content.text = content;
         Animator.SetBool("show", true);
         yield return new WaitForSecondsRealtime((float)millseconds / 1000);
         //yield return new WaitForSeconds(1f);
         Animator.SetBool("show", false);
-        Shown = false;
     }
 
     public void Show(string title, string content)
@@ -45,7 +49,6 @@ public class Popup : MonoBehaviour {
         {
             return;
         }
-        Shown = true;
         Title.text = title;
         Content.text = content;
         Animator.SetBool("show", true);

@@ -7,6 +7,7 @@ public class ControlRobot : MonoBehaviour
     public float TorqueFactor;
     public float Drag;
     public float AngularDrag;
+    public float DoubleZeroDrag;
 
     public bool Debugging;
 
@@ -17,12 +18,17 @@ public class ControlRobot : MonoBehaviour
     Vector3 forward_force, forward_drag;
     Vector3 torque, angular_drag;
 
+    GameObject leftwheel, rightwheel;
+
     Rigidbody rb;
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         rb.maxAngularVelocity = (Const.Robot.maxAngularVelocity * Mathf.Deg2Rad);
+
+        leftwheel = transform.Find("WheelL").gameObject;
+        rightwheel = transform.Find("WheelR").gameObject;
 
         InitRobotParameter();
     }
@@ -33,6 +39,17 @@ public class ControlRobot : MonoBehaviour
         forward_drag = rb.velocity * -Drag;
         rb.AddForce(forward_force + forward_drag);
         //rb.AddRelativeForce(forward_force + forward_drag);
+
+        if (LeftVelocity == 0 && LastLeftVelocity == 0)
+        {
+            Vector3 zeroforce = rb.velocity * DoubleZeroDrag * -Drag;
+            rb.AddForceAtPosition(zeroforce, leftwheel.transform.position);
+        }
+        if (RightVelocity == 0 && LastRightVelocity == 0)
+        {
+            Vector3 zeroforce = rb.velocity * DoubleZeroDrag * -Drag;
+            rb.AddForceAtPosition(zeroforce, rightwheel.transform.position);
+        }
 
         torque = Vector3.up * (LeftVelocity - RightVelocity) * TorqueFactor;
         angular_drag = rb.angularVelocity * -AngularDrag;
@@ -91,8 +108,10 @@ public class ControlRobot : MonoBehaviour
     public void SetStill()
     {
         SetWheelVelocity(0, 0);
-        rb.Sleep();
-        rb.WakeUp();
+        rb.angularVelocity = Vector3.zero;
+        rb.velocity = Vector3.zero;
+        //rb.Sleep();
+        //rb.WakeUp();
     }
 
     /// <summary>
@@ -122,11 +141,12 @@ public class ControlRobot : MonoBehaviour
         rb.constraints = RigidbodyConstraints.FreezePositionY |
             RigidbodyConstraints.FreezeRotationX |
             RigidbodyConstraints.FreezeRotationY;
+        rb.maxAngularVelocity = Const.Robot.maxAngularVelocity;
 
         ForwardFactor = Const.Robot.ForwardForceFactor;
         TorqueFactor = Const.Robot.TorqueFactor;
         Drag = Const.Robot.DragFactor;
         AngularDrag = Const.Robot.AngularDragFactor;
-        rb.maxAngularVelocity = Const.Robot.maxAngularVelocity;
+        DoubleZeroDrag = Const.Robot.DoubleZeroDragFactor;
     }
 }

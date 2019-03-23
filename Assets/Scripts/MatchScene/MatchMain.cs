@@ -111,6 +111,7 @@ public class MatchMain : MonoBehaviour
                     AutoPlacement();
                     GlobalMatchInfo.PlayTime++;
                     InPlacement = false;
+                    //StartRoundAfterFrame();
                     StartRound();
                 });
             }
@@ -199,11 +200,8 @@ public class MatchMain : MonoBehaviour
         GlobalMatchInfo.ControlState.Reset();
         StartedMatch = false;
 
-        if (!Debugging)
-        {
-            ObjectManager.SetToDefault();
-            ObjectManager.SetStill();
-        }
+        ObjectManager.SetToDefault();
+        ObjectManager.SetStill();
         GlobalMatchInfo.Score = new MatchScore();
         GlobalMatchInfo.PlayTime = 0;
         GlobalMatchInfo.Referee = new Referee();
@@ -231,6 +229,17 @@ public class MatchMain : MonoBehaviour
             PauseRound();
             Event.Send(Event.EventType0.RoundStart);
         }
+    }
+
+    public void StartRoundAfterFrame()
+    {
+        StartCoroutine(AwaitStartRound());
+    }
+
+    IEnumerator AwaitStartRound()
+    {
+        yield return new WaitForFixedUpdate();
+        StartRound();
     }
 
     public void PauseRound()
@@ -361,6 +370,10 @@ public class MatchMain : MonoBehaviour
         PlacementInfo yellowInfo = StrategyManager.PlacementYellow(GlobalMatchInfo);
         blueInfo.Normalize();
         yellowInfo.Normalize();
+        if (GeneralConfig.EnableConvertYellowData)
+        {
+            yellowInfo.ConvertToOtherSide();
+        }
         ObjectManager.SetBluePlacement(blueInfo);
         ObjectManager.SetYellowPlacement(yellowInfo);
 

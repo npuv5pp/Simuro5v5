@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections;
 using Simuro5v5;
 
 public class ControlBall : MonoBehaviour
@@ -24,6 +25,7 @@ public class ControlBall : MonoBehaviour
             y = Const.Ball.HBL + Const.Field.Height
         };
         transform.position = pos;
+        SetStill();
     }
 
     public void Revert(Ball ball)

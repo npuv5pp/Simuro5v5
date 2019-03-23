@@ -134,7 +134,7 @@ public class StrategyServer : MonoBehaviour
             StartInfo = new ProcessStartInfo
             {
                 CreateNoWindow = true,
-                UseShellExecute = false,
+                UseShellExecute = true,
                 FileName = StrategyConfig.StrategyServer,
                 Arguments = string.Format("{0} -p {1} --log-file {2} {3} --lock-file {4} {5}",
             StrategyConfig.StrategyServerScript, port, logfilepath, "--log-append", LockFile.Name, StrategyConfig.UseUdp ? "--udp" : "")

@@ -14,7 +14,6 @@ using Simuro5v5.Strategy;
 
 public class GUI_Play : MonoBehaviour
 {
-
     bool menu_open = false;
     bool GUI_on_Camera = true;
 
@@ -49,6 +48,13 @@ public class GUI_Play : MonoBehaviour
     static InputField YellowInputField { get; set; }
     static GameObject BeginObj { get; set; }
     static GameObject UnloadObj { get; set; }
+
+    // animation control items
+    static AnimControl AnimStatus { get; set; }
+    static AnimControl AnimTime { get; set; }
+    static AnimControl AnimReferee { get; set; }
+    static AnimControl AnimScore { get; set; }
+    static AnimControl AnimCamera { get; set; }
 
     // other ui items
     static Text BlueScoreText { get; set; }
@@ -102,12 +108,28 @@ public class GUI_Play : MonoBehaviour
 
         BeginObj.GetComponent<Button>().onClick.AddListener(delegate ()
         {
-            matchMain.LoadStrategy(BlueInputField.text.Trim(), YellowInputField.text.Trim());
+            AnimInGame();
+            try
+            {
+                matchMain.LoadStrategy(BlueInputField.text.Trim(), YellowInputField.text.Trim());
+            }
+            catch
+            {
+                AnimOutGame();
+            }
         });
         UnloadObj.GetComponent<Button>().onClick.AddListener(delegate ()
         {
-            matchMain.RemoveStrategy();
-            matchMain.StopMatch();
+            AnimOutGame();
+            try
+            {
+                matchMain.RemoveStrategy();
+                matchMain.StopMatch();
+            }
+            catch
+            {
+                AnimInGame();
+            }
         });
 
         ReplayObj.GetComponent<Button>().interactable = false;
@@ -165,6 +187,12 @@ public class GUI_Play : MonoBehaviour
         TimeText = GameObject.Find("/Canvas/Time").GetComponent<Text>();
         RefereeLogText = GameObject.Find("/Canvas/Log/Referee").GetComponent<Text>();
         StatusText = GameObject.Find("/Canvas/Status").GetComponent<Text>();
+
+        AnimScore = GameObject.Find("/Canvas/Score").GetComponent<AnimControl>();
+        AnimStatus = GameObject.Find("/Canvas/Status").GetComponent<AnimControl>();
+        AnimTime = GameObject.Find("/Canvas/Time").GetComponent<AnimControl>();
+        AnimReferee = GameObject.Find("/Canvas/Log/Referee").GetComponent<AnimControl>();
+        AnimCamera = GameObject.Find("/Cameras/MainCamera").GetComponent<AnimControl>();
     }
 
     void Update()
@@ -368,6 +396,33 @@ public class GUI_Play : MonoBehaviour
     void SetStatusInfo(string info)
     {
         StatusText.text = info;
+    }
+
+    void AnimInGame()
+    {
+        AnimStatus.InGame();
+        AnimScore.InGame();
+        AnimTime.InGame();
+        AnimReferee.InGame();
+        AnimCamera.InGame();
+    }
+    
+    void AnimOutGame()
+    {
+        AnimStatus.OutGame();
+        AnimScore.OutGame();
+        AnimTime.OutGame();
+        AnimReferee.OutGame();
+        AnimCamera.OutGame();
+    }
+
+    void AnimToggleGame()
+    {
+        AnimStatus.Toggle();
+        AnimScore.Toggle();
+        AnimTime.Toggle();
+        AnimReferee.Toggle();
+        AnimCamera.Toggle();
     }
 
     void Open_GUI_Camera()
