@@ -135,7 +135,6 @@ namespace Simuro5v5
 
         public static void SetStill()
         {
-            Debug.Log("set still");
             for (int i = 0; i < 5; i++)
             {
                 blueComponent[i].SetStill();

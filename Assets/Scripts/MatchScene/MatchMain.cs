@@ -391,6 +391,7 @@ public class MatchMain : MonoBehaviour
 
     private void OnApplicationQuit()
     {
+        ScreenCapture.CaptureScreenshot("test.png");
         Event.Send(Event.EventType0.PlatformExiting);
     }
 }

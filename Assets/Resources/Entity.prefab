@@ -1041,7 +1041,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1141023563051256}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -1.411821, z: -56.5}
+  m_LocalPosition: {x: 0, y: -1.411821, z: 0}
   m_LocalScale: {x: 5.043424, y: 5.043424, z: 5.043424}
   m_Children:
   - {fileID: 4842189050882414}
@@ -2788,6 +2788,7 @@ MonoBehaviour:
   TorqueFactor: 0
   Drag: 0
   AngularDrag: 0
+  DoubleZeroDrag: 0
   Debugging: 0
 --- !u!114 &114017573742089156
 MonoBehaviour:
@@ -2815,6 +2816,7 @@ MonoBehaviour:
   TorqueFactor: 0
   Drag: 0
   AngularDrag: 0
+  DoubleZeroDrag: 0
   Debugging: 0
 --- !u!114 &114025802584564784
 MonoBehaviour:
@@ -2831,6 +2833,7 @@ MonoBehaviour:
   TorqueFactor: 0
   Drag: 0
   AngularDrag: 0
+  DoubleZeroDrag: 0
   Debugging: 0
 --- !u!114 &114034639918963224
 MonoBehaviour:
@@ -2847,6 +2850,7 @@ MonoBehaviour:
   TorqueFactor: 0
   Drag: 0
   AngularDrag: 0
+  DoubleZeroDrag: 0
   Debugging: 0
 --- !u!114 &114044475494436564
 MonoBehaviour:
@@ -2863,6 +2867,7 @@ MonoBehaviour:
   TorqueFactor: 0
   Drag: 0
   AngularDrag: 0
+  DoubleZeroDrag: 0
   Debugging: 0
 --- !u!114 &114056077078464974
 MonoBehaviour:
@@ -2879,6 +2884,7 @@ MonoBehaviour:
   TorqueFactor: 0
   Drag: 0
   AngularDrag: 0
+  DoubleZeroDrag: 0
   Debugging: 0
 --- !u!114 &114147474297407322
 MonoBehaviour:
@@ -2973,6 +2979,7 @@ MonoBehaviour:
   TorqueFactor: 0
   Drag: 0
   AngularDrag: 0
+  DoubleZeroDrag: 0
   Debugging: 0
 --- !u!114 &114510954540852904
 MonoBehaviour:
@@ -2989,6 +2996,7 @@ MonoBehaviour:
   TorqueFactor: 0
   Drag: 0
   AngularDrag: 0
+  DoubleZeroDrag: 0
   Debugging: 0
 --- !u!114 &114537822355659762
 MonoBehaviour:
@@ -3005,6 +3013,7 @@ MonoBehaviour:
   TorqueFactor: 0
   Drag: 0
   AngularDrag: 0
+  DoubleZeroDrag: 0
   Debugging: 0
 --- !u!114 &114549993496581880
 MonoBehaviour:
@@ -3043,6 +3052,7 @@ MonoBehaviour:
   TorqueFactor: 0
   Drag: 0
   AngularDrag: 0
+  DoubleZeroDrag: 0
   Debugging: 0
 --- !u!114 &114783453073708180
 MonoBehaviour:
