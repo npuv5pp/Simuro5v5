@@ -571,4 +571,11 @@ namespace Simuro5v5
         public Vector3 GetLinearVelocityVector3() { return linearVelocity.GetUnityVector3(); }
         public Vector3 GetAngularVelocityVector3() { return new Vector3 { y = angularVelocity }; }
     }
+
+    [JsonObject(MemberSerialization.OptIn)]
+    public class Teaminfo
+    {
+        [JsonProperty("name")]
+        public string Name { get; set; }
+    }
 }

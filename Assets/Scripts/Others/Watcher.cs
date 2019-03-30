@@ -18,7 +18,7 @@ namespace Simuro5v5
                 var strategy = obj as IStrategy;
                 if (strategy != null)
                 {
-                    Const.DebugLog(string.Format("Blue {0} loaded {1}.", strategy.Description,
+                    Const.DebugLog(string.Format("Blue {0} loaded {1}.", strategy.Teaminfo.Name,
                         strategy.IsConnected() ? "succeed" : "failed"));
                 }
             });
@@ -27,7 +27,7 @@ namespace Simuro5v5
                 var strategy = obj as IStrategy;
                 if (strategy != null)
                 {
-                    Const.DebugLog(string.Format("Yellow {0} loaded {1}.", strategy.Description, 
+                    Const.DebugLog(string.Format("Yellow {0} loaded {1}.", strategy.Teaminfo.Name, 
                         strategy.IsConnected() ? "succeed" : "failed"));
                 }
             });

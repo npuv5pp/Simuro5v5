@@ -170,10 +170,10 @@ public class StrategyServer : MonoBehaviour
             {
                 //lock (BlueServerLock)
                 //{
-                    Logger.MainLogger.Log("Starting Blue Side Server");
-                    BlueServer = CreateServer("Blue", StrategyConfig.BlueStrategyLogFile,
-                        StrategyConfig.BlueStrategyPort, autoreboot);
-                    BlueServer.Start();
+                Logger.MainLogger.Log("Starting Blue Side Server");
+                BlueServer = CreateServer("Blue", StrategyConfig.BlueStrategyLogFile,
+                    StrategyConfig.BlueStrategyPort, autoreboot);
+                BlueServer.Start();
                 //}
             }
             catch (Exception ex)
@@ -189,10 +189,10 @@ public class StrategyServer : MonoBehaviour
             {
                 //lock (YellowServerLock)
                 //{
-                    Logger.MainLogger.Log("Starting Yellow Side Server");
-                    YellowServer = CreateServer("Yellow", StrategyConfig.YellowStrategyLogFile,
-                        StrategyConfig.YellowStrategyPort, autoreboot);
-                    YellowServer.Start();
+                Logger.MainLogger.Log("Starting Yellow Side Server");
+                YellowServer = CreateServer("Yellow", StrategyConfig.YellowStrategyLogFile,
+                    StrategyConfig.YellowStrategyPort, autoreboot);
+                YellowServer.Start();
                 //}
             }
             catch (Exception ex)
@@ -451,187 +451,191 @@ namespace ServerMessage
     /// 每个消息类型(TypeName)只能拥有一个实例
     /// </summary>
     public class MessageType
+    {
+        public static MessageType MSG_true { get; private set; }
+        public static MessageType MSG_false { get; private set; }
+        public static MessageType MSG_ping { get; private set; }
+        public static MessageType MSG_pong { get; private set; }
+        public static MessageType MSG_free { get; private set; }
+        public static MessageType MSG_load { get; private set; }
+        public static MessageType MSG_create { get; private set; }
+        public static MessageType MSG_strategy { get; private set; }
+        public static MessageType MSG_placement { get; private set; }
+        public static MessageType MSG_destroy { get; private set; }
+        public static MessageType MSG_placementinfo { get; private set; }
+        public static MessageType MSG_wheelinfo { get; private set; }
+        public static MessageType MSG_exit { get; private set; }
+        public static MessageType MSG_fin { get; private set; }
+        public static MessageType MSG_error { get; private set; }
+        public static MessageType MSG_getteaminfo { get; private set; }
+        public static MessageType MSG_setteaminfo { get; private set; }
+
+        static MessageType()
         {
-            public static MessageType MSG_true { get; private set; }
-            public static MessageType MSG_false { get; private set; }
-            public static MessageType MSG_ping { get; private set; }
-            public static MessageType MSG_pong { get; private set; }
-            public static MessageType MSG_free { get; private set; }
-            public static MessageType MSG_load { get; private set; }
-            public static MessageType MSG_create { get; private set; }
-            public static MessageType MSG_strategy { get; private set; }
-            public static MessageType MSG_placement { get; private set; }
-            public static MessageType MSG_destroy { get; private set; }
-            public static MessageType MSG_placementinfo { get; private set; }
-            public static MessageType MSG_wheelinfo { get; private set; }
-            public static MessageType MSG_exit { get; private set; }
-            public static MessageType MSG_fin { get; private set; }
-            public static MessageType MSG_error { get; private set; }
-
-            static MessageType()
-            {
-                MSG_true = new MessageType("true", null);
-                MSG_false = new MessageType("false", null);
-                MSG_ping = new MessageType("ping", null);
-                MSG_pong = new MessageType("pong", null);
-                MSG_free = new MessageType("free", null);
-                MSG_load = new MessageType("load", typeof(FileMsgContainer));
-                MSG_create = new MessageType("create", typeof(SideInfo));
-                MSG_strategy = new MessageType("strategy", typeof(SideInfo));
-                MSG_placement = new MessageType("placement", typeof(SideInfo));
-                MSG_destroy = new MessageType("destroy", typeof(SideInfo));
-                MSG_placementinfo = new MessageType("placementinfo", typeof(PlacementInfo));
-                MSG_wheelinfo = new MessageType("wheelinfo", typeof(WheelInfo));
-                MSG_exit = new MessageType("exit", null);
-                MSG_fin = new MessageType("fin", null);
-                MSG_error = new MessageType("error", typeof(ErrorMsgContainer));
-            }
-
-            public string TypeName { get; private set; }
-            public Type DataType { get; private set; }
-
-            private static Dictionary<string, MessageType> TypeNameUsed = new Dictionary<string, MessageType>();
-
-            public MessageType(string type, Type datatype)
-            {
-                if (TypeNameUsed.ContainsKey(type))
-                {
-                    throw new MessageTypeError("type name " + type + " existed");
-                }
-
-                TypeName = type;
-                DataType = datatype;
-                TypeNameUsed[type] = this;
-            }
-
-            public static MessageType GetFromName(string name)
-            {
-                if (!TypeNameUsed.ContainsKey(name))
-                {
-                    throw new MessageTypeError("type name " + name + " not found");
-                }
-
-                return TypeNameUsed[name];
-            }
-
-            public override string ToString()
-            {
-                return string.Format("MessageType({0})", TypeName);
-            }
+            MSG_true = new MessageType("true", null);
+            MSG_false = new MessageType("false", null);
+            MSG_ping = new MessageType("ping", null);
+            MSG_pong = new MessageType("pong", null);
+            MSG_free = new MessageType("free", null);
+            MSG_load = new MessageType("load", typeof(FileMsgContainer));
+            MSG_create = new MessageType("create", typeof(SideInfo));
+            MSG_strategy = new MessageType("strategy", typeof(SideInfo));
+            MSG_placement = new MessageType("placement", typeof(SideInfo));
+            MSG_destroy = new MessageType("destroy", typeof(SideInfo));
+            MSG_placementinfo = new MessageType("placementinfo", typeof(PlacementInfo));
+            MSG_wheelinfo = new MessageType("wheelinfo", typeof(WheelInfo));
+            MSG_exit = new MessageType("exit", null);
+            MSG_fin = new MessageType("fin", null);
+            MSG_error = new MessageType("error", typeof(ErrorMsgContainer));
+            MSG_getteaminfo = new MessageType("getteaminfo", null);
+            MSG_setteaminfo = new MessageType("setteaminfo", typeof(Teaminfo));
         }
 
-        [JsonObject(MemberSerialization.OptIn)]
-        public class Message
+        public string TypeName { get; private set; }
+        public Type DataType { get; private set; }
+
+        private static Dictionary<string, MessageType> TypeNameUsed = new Dictionary<string, MessageType>();
+
+        public MessageType(string type, Type datatype)
         {
-            [JsonProperty("type")]
-            public string TypeName
+            if (TypeNameUsed.ContainsKey(type))
             {
-                get { return MsgType.TypeName; }
-                set { MsgType = MessageType.GetFromName(value); }
+                throw new MessageTypeError("type name " + type + " existed");
             }
 
-            // 可能为null。
-            // 序列化时，为null则data字段不存在
-            // 反序列化时，如果data字段不存在或为null，则该字段为null
-            [JsonProperty("data", NullValueHandling = NullValueHandling.Ignore)]
-            private Newtonsoft.Json.Linq.JObject JObjectData { get; set; }
-
-            public MessageType MsgType { get; set; }
-
-            public Message() { }
-
-            public Message(MessageType msgtype, object data)
-            {
-                var objtype = data?.GetType();
-                if (msgtype.DataType != objtype)
-                {
-                    // 检查类型是否匹配
-                    throw new MessageError("unmatched type and data");
-                }
-
-                MsgType = msgtype;
-                JObjectData = data == null ? null : Newtonsoft.Json.Linq.JObject.FromObject(data);
-            }
-
-            public static Message FromJson(string json)
-            {
-                Message msg = JsonConvert.DeserializeObject<Message>(json);
-                if (msg.MsgType.DataType != null && msg.JObjectData == null)
-                {
-                    // 检查data字段
-                    throw new MessageError("unexcepted null data");
-                }
-                return msg;
-            }
-
-            public static Message FromJson(byte[] bs, int offset, int len)
-            {
-                return FromJson(Encoding.UTF8.GetString(bs, offset, len));
-            }
-
-            public string ToJson()
-            {
-                return JsonConvert.SerializeObject(this);
-            }
-
-            public byte[] ToJsonBytes()
-            {
-                return Encoding.UTF8.GetBytes(ToJson());
-            }
-
-            public int ToJsonBytes(byte[] bytes, int offset)
-            {
-                var cs = ToJson().ToCharArray();
-                return Encoding.UTF8.GetBytes(cs, 0, cs.Length, bytes, offset);
-            }
-
-            public object GetData()
-            {
-                return JObjectData == null ? null : JObjectData.ToObject(MsgType.DataType);
-            }
+            TypeName = type;
+            DataType = datatype;
+            TypeNameUsed[type] = this;
         }
 
-        class MessageTypeError : Exception
+        public static MessageType GetFromName(string name)
         {
-            public MessageTypeError()
+            if (!TypeNameUsed.ContainsKey(name))
             {
+                throw new MessageTypeError("type name " + name + " not found");
             }
 
-            public MessageTypeError(string message) : base(message)
-            {
-            }
-
-            public MessageTypeError(string message, Exception innerException) : base(message, innerException)
-            {
-            }
+            return TypeNameUsed[name];
         }
 
-        class MessageError : Exception
+        public override string ToString()
         {
-            public MessageError()
-            {
-            }
-
-            public MessageError(string message) : base(message)
-            {
-            }
-
-            public MessageError(string message, Exception innerException) : base(message, innerException)
-            {
-            }
-        }
-
-        class FileMsgContainer
-        {
-            [JsonProperty("filename")]
-            public string FileName { get; set; }
-        }
-
-        class ErrorMsgContainer
-        {
-            [JsonProperty("errcode")]
-            public int ErrCode { get; set; }
-            [JsonProperty("errdesc")]
-            public string Description { get; set; }
+            return string.Format("MessageType({0})", TypeName);
         }
     }
+
+    [JsonObject(MemberSerialization.OptIn)]
+    public class Message
+    {
+        [JsonProperty("type")]
+        public string TypeName
+        {
+            get { return MsgType.TypeName; }
+            set { MsgType = MessageType.GetFromName(value); }
+        }
+
+        // 可能为null。
+        // 序列化时，为null则data字段不存在
+        // 反序列化时，如果data字段不存在或为null，则该字段为null
+        [JsonProperty("data", NullValueHandling = NullValueHandling.Ignore)]
+        private Newtonsoft.Json.Linq.JObject JObjectData { get; set; }
+
+        public MessageType MsgType { get; set; }
+
+        public Message() { }
+
+        public Message(MessageType msgtype, object data)
+        {
+            var objtype = data?.GetType();
+            if (msgtype.DataType != objtype)
+            {
+                // 检查类型是否匹配
+                throw new MessageError("unmatched type and data");
+            }
+
+            MsgType = msgtype;
+            JObjectData = data == null ? null : Newtonsoft.Json.Linq.JObject.FromObject(data);
+        }
+
+        public static Message FromJson(string json)
+        {
+            Message msg = JsonConvert.DeserializeObject<Message>(json);
+            if (msg.MsgType.DataType != null && msg.JObjectData == null)
+            {
+                // 检查data字段
+                throw new MessageError("unexcepted null data");
+            }
+            return msg;
+        }
+
+        public static Message FromJson(byte[] bs, int offset, int len)
+        {
+            return FromJson(Encoding.UTF8.GetString(bs, offset, len));
+        }
+
+        public string ToJson()
+        {
+            return JsonConvert.SerializeObject(this);
+        }
+
+        public byte[] ToJsonBytes()
+        {
+            return Encoding.UTF8.GetBytes(ToJson());
+        }
+
+        public int ToJsonBytes(byte[] bytes, int offset)
+        {
+            var cs = ToJson().ToCharArray();
+            return Encoding.UTF8.GetBytes(cs, 0, cs.Length, bytes, offset);
+        }
+
+        public object GetData()
+        {
+            return JObjectData == null ? null : JObjectData.ToObject(MsgType.DataType);
+        }
+    }
+
+    class MessageTypeError : Exception
+    {
+        public MessageTypeError()
+        {
+        }
+
+        public MessageTypeError(string message) : base(message)
+        {
+        }
+
+        public MessageTypeError(string message, Exception innerException) : base(message, innerException)
+        {
+        }
+    }
+
+    class MessageError : Exception
+    {
+        public MessageError()
+        {
+        }
+
+        public MessageError(string message) : base(message)
+        {
+        }
+
+        public MessageError(string message, Exception innerException) : base(message, innerException)
+        {
+        }
+    }
+
+    class FileMsgContainer
+    {
+        [JsonProperty("filename")]
+        public string FileName { get; set; }
+    }
+
+    class ErrorMsgContainer
+    {
+        [JsonProperty("errcode")]
+        public int ErrCode { get; set; }
+        [JsonProperty("errdesc")]
+        public string Description { get; set; }
+    }
+}

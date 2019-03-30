@@ -50,11 +50,9 @@ public class GUI_Play : MonoBehaviour
     static GameObject UnloadObj { get; set; }
 
     // animation control items
-    static AnimControl AnimStatus { get; set; }
-    static AnimControl AnimTime { get; set; }
     static AnimControl AnimReferee { get; set; }
-    static AnimControl AnimScore { get; set; }
     static AnimControl AnimCamera { get; set; }
+    static AnimControl AnimTop { get; set; }
 
     // other ui items
     static Text BlueScoreText { get; set; }
@@ -62,6 +60,9 @@ public class GUI_Play : MonoBehaviour
     static Text TimeText { get; set; }
     static Text RefereeLogText { get; set; }
     static Text StatusText { get; set; }
+
+    static Text BlueTeamname { get; set; }
+    static Text YellowTeamname { get; set; }
 
     static List<GameObject> MenuStack { get; set; }
 
@@ -182,15 +183,16 @@ public class GUI_Play : MonoBehaviour
         BeginObj = GameObject.Find("/Canvas/Menu/Strategy/BeginBtn");
         UnloadObj = GameObject.Find("/Canvas/Menu/Strategy/UnloadBtn");
 
-        BlueScoreText  = GameObject.Find("/Canvas/Score/Blue").GetComponent<Text>();
-        YellowScoreText = GameObject.Find("/Canvas/Score/Yellow").GetComponent<Text>();
-        TimeText = GameObject.Find("/Canvas/Time").GetComponent<Text>();
+        BlueScoreText  = GameObject.Find("/Canvas/Top/Score/Blue").GetComponent<Text>();
+        YellowScoreText = GameObject.Find("/Canvas/Top/Score/Yellow").GetComponent<Text>();
+        TimeText = GameObject.Find("/Canvas/Top/Time").GetComponent<Text>();
         RefereeLogText = GameObject.Find("/Canvas/Log/Referee").GetComponent<Text>();
-        StatusText = GameObject.Find("/Canvas/Status").GetComponent<Text>();
+        StatusText = GameObject.Find("/Canvas/Top/Status").GetComponent<Text>();
 
-        AnimScore = GameObject.Find("/Canvas/Score").GetComponent<AnimControl>();
-        AnimStatus = GameObject.Find("/Canvas/Status").GetComponent<AnimControl>();
-        AnimTime = GameObject.Find("/Canvas/Time").GetComponent<AnimControl>();
+        BlueTeamname = GameObject.Find("/Canvas/Top/Teamname/Bname").GetComponent<Text>();
+        YellowTeamname = GameObject.Find("/Canvas/Top/Teamname/Yname").GetComponent<Text>();
+
+        AnimTop = GameObject.Find("/Canvas/Top").GetComponent<AnimControl>();
         AnimReferee = GameObject.Find("/Canvas/Log/Referee").GetComponent<AnimControl>();
         AnimCamera = GameObject.Find("/Cameras/MainCamera").GetComponent<AnimControl>();
     }
@@ -251,6 +253,21 @@ public class GUI_Play : MonoBehaviour
         UpdateScoreText();
         UpdateButtons();
         UpdateStatusText();
+        UpdateTeamname();
+    }
+
+    void UpdateTeamname()
+    {
+        if (!matchMain.LoadSucceed)
+        {
+            SetBlueTeamname("Blueteam");
+            SetYellowTeamname("Yellowteam");
+        }
+        else
+        {
+            SetBlueTeamname(MatchMain.StrategyManager.GetBlueTeaminfo().Name);
+            SetYellowTeamname(MatchMain.StrategyManager.GetYellowTeaminfo().Name);
+        }
     }
 
     void UpdateStatusText()
@@ -393,6 +410,16 @@ public class GUI_Play : MonoBehaviour
         SetRefereeInfo(info);
     }
 
+    void SetBlueTeamname(string info)
+    {
+        BlueTeamname.text = info;
+    }
+
+    void SetYellowTeamname(string info)
+    {
+        YellowTeamname.text = info;
+    }
+
     void SetStatusInfo(string info)
     {
         StatusText.text = info;
@@ -400,27 +427,21 @@ public class GUI_Play : MonoBehaviour
 
     void AnimInGame()
     {
-        AnimStatus.InGame();
-        AnimScore.InGame();
-        AnimTime.InGame();
+        AnimTop.InGame();
         AnimReferee.InGame();
         AnimCamera.InGame();
     }
     
     void AnimOutGame()
     {
-        AnimStatus.OutGame();
-        AnimScore.OutGame();
-        AnimTime.OutGame();
+        AnimTop.OutGame();
         AnimReferee.OutGame();
         AnimCamera.OutGame();
     }
 
     void AnimToggleGame()
     {
-        AnimStatus.Toggle();
-        AnimScore.Toggle();
-        AnimTime.Toggle();
+        AnimTop.Toggle();
         AnimReferee.Toggle();
         AnimCamera.Toggle();
     }

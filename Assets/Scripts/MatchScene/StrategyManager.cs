@@ -57,18 +57,18 @@ namespace Simuro5v5.Strategy
         /// 获得当前蓝方策略的描述信息
         /// </summary>
         /// <returns>描述信息</returns>
-        public string GetBlueDescription()
+        public Teaminfo GetBlueTeaminfo()
         {
-            return blue != null ? blue.Description : "null";
+            return blue?.Teaminfo;
         }
 
         /// <summary>
         /// 获得当前黄方策略的描述信息
         /// </summary>
         /// <returns>描述信息</returns>
-        public string GetYellowDescription()
+        public Teaminfo GetYellowTeaminfo()
         {
-            return yellow != null ? yellow.Description : "null";
+            return yellow?.Teaminfo;
         }
 
         public void LoadLastSaved()
@@ -87,6 +87,7 @@ namespace Simuro5v5.Strategy
 
             BluePath = dllpath;
             blue = GetLocalDllStrategyFromPath(dllpath, Side.Blue);
+            blue.SendGetTeaminfo();
             Event.Send(Event.EventType1.StrategyBlueLoaded, blue);
         }
 
@@ -99,6 +100,7 @@ namespace Simuro5v5.Strategy
 
             YellowPath = dllpath;
             yellow = GetLocalDllStrategyFromPath(dllpath, Side.Yellow);
+            yellow.SendGetTeaminfo();
             Event.Send(Event.EventType1.StrategyYellowLoaded, yellow);
         }
 
@@ -294,7 +296,7 @@ namespace Simuro5v5.Strategy
         /// <summary>
         /// 策略的描述信息
         /// </summary>
-        string Description { get; }
+        Teaminfo Teaminfo { get; set; }
 
         /// <summary>
         /// 以返回值判断是否连接
@@ -334,6 +336,8 @@ namespace Simuro5v5.Strategy
         /// </param>
         void SendOver(SideInfo sideInfo);
 
+        void SendGetTeaminfo();
+
         /// <summary>
         /// 显示调用以释放策略所持有的资源
         /// </summary>
@@ -345,12 +349,12 @@ namespace Simuro5v5.Strategy
 
     class NetStrategy : IStrategy
     {
-        public string Description { get { return string.Format("{0} in {1}:{2}", DllPath, ServerAddr, ServerPort); } }
-
         public string DllPath { get; private set; }
         public string ServerAddr { get { return Conn.ServerAddr; } }
         public int ServerPort { get { return Conn.ServerPort; } }
         public bool LoadSucceed { get; private set; }
+
+        public Teaminfo Teaminfo { get; set; }
 
         private ConnectionHandle Conn;
 
@@ -422,10 +426,16 @@ namespace Simuro5v5.Strategy
         {
             Conn.SendThenRecv(new Message(MessageType.MSG_destroy, sideInfo));
         }
-        
+
         public void SendExit()
         {
             Conn.SendThenRecv(new Message(MessageType.MSG_exit, null));
+        }
+
+        public void SendGetTeaminfo()
+        {
+            var msg = Conn.SendThenRecv(new Message(MessageType.MSG_getteaminfo, null));
+            Teaminfo = (Teaminfo)msg.GetData();
         }
     }
 
@@ -459,7 +469,7 @@ namespace Simuro5v5.Strategy
             output_wheelinfo = wi;
         }
 
-        public string Description { get { return "Debug Strategy"; } }
+        public Teaminfo Teaminfo { get; set; }
 
         public void CheckReady_ex() { }
 
@@ -487,6 +497,11 @@ namespace Simuro5v5.Strategy
                 Ball = sideInfo.currentBall
             };
         }
+
+        public void SendGetTeaminfo()
+        {
+            Teaminfo = new Teaminfo { Name = "DebugTeam" };
+        }
     }
 
     /// <summary>
@@ -502,7 +517,7 @@ namespace Simuro5v5.Strategy
 
         public static List<DllInfo> InfoList = new List<DllInfo>();
 
-        private static DllInfo DefaultInfo { get; set; } 
+        private static DllInfo DefaultInfo { get; set; }
 
         // TODO
         //static LoadInfo()
