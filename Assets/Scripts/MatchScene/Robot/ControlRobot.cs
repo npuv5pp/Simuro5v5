@@ -11,7 +11,6 @@ public class ControlRobot : MonoBehaviour
 
     public bool Debugging;
 
-    float LastLeftVelocity, LastRightVelocity;
     float LeftVelocity { get; set; }
     float RightVelocity { get; set; }
 
@@ -35,26 +34,14 @@ public class ControlRobot : MonoBehaviour
 
     void FixedUpdate()
     {
+        // TODO 零减速
         forward_force = -transform.up * (LeftVelocity + RightVelocity) * ForwardFactor;
         forward_drag = rb.velocity * -Drag;
         rb.AddForce(forward_force + forward_drag);
-        //rb.AddRelativeForce(forward_force + forward_drag);
-
-        if (LeftVelocity == 0 && LastLeftVelocity == 0)
-        {
-            Vector3 zeroforce = rb.velocity * DoubleZeroDrag * -Drag;
-            rb.AddForceAtPosition(zeroforce, leftwheel.transform.position);
-        }
-        if (RightVelocity == 0 && LastRightVelocity == 0)
-        {
-            Vector3 zeroforce = rb.velocity * DoubleZeroDrag * -Drag;
-            rb.AddForceAtPosition(zeroforce, rightwheel.transform.position);
-        }
 
         torque = Vector3.up * (LeftVelocity - RightVelocity) * TorqueFactor;
         angular_drag = rb.angularVelocity * -AngularDrag;
         rb.AddTorque(torque + angular_drag);
-        //rb.AddRelativeTorque(torque + angular_drag);
     }
 
     private void LateUpdate()
@@ -74,8 +61,6 @@ public class ControlRobot : MonoBehaviour
 
     public void SetWheelVelocity(float left, float right)
     {
-        LastLeftVelocity = LeftVelocity;
-        LastRightVelocity = RightVelocity;
         LeftVelocity = left;
         RightVelocity = right;
     }

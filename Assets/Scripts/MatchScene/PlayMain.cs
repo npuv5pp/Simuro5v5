@@ -7,7 +7,7 @@ using Simuro5v5.Strategy;
 using Logger = Simuro5v5.Logger;
 using Event = Simuro5v5.EventSystem.Event;
 
-public class MatchMain : MonoBehaviour
+public class PlayMain : MonoBehaviour
 {
     public bool Debugging;
     public Wheel[] DebugWheels;
@@ -48,6 +48,7 @@ public class MatchMain : MonoBehaviour
     public static bool CreateNewScene { get; set; }
     public static StrategyManager StrategyManager { get; private set; }
     public static MatchInfo GlobalMatchInfo { get; private set; }
+    public static ObjectManager ObjectManager { get; private set; }
 
     public delegate void TimedPauseCallback();
     static bool TimedPausing { get; set; }
@@ -71,6 +72,7 @@ public class MatchMain : MonoBehaviour
         Time.fixedDeltaTime = Const.Zeit;
 
         // 绑定物体
+        ObjectManager = new ObjectManager();
         ObjectManager.RebindObject();
         if (GlobalMatchInfo == null || CreateNewScene)
         {
@@ -391,7 +393,6 @@ public class MatchMain : MonoBehaviour
 
     private void OnApplicationQuit()
     {
-        ScreenCapture.CaptureScreenshot("test.png");
         Event.Send(Event.EventType0.PlatformExiting);
     }
 }

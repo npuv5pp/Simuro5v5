@@ -20,8 +20,8 @@ public class GUI_Play : MonoBehaviour
     // 以下对象设为静态，防止之后注册事件函数后，闭包造成重载场景后的空引用
     static Popup Popup { get; set; }
 
-    static MatchMain matchMain { get; set; }
-    static MatchInfo matchInfo { get { return MatchMain.GlobalMatchInfo; } }
+    static PlayMain matchMain { get; set; }
+    static MatchInfo matchInfo { get { return PlayMain.GlobalMatchInfo; } }
 
     static GameObject SceneObj { get; set; }
 
@@ -160,7 +160,7 @@ public class GUI_Play : MonoBehaviour
 
     void InitObjects()
     {
-        matchMain = GameObject.Find("/Entity").GetComponent<MatchMain>();
+        matchMain = GameObject.Find("/Entity").GetComponent<PlayMain>();
         Popup = GameObject.Find("/Canvas/Popup").GetComponent<Popup>();
 
         SceneObj = GameObject.Find("MatchScene");
@@ -195,23 +195,12 @@ public class GUI_Play : MonoBehaviour
         AnimTop = GameObject.Find("/Canvas/Top").GetComponent<AnimControl>();
         AnimReferee = GameObject.Find("/Canvas/Log/Referee").GetComponent<AnimControl>();
         AnimCamera = GameObject.Find("/Cameras/MainCamera").GetComponent<AnimControl>();
+
+        UpdateAnim();
     }
 
     void Update()
     {
-        var cameras = GameObject.Find("MainCamera");
-        if (cameras.GetComponent<Camera>().enabled == true && GUI_on_Camera == false)
-        {
-            Open_GUI_Camera();
-            GUI_on_Camera = true;
-        }
-        if (cameras.GetComponent<Camera>().enabled == false && GUI_on_Camera == true)
-        {
-            Close_GUI_Camera();
-            GUI_on_Camera = false;
-        }
-        if (cameras.GetComponent<Camera>().enabled == true) { }
-
         if (Input.GetMouseButtonDown(1))
         {
             // right clicked, pause and toggle menu
@@ -256,6 +245,18 @@ public class GUI_Play : MonoBehaviour
         UpdateTeamname();
     }
 
+    void UpdateAnim()
+    {
+        if (matchMain.LoadSucceed)
+        {
+            AnimInGame();
+        }
+        else
+        {
+            AnimOutGame();
+        }
+    }
+
     void UpdateTeamname()
     {
         if (!matchMain.LoadSucceed)
@@ -265,8 +266,8 @@ public class GUI_Play : MonoBehaviour
         }
         else
         {
-            SetBlueTeamname(MatchMain.StrategyManager.GetBlueTeaminfo().Name);
-            SetYellowTeamname(MatchMain.StrategyManager.GetYellowTeaminfo().Name);
+            SetBlueTeamname(PlayMain.StrategyManager.GetBlueTeaminfo().Name);
+            SetYellowTeamname(PlayMain.StrategyManager.GetYellowTeaminfo().Name);
         }
     }
 
@@ -444,131 +445,5 @@ public class GUI_Play : MonoBehaviour
         AnimTop.Toggle();
         AnimReferee.Toggle();
         AnimCamera.Toggle();
-    }
-
-    void Open_GUI_Camera()
-    {
-        GameObject obj0 = GameObject.Find("Canvas");
-        if (obj0 == null)
-        {
-            Debug.Log("No Canvas Object.");
-        }
-        else
-        {
-            Debug.Log("Canvas Object.");
-        }
-
-        GameObject obj1 = obj0.transform.Find("ys").gameObject;
-        if (obj1 == null)
-        {
-            Debug.Log("No ys Object.");
-        }
-        else
-        {
-            Debug.Log("ys Object.");
-        }
-        obj1.SetActive(true);
-
-        GameObject obj2 = obj0.transform.Find("bs").gameObject;
-        if (obj2 == null)
-        {
-            Debug.Log("No bs Object.");
-        }
-        else
-        {
-            Debug.Log("bs Object.");
-        }
-        obj2.SetActive(true);
-
-        GameObject obj3 = obj0.transform.Find("referee").gameObject;
-        if (obj3 == null)
-        {
-            Debug.Log("No referee Object.");
-        }
-        else
-        {
-            Debug.Log("referee Object.");
-        }
-        obj3.SetActive(true);
-
-        GameObject obj4 = obj0.transform.Find("time").gameObject;
-        if (obj4 == null)
-        {
-            Debug.Log("No time Object.");
-        }
-        else
-        {
-            Debug.Log("time Object.");
-        }
-        obj4.SetActive(true);
-
-        GameObject obj5 = obj0.transform.Find("esc").gameObject;
-        if (obj5 == null)
-        {
-            Debug.Log("No esc Object.");
-        }
-        else
-        {
-            Debug.Log("esc Object.");
-        }
-        obj5.SetActive(true);
-    }
-
-    void Close_GUI_Camera()
-    {
-        GameObject obj1 = GameObject.Find("ys");
-        if (obj1 == null)
-        {
-            Debug.Log("No ys Object.");
-        }
-        else
-        {
-            Debug.Log("ys Object.");
-        }
-        obj1.SetActive(false);
-
-        GameObject obj2 = GameObject.Find("bs");
-        if (obj2 == null)
-        {
-            Debug.Log("No bs Object.");
-        }
-        else
-        {
-            Debug.Log("bs Object.");
-        }
-        obj2.SetActive(false);
-
-        GameObject obj3 = GameObject.Find("referee");
-        if (obj3 == null)
-        {
-            Debug.Log("No referee Object.");
-        }
-        else
-        {
-            Debug.Log("referee Object.");
-        }
-        obj3.SetActive(false);
-
-        GameObject obj4 = GameObject.Find("time");
-        if (obj4 == null)
-        {
-            Debug.Log("No time Object.");
-        }
-        else
-        {
-            Debug.Log("time Object.");
-        }
-        obj4.SetActive(false);
-
-        GameObject obj5 = GameObject.Find("esc");
-        if (obj5 == null)
-        {
-            Debug.Log("No esc Object.");
-        }
-        else
-        {
-            Debug.Log("esc Object.");
-        }
-        obj5.SetActive(false);
     }
 }

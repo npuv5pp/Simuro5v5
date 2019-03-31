@@ -76,12 +76,13 @@ public class Referee
     private const int delayTime = 10;
     private const int Time = 10;
 
+    private ObjectManager objectManager { get; set; }
+
     // Class
-    private GameObject[] BlueObject { get { return ObjectManager.blueObject; } }
-    private GameObject[] YellowObject { get { return ObjectManager.yellowObject; } }
+    private GameObject[] BlueObject { get { return PlayMain.ObjectManager.blueObject; } }
+    private GameObject[] YellowObject { get { return PlayMain.ObjectManager.yellowObject; } }
     private StateSpace statespace;
     private SideInfo pEnv;
-
 
     /// <summary>
     /// 待解决：黄蓝方同时犯相同规，怎么判？

@@ -3,25 +3,31 @@ using UnityEngine.SceneManagement;
 
 namespace Simuro5v5
 {
-    using Simuro5v5.EventSystem;
-
-    public static class ObjectManager
+    public class ObjectManager
     {
-        public static GameObject ballObject { get; private set; }
-        public static GameObject[] blueObject { get; private set; }
-        public static GameObject[] yellowObject { get; private set; }
+        public GameObject ballObject { get; private set; }
+        public GameObject[] blueObject { get; private set; }
+        public GameObject[] yellowObject { get; private set; }
 
-        public static ControlBall ballComponent { get; private set; }
-        public static ControlRobot[] blueComponent { get; private set; }
-        public static ControlRobot[] yellowComponent { get; private set; }
+        public ControlBall ballComponent { get; private set; }
+        public ControlRobot[] blueComponent { get; private set; }
+        public ControlRobot[] yellowComponent { get; private set; }
 
-        public static MatchInfo OutputMatchInfo { get; private set; }
+        public MatchInfo OutputMatchInfo { get; private set; }
+
+        public ObjectManager() { }
+
+        public ObjectManager(MatchInfo matchInfo)
+        {
+            RebindMatchInfo(matchInfo);
+            RebindObject();
+        }
 
         /// <summary>
         /// 重新绑定一个用来输出的MatchInfo
         /// </summary>
         /// <param name="matchInfo"></param>
-        public static void RebindMatchInfo(MatchInfo matchInfo)
+        public void RebindMatchInfo(MatchInfo matchInfo)
         {
             OutputMatchInfo = matchInfo;
         }
@@ -29,7 +35,7 @@ namespace Simuro5v5
         /// <summary>
         /// 重新绑定场景中的对象
         /// </summary>
-        public static void RebindObject()
+        public void RebindObject()
         {
             ballObject = GameObject.Find("Ball");
             blueObject = new GameObject[5] {
@@ -64,12 +70,12 @@ namespace Simuro5v5
             };
         }
 
-        public static void SetToDefault()
+        public void SetToDefault()
         {
             RevertScene(MatchInfo.DefaultMatch);
         }
 
-        public static void SetBlueWheels(WheelInfo ws)
+        public void SetBlueWheels(WheelInfo ws)
         {
             for (int i = 0; i < 5; i++)
             {
@@ -79,7 +85,7 @@ namespace Simuro5v5
             }
         }
 
-        public static void SetYellowWheels(WheelInfo ws)
+        public void SetYellowWheels(WheelInfo ws)
         {
             for (int i = 0; i < 5; i++)
             {
@@ -89,7 +95,7 @@ namespace Simuro5v5
             }
         }
 
-        public static void SetBluePlacement(PlacementInfo sInfo)
+        public void SetBluePlacement(PlacementInfo sInfo)
         {
             for (int i = 0; i < 5; i++)
             {
@@ -97,7 +103,7 @@ namespace Simuro5v5
             }
         }
 
-        public static void SetBluePlacement(Robot[] robots)
+        public void SetBluePlacement(Robot[] robots)
         {
             for (int i = 0; i < 5; i++)
             {
@@ -105,7 +111,7 @@ namespace Simuro5v5
             }
         }
 
-        public static void SetYellowPlacement(PlacementInfo sInfo)
+        public void SetYellowPlacement(PlacementInfo sInfo)
         {
             for (int i = 0; i < 5; i++)
             {
@@ -113,7 +119,7 @@ namespace Simuro5v5
             }
         }
 
-        public static void SetYellowPlacement(Robot[] robots)
+        public void SetYellowPlacement(Robot[] robots)
         {
             for (int i = 0; i < 5; i++)
             {
@@ -121,19 +127,19 @@ namespace Simuro5v5
             }
         }
 
-        public static void SetBallPlacement(PlacementInfo sInfo)
+        public void SetBallPlacement(PlacementInfo sInfo)
         {
             ballComponent.SetPlacement(sInfo.Ball);
         }
 
-        public static void SetBallPlacement(Ball ball)
+        public void SetBallPlacement(Ball ball)
         {
             var b = ball;
             b.Normalize();
             ballComponent.SetPlacement(b);
         }
 
-        public static void SetStill()
+        public void SetStill()
         {
             for (int i = 0; i < 5; i++)
             {
@@ -147,7 +153,7 @@ namespace Simuro5v5
         /// 从指定MatchInfo还原场景
         /// </summary>
         /// <param name="matchInfo"></param>
-        public static void RevertScene(MatchInfo matchInfo)
+        public void RevertScene(MatchInfo matchInfo)
         {
             for (int i = 0; i < 5; i++)
             {
@@ -161,7 +167,7 @@ namespace Simuro5v5
         /// <summary>
         /// 从场景更新到绑定的MatchInfo中
         /// </summary>
-        public static void UpdateFromScene()
+        public void UpdateFromScene()
         {
             OutputMatchInfo.UpdateEntity(ballObject, blueObject, yellowObject);
         }
@@ -169,7 +175,7 @@ namespace Simuro5v5
         /// <summary>
         /// 继续运行世界
         /// </summary>
-        public static void Resume()
+        public void Resume()
         {
             Time.timeScale = Const.TimeScale;
         }
@@ -177,28 +183,9 @@ namespace Simuro5v5
         /// <summary>
         /// 暂停世界
         /// </summary>
-        public static void Pause()
+        public void Pause()
         {
             Time.timeScale = 0.0f;
-        }
-
-        public static void RegisterReplay()
-        {
-            Event.Register(Event.EventType1.ReplayInfoUpdate, SetReplayInfo);
-        }
-
-        public static void SetReplayInfo(object obj)
-        {
-            MatchInfo matchInfo = obj as MatchInfo;
-            if (matchInfo != null)
-            {
-                Debug.Log("new matchinfo in replaying");
-                RevertScene(matchInfo);
-            }
-            else
-            {
-                Debug.Log("error matchinfo in replaying");
-            }
         }
     }
 }
