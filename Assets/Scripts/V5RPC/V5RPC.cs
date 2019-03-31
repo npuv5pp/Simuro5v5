@@ -203,7 +203,7 @@ namespace V5RPC
             return packet;
         }
 
-        public static void Write(this Stream io, in V5Packet packet)
+        public static void Write(this Stream io, V5Packet packet)
         {
             var writer = new BinaryWriter(io);
             writer.Write(V5Packet.MAGIC);
