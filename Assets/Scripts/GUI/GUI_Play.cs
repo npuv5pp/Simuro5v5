@@ -20,11 +20,9 @@ public class GUI_Play : MonoBehaviour
     // 以下对象设为静态，防止之后注册事件函数后，闭包造成重载场景后的空引用
     static Popup Popup { get; set; }
 
-    static PlayMain matchMain { get; set; }
-    static MatchInfo matchInfo { get { return matchMain?.GlobalMatchInfo; } }
-
     public PlayMain playMain;
-    static MatchInfo MatchInfo => PlayMain.GlobalMatchInfo;
+
+    MatchInfo MatchInfo => playMain.GlobalMatchInfo;
 
     // background object
     public GameObject menuBackground;
@@ -62,6 +60,7 @@ public class GUI_Play : MonoBehaviour
 
     void Start()
     {
+        playMain = PlayMain.Singleton.GetComponent<PlayMain>();
         InitObjects();
 
         UpdateTimeText();
@@ -74,17 +73,6 @@ public class GUI_Play : MonoBehaviour
         MenuStack = new Stack<GameObject>();
         PushMenu(menuMain);
         OpenMenu();
-
-        // >>> SET IN EDITOR <<<
-        // NewMatch onClick() => GUI_Play.PlayMainStartMatch()
-        // NewRound onClick() => GUI_Play.PlayMainStartRound()
-        // Resume onClick() => GUI_Play.CloseMenuAndResume()
-        // Replay onClick() => GUI_Play.LoadReplayScene()
-        // Menu/Main/Strategy onClick() => GUI_Play.OpenMenuStrategy()
-        // BeginBtn onClick() => GUI_Play.AnimInGameAndLoadStrategy()
-        // UnloadBtn onClick() => GUI_Play.AnimOutGameAndRemoveStrategy()
-        // Replay interactable => false;
-        // Exit onClick() => GUI_Play.LoadMainScene()
 
         Event.Register(Event.EventType1.LogUpdate, SetRefereeInfo);
     }
@@ -225,8 +213,8 @@ public class GUI_Play : MonoBehaviour
         }
         else
         {
-            SetBlueTeamname(matchMain.StrategyManager.GetBlueTeaminfo().Name);
-            SetYellowTeamname(matchMain.StrategyManager.GetYellowTeaminfo().Name);
+            SetBlueTeamname(playMain.StrategyManager.GetBlueTeaminfo().Name);
+            SetYellowTeamname(playMain.StrategyManager.GetYellowTeaminfo().Name);
         }
     }
 
