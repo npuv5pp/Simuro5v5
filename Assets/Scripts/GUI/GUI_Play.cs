@@ -355,6 +355,9 @@ public class GUI_Play : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 打开背景与 <code>MenuStack</code> 最后一项，并设置 <code>menu_open</code> 为真。
+    /// </summary>
     void OpenMenu()
     {
         if (MenuStack.Count > 0)
@@ -365,6 +368,9 @@ public class GUI_Play : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 关闭背景与 <code>MenuStack</code> 中最后一项。
+    /// </summary>
     void CloseMenu()
     {
         if (MenuStack.Count > 0)
