@@ -18,36 +18,27 @@ public class GUI_Play : MonoBehaviour
     bool GUI_on_Camera = true;
 
     // 以下对象设为静态，防止之后注册事件函数后，闭包造成重载场景后的空引用
-    static Popup Popup { get; set; }
+    // public Popup popup;
 
-    static PlayMain matchMain { get; set; }
-    static MatchInfo matchInfo { get { return PlayMain.GlobalMatchInfo; } }
-
-    static GameObject SceneObj { get; set; }
-
-    static GameObject CanvasObj { get; set; }
-    static GameObject MenuObj { get; set; }
+    public PlayMain playMain;
+    static MatchInfo MatchInfo => PlayMain.GlobalMatchInfo;
 
     // background object
-    static GameObject MenuBack { get; set; }
+    public GameObject menuBackground;
 
     // sub-menu items
-    static GameObject MenuObj_Main { get; set; }  // main menu object
-    static GameObject MenuObj_Strategy { get; set; } // strategy menu object
+    public GameObject menuMain; // main menu object
+    public GameObject menuStrategy; // strategy menu object
 
     // main menu items
-    static GameObject StrategyMenuBtnObj { get; set; }   // button on main menu to strategy menu
-    static GameObject NewMatchObj { get; set; }
-    static GameObject NewRoundObj { get; set; }
-    static GameObject ResumeObj { get; set; }
-    static GameObject ReplayObj { get; set; }
-    static GameObject ExitObj { get; set; }
+    public Button newMatchButton;
+    public Button newRoundButton;
+    public Button resumeButton;
+    public Button replayButton;
 
     // strategy menu items
-    static InputField BlueInputField { get; set; }
-    static InputField YellowInputField { get; set; }
-    static GameObject BeginObj { get; set; }
-    static GameObject UnloadObj { get; set; }
+    public InputField blueInputField;
+    public InputField yellowInputField;
 
     // animation control items
     static AnimControl AnimReferee { get; set; }
@@ -74,11 +65,11 @@ public class GUI_Play : MonoBehaviour
         UpdateScoreText();
 
         CloseBackground();
-        MenuObj_Main.SetActive(false);
-        MenuObj_Strategy.SetActive(false);
+        menuMain.SetActive(false);
+        menuStrategy.SetActive(false);
 
         MenuStack = new Stack<GameObject>();
-        PushMenu(MenuObj_Main);
+        PushMenu(menuMain);
         OpenMenu();
 
         // >>> SET IN EDITOR <<<
@@ -121,8 +112,8 @@ public class GUI_Play : MonoBehaviour
         AnimOutGame();
         try
         {
-            matchMain.RemoveStrategy();
-            matchMain.StopMatch();
+            playMain.RemoveStrategy();
+            playMain.StopMatch();
         }
         catch
         {
@@ -135,7 +126,7 @@ public class GUI_Play : MonoBehaviour
         AnimInGame();
         try
         {
-            matchMain.LoadStrategy(BlueInputField.text.Trim(), YellowInputField.text.Trim());
+            playMain.LoadStrategy(blueInputField.text.Trim(), yellowInputField.text.Trim());
         }
         catch
         {
@@ -146,47 +137,36 @@ public class GUI_Play : MonoBehaviour
     public void OpenMenuStrategy()
     {
         MenuStack.Peek().SetActive(false);
-        PushMenu(MenuObj_Strategy);
+        PushMenu(menuStrategy);
         MenuStack.Peek().SetActive(true);
     }
 
     public void LoadReplayScene()
     {
         // 总拍数作为回放结束拍数
-        PlayerPrefs.SetInt("step_end", matchInfo.PlayTime);
+        PlayerPrefs.SetInt("step_end", MatchInfo.PlayTime);
         SceneManager.LoadScene("GameScene_Replay");
     }
 
     public void CloseMenuAndResume()
     {
         CloseMenu();
-        matchMain.ResumeRound();
+        playMain.ResumeRound();
     }
 
     void InitObjects()
     {
-        matchMain = GameObject.Find("/Entity").GetComponent<PlayMain>();
-        Popup = GameObject.Find("/Canvas/Popup").GetComponent<Popup>();
+        // playMain = GameObject.Find("/Entity").GetComponent<PlayMain>();
+        // popup = GameObject.Find("/Canvas/Popup").GetComponent<Popup>();
 
-        SceneObj = GameObject.Find("MatchScene");
+        // menuBack = GameObject.Find("/Canvas/Menu/Background");
 
-        CanvasObj = GameObject.Find("Canvas");
-        MenuObj = GameObject.Find("/Canvas/Menu");
-        MenuBack = GameObject.Find("/Canvas/Menu/Background");
+        // menuMain = GameObject.Find("/Canvas/Menu/Main");
+        // newMatchButton = GameObject.Find("/Canvas/Menu/Main/NewMatch").GetComponent<Button>();
 
-        MenuObj_Main = GameObject.Find("/Canvas/Menu/Main");
-        StrategyMenuBtnObj = GameObject.Find("/Canvas/Menu/Main/Strategy");
-        NewMatchObj = GameObject.Find("/Canvas/Menu/Main/NewMatch");
-        NewRoundObj = GameObject.Find("/Canvas/Menu/Main/NewRound");
-        ResumeObj = GameObject.Find("/Canvas/Menu/Main/Resume");
-        ReplayObj = GameObject.Find("/Canvas/Menu/Main/Replay");
-        ExitObj = GameObject.Find("/Canvas/Menu/Main/Exit");
-
-        MenuObj_Strategy = GameObject.Find("/Canvas/Menu/Strategy");
-        BlueInputField = GameObject.Find("/Canvas/Menu/Strategy/BlueInput").GetComponent<InputField>();
-        YellowInputField = GameObject.Find("/Canvas/Menu/Strategy/YellowInput").GetComponent<InputField>();
-        BeginObj = GameObject.Find("/Canvas/Menu/Strategy/BeginBtn");
-        UnloadObj = GameObject.Find("/Canvas/Menu/Strategy/UnloadBtn");
+        // menuStrategy = GameObject.Find("/Canvas/Menu/Strategy");
+        // blueInputField = GameObject.Find("/Canvas/Menu/Strategy/BlueInput").GetComponent<InputField>();
+        // yellowInputField = GameObject.Find("/Canvas/Menu/Strategy/YellowInput").GetComponent<InputField>();
 
         BlueScoreText  = GameObject.Find("/Canvas/Top/Score/Blue").GetComponent<Text>();
         YellowScoreText = GameObject.Find("/Canvas/Top/Score/Yellow").GetComponent<Text>();
@@ -216,10 +196,10 @@ public class GUI_Play : MonoBehaviour
             }
             else
             {
-                if (!matchMain.InPlacement)
+                if (!playMain.InPlacement)
                 {
-                    matchMain.PauseRound();
-                    PushMenu(MenuObj_Main);
+                    playMain.PauseRound();
+                    PushMenu(menuMain);
                     OpenMenu();
                 }
             }
@@ -229,15 +209,15 @@ public class GUI_Play : MonoBehaviour
             // left clicked, pause
             if (!menu_open)
             {
-                if (matchMain.StartedMatch && matchMain.InRound)
+                if (playMain.StartedMatch && playMain.InRound)
                 {
-                    if (matchMain.PausedRound)
+                    if (playMain.PausedRound)
                     {
-                        matchMain.ResumeRound();
+                        playMain.ResumeRound();
                     }
                     else
                     {
-                        matchMain.PauseRound();
+                        playMain.PauseRound();
                     }
                 }
             }
@@ -252,7 +232,7 @@ public class GUI_Play : MonoBehaviour
 
     void UpdateAnim()
     {
-        if (matchMain.LoadSucceed)
+        if (playMain.LoadSucceed)
         {
             AnimInGame();
         }
@@ -264,7 +244,7 @@ public class GUI_Play : MonoBehaviour
 
     void UpdateTeamname()
     {
-        if (!matchMain.LoadSucceed)
+        if (!playMain.LoadSucceed)
         {
             SetBlueTeamname("Blueteam");
             SetYellowTeamname("Yellowteam");
@@ -278,24 +258,24 @@ public class GUI_Play : MonoBehaviour
 
     void UpdateStatusText()
     {
-        if (!matchMain.LoadSucceed)
+        if (!playMain.LoadSucceed)
         {
             SetStatusInfo("Waiting for strategies");
         }
-        else if (!matchMain.StartedMatch)
+        else if (!playMain.StartedMatch)
         {
             SetStatusInfo("Waiting for new game");
         }
         else
         {
-            if (matchMain.InPlacement)
+            if (playMain.InPlacement)
             {
                 SetStatusInfo("Auto placementing");
             }
-            else if (matchMain.InRound)
+            else if (playMain.InRound)
             {
                 // In round
-                if (matchMain.PausedRound)
+                if (playMain.PausedRound)
                 {
                     SetStatusInfo("Paused round");
                 }
@@ -314,21 +294,21 @@ public class GUI_Play : MonoBehaviour
     void UpdateButtons()
     {
         // update buttons' status
-        NewMatchObj.GetComponent<Button>().interactable = matchMain.LoadSucceed;
-        NewRoundObj.GetComponent<Button>().interactable = matchMain.StartedMatch;
-        ResumeObj.GetComponent<Button>().interactable = matchMain.InRound && matchMain.PausedRound;
-        ReplayObj.GetComponent<Button>().interactable = false;
+        newMatchButton.interactable = playMain.LoadSucceed;
+        newRoundButton.interactable = playMain.StartedMatch;
+        resumeButton.interactable = playMain.InRound && playMain.PausedRound;
+        replayButton.interactable = false;
     }
 
     void UpdateTimeText()
     {
-        SetTimeText(matchInfo.PlayTime);
+        SetTimeText(MatchInfo.PlayTime);
     }
 
     void UpdateScoreText()
     {
-        SetBlueScoreText(matchInfo.Score.BlueScore);
-        SetBlueScoreText(matchInfo.Score.YellowScore);
+        SetBlueScoreText(MatchInfo.Score.BlueScore);
+        SetBlueScoreText(MatchInfo.Score.YellowScore);
     }
 
     void PushMenu(GameObject new_menu)
@@ -387,12 +367,12 @@ public class GUI_Play : MonoBehaviour
 
     void OpenBackground()
     {
-        MenuBack.SetActive(true);
+        menuBackground.SetActive(true);
     }
 
     void CloseBackground()
     {
-        MenuBack.SetActive(false);
+        menuBackground.SetActive(false);
     }
 
     void SetBlueScoreText(int i)
