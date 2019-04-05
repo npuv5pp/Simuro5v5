@@ -12,6 +12,9 @@ namespace Simuro5v5
     /// </summary>
     public class DataRecorder
     {
+        public String Name { get; set; }
+        private DateTime BeginTime;
+
         private List<MatchInfo> Data = new List<MatchInfo>();
 
         /// <summary>
@@ -21,21 +24,22 @@ namespace Simuro5v5
 
         public DataRecorder() { }
 
-        public DataRecorder(bool InitNow)
+        /// <summary>
+        /// 开始记录
+        /// </summary>
+        public void Begin()
         {
-            if (InitNow)
-            {
-                Initialize();
-            }
+            BeginTime = DateTime.Now;
+            Name = $"{BeginTime.Year}-{BeginTime.Month}-{BeginTime.Day}-{BeginTime.Hour}-{BeginTime.Minute}";
+            Event.Register(Event.EventType1.MatchInfoUpdate, Record);
         }
 
         /// <summary>
-        /// 初始化
+        /// 停止记录
         /// </summary>
-        public void Initialize()
+        public void Stop()
         {
-            Event.Register(Event.EventType1.MatchInfoUpdate, Record);
-            //Event.Register(Event.EventType1.NewRound, Remove);
+            Event.UnRegister(Event.EventType1.MatchInfoUpdate, Record);
         }
 
         /// <summary>
@@ -47,14 +51,17 @@ namespace Simuro5v5
             MatchInfo matchInfo = obj as MatchInfo;
             if (matchInfo != null)
             {
-                Debug.Log("new matchinfo recorded");
                 Data.Add(matchInfo.Clone());
             }
             else
             {
-                Debug.Log("error matchinfo");
                 Data.Add(null);
             }
+        }
+
+        public void Add(MatchInfo match)
+        {
+            Data.Add(match);
         }
 
         /// <summary>
@@ -75,12 +82,16 @@ namespace Simuro5v5
         }
 
         /// <summary>
-        /// 索引第<paramref name="i"/>个数据
+        /// 索引第<paramref name="i"/>个数据,下标从0开始
         /// </summary>
         /// <param name="i">下标</param>
         /// <returns>第i个MatchInfo数据</returns>
-        public MatchInfo Index(int i)
+        public MatchInfo Get(int i)
         {
+            if (i >= DataLength)
+            {
+                return null;
+            }
             return Data[i];
         }
     }

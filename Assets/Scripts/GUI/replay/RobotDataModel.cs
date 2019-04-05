@@ -4,20 +4,13 @@ using UnityEngine;
 using UnityEngine.UI;
 using Simuro5v5;
 
-public class Model : MonoBehaviour
+public class RobotDataModel : MonoBehaviour
 {
-    Text rowname;
-    InputField x, y;
+    public Text rowname;
+    public InputField x, y, rotation;
 
-    public string PlayerName { get; set; }
-    public Vector2 Data { get; set; }
-
-    void OnEnable()
-    {
-        rowname = transform.Find("name").GetComponent<Text>();
-        x = transform.Find("x").GetComponent<InputField>();
-        y = transform.Find("y").GetComponent<InputField>();
-    }
+    string PlayerName { get; set; }
+    Robot Robot { get; set; }
 
     private void Start()
     {
@@ -35,15 +28,24 @@ public class Model : MonoBehaviour
     private void Update()
     {
         rowname.text = PlayerName;
-        x.text = Data.x.ToString();
-        y.text = Data.y.ToString();
+        x.text = Robot.pos.x.ToString();
+        y.text = Robot.pos.y.ToString();
+        rotation.text = Robot.rotation.ToString();
     }
 
-    public void RenderData(Vector2 data)
+    /// <summary>
+    /// 渲染数据
+    /// </summary>
+    /// <param name="data"></param>
+    public void RenderData(Robot robot)
     {
-        Data = data;
+        Robot = robot;
     }
 
+    /// <summary>
+    /// 设置标题
+    /// </summary>
+    /// <param name="name"></param>
     public void SetName(string name)
     {
         PlayerName = name;

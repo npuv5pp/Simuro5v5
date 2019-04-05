@@ -4,16 +4,13 @@ using Simuro5v5;
 
 public class ControlBall : MonoBehaviour
 {
+    Collider Collider;
     Rigidbody rb;
 
     void Start()
     {
+        Collider = GetComponent<Collider>();
         rb = GetComponent<Rigidbody>();
-    }
-
-    void FixedUpdate()
-    {
-
     }
 
     public void SetPlacement(Ball ball)
@@ -39,5 +36,17 @@ public class ControlBall : MonoBehaviour
     {
         rb.Sleep();
         rb.WakeUp();
+    }
+
+    public void EnableRigidBodyAndCollider()
+    {
+        Collider.enabled = true;
+        rb.isKinematic = false;
+    }
+
+    public void DisableRigidBodyAndCollider()
+    {
+        Collider.enabled = false;
+        rb.isKinematic = true;
     }
 }

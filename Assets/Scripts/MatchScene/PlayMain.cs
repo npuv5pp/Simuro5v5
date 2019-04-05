@@ -44,51 +44,47 @@ public class PlayMain : MonoBehaviour
         set { GlobalMatchInfo.ControlState.InPlacement = value; }
     }
 
-    public static bool Created { get; set; }
-    public static bool CreateNewScene { get; set; }
-    public static StrategyManager StrategyManager { get; private set; }
-    public static MatchInfo GlobalMatchInfo { get; private set; }
+    public static GameObject Singleton;
+    public StrategyManager StrategyManager { get; private set; }
+    public MatchInfo GlobalMatchInfo { get; private set; }
     public static ObjectManager ObjectManager { get; private set; }
 
     public delegate void TimedPauseCallback();
-    static bool TimedPausing { get; set; }
-    static readonly object TimedPausingLock = new object();
+    bool TimedPausing { get; set; }
+    readonly object TimedPausingLock = new object();
 
-    static Watcher Watcher { get; set; }
-    Logger MainLogger { get { return Logger.MainLogger; } }
+    // 进入场景之后
+    void OnEnable()
+    {
+        if (Singleton != null)
+        {
+            if (gameObject != Singleton)
+            {
+                // 此时新的gameobject已经创建，调用DestroyImmediate而不是Destroy以确保新的go不会与已存在的go碰撞
+                DestroyImmediate(gameObject);
+            }
+            else
+            {
+                ObjectManager.Pause();
+            }
+            // 激活单例
+            Singleton.SetActive(true);
+        }
+    }
 
     IEnumerator Start()
     {
-        if (Created)
-        {
-            Destroy(gameObject);
-            yield break;
-        }
-        Created = true;
+        Singleton = gameObject;
         DontDestroyOnLoad(GameObject.Find("/Entity"));
-
         ConfigManager.ReadConfigFile("config.json");
-
-        Time.fixedDeltaTime = Const.Zeit;
 
         // 绑定物体
         ObjectManager = new ObjectManager();
+        NewMatch();
         ObjectManager.RebindObject();
-        if (GlobalMatchInfo == null || CreateNewScene)
-        {
-            // 新建场景
-            NewMatch();
-        }
-        else
-        {
-            // 还原场景
-            ObjectManager.RevertScene(GlobalMatchInfo);
-            Debug.Log("Reverting");
-        }
-        // 绑定MatchInfo
         ObjectManager.RebindMatchInfo(GlobalMatchInfo);
+        Event.Register(Event.EventType0.PlaySceneExited, SceneExited);
 
-        // 暂停世界
         // 等待当前帧渲染完毕后暂停，确保还原后的场景显示到屏幕上
         yield return new WaitForEndOfFrame();
         ObjectManager.Pause();
@@ -389,6 +385,11 @@ public class PlayMain : MonoBehaviour
         }
 
         Event.Send(Event.EventType1.MatchInfoUpdate, GlobalMatchInfo);
+    }
+
+    void SceneExited()
+    {
+        gameObject.SetActive(false);
     }
 
     private void OnApplicationQuit()

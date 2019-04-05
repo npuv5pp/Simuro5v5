@@ -10,7 +10,6 @@ using Button = UnityEngine.UI.Button;
 using UnityEngine.SceneManagement;
 using TMPro;
 using Simuro5v5.Strategy;
-using System.Windows.Forms;
 using System;
 
 public class GUI_Settings : MonoBehaviour

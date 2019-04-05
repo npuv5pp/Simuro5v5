@@ -1,38 +1,50 @@
 ﻿using UnityEngine.UI;
 using UnityEngine;
+using Simuro5v5;
 
+/// <summary>
+/// 管理数据板的内容
+/// </summary>
 public class DataBoardContent : MonoBehaviour
 {
     public GameObject template;
 
-    Model[] blues;
-    Model[] yellows;
+    RobotDataModel[] blues;
+    RobotDataModel[] yellows;
+    BallDataModel ball;
 
     void Start()
     {
-        blues = new Model[5];
-        yellows = new Model[5];
+        ball = transform.Find("ball").gameObject.GetComponent<BallDataModel>();
+        blues = new RobotDataModel[5];
+        yellows = new RobotDataModel[5];
 
         for (int i = 0; i < 5; i++)
         {
             var go = Instantiate(template, transform);
             go.name = $"blue{i}";
-            blues[i] = go.GetComponent<Model>();
-            blues[i].SetName($"Blue{i}");
+            blues[i] = go.GetComponent<RobotDataModel>();
+            blues[i].SetName($"B{i}");
         }
         for (int i = 0; i < 5; i++)
         {
             var go = Instantiate(template, transform);
             go.name = $"yellow{i}";
-            yellows[i] = go.GetComponent<Model>();
-            yellows[i].SetName($"Yellow{i}");
+            yellows[i] = go.GetComponent<RobotDataModel>();
+            yellows[i].SetName($"Y{i}");
         }
         Destroy(template);
 
         GetComponent<VerticalLayoutGroup>().childForceExpandHeight = true;
     }
 
-    void Update()
+    public void Render(MatchInfo matchinfo)
     {
+        for (int i = 0; i < 5; i++)
+        {
+            blues[i].RenderData(matchinfo.BlueRobot[i]);
+            yellows[i].RenderData(matchinfo.YellowRobot[i]);
+        }
+        ball.RenderData(matchinfo.Ball);
     }
 }
