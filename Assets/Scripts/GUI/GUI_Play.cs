@@ -81,63 +81,18 @@ public class GUI_Play : MonoBehaviour
         PushMenu(MenuObj_Main);
         OpenMenu();
 
-        NewMatchObj.GetComponent<Button>().onClick.AddListener(delegate ()
-        {
-            matchMain.StartMatch();
-        });
-        NewRoundObj.GetComponent<Button>().onClick.AddListener(delegate ()
-        {
-            matchMain.StartRound();
-        });
-        ResumeObj.GetComponent<Button>().onClick.AddListener(delegate
-        {
-            CloseMenu();
-            matchMain.ResumeRound();
-        });
-        ReplayObj.GetComponent<Button>().onClick.AddListener(delegate
-        {
-            // 总拍数作为回放结束拍数
-            PlayerPrefs.SetInt("step_end", matchInfo.PlayTime);
-            SceneManager.LoadScene("GameScene_Replay");
-        });
-        StrategyMenuBtnObj.GetComponent<Button>().onClick.AddListener(delegate ()
-        {
-            MenuStack[MenuStack.Count - 1].SetActive(false);
-            PushMenu(MenuObj_Strategy);
-            MenuStack[MenuStack.Count - 1].SetActive(true);
-        });
+        // >>> SET IN EDITOR <<<
+        // NewMatch onClick() => PlayMain.StartMatch()
+        // NewRound onClick() => PlayMain.StartRound()
+        // Resume onClick() => GUI_Play.CloseMenuAndResume()
+        // Replay onClick() => GUI_Play.LoadReplayScene()
+        // Menu/Main/Strategy onClick() => GUI_Play.OpenMenuStrategy()
 
-        BeginObj.GetComponent<Button>().onClick.AddListener(delegate ()
-        {
-            AnimInGame();
-            try
-            {
-                matchMain.LoadStrategy(BlueInputField.text.Trim(), YellowInputField.text.Trim());
-            }
-            catch
-            {
-                AnimOutGame();
-            }
-        });
-        UnloadObj.GetComponent<Button>().onClick.AddListener(delegate ()
-        {
-            AnimOutGame();
-            try
-            {
-                matchMain.RemoveStrategy();
-                matchMain.StopMatch();
-            }
-            catch
-            {
-                AnimInGame();
-            }
-        });
+        // BeginBtn onClick() => GUI_Play.AnimInGameAndLoadStrategy()
+        // UnloadBtn onClick() => GUI_Play.AnimOutGameAndRemoveStrategy()
 
-        ReplayObj.GetComponent<Button>().interactable = false;
-        ExitObj.GetComponent<Button>().onClick.AddListener(delegate
-        {
-            SceneManager.LoadScene("MainScene");
-        });
+        // Replay interactable => false;
+        // Exit onClick() => GUI_Play.LoadMainScene()
 
         Event.Register(Event.EventType0.RoundStart, delegate ()
         {
@@ -156,6 +111,58 @@ public class GUI_Play : MonoBehaviour
         //    Popup.Show("Round", "Round stop", 1500);
         //});
         Event.Register(Event.EventType1.LogUpdate, SetRefereeInfo);
+    }
+
+    public void LoadMainScene()
+    {
+        SceneManager.LoadScene("MainScene");
+    }
+
+    public void AnimOutGameAndRemoveStrategy()
+    {
+        AnimOutGame();
+        try
+        {
+            matchMain.RemoveStrategy();
+            matchMain.StopMatch();
+        }
+        catch
+        {
+            AnimInGame();
+        }
+    }
+
+    public void AnimInGameAndLoadStrategy()
+    {
+        AnimInGame();
+        try
+        {
+            matchMain.LoadStrategy(BlueInputField.text.Trim(), YellowInputField.text.Trim());
+        }
+        catch
+        {
+            AnimOutGame();
+        }
+    }
+
+    public void OpenMenuStrategy()
+    {
+        MenuStack[MenuStack.Count - 1].SetActive(false);
+        PushMenu(MenuObj_Strategy);
+        MenuStack[MenuStack.Count - 1].SetActive(true);
+    }
+
+    public void LoadReplayScene()
+    {
+        // 总拍数作为回放结束拍数
+        PlayerPrefs.SetInt("step_end", matchInfo.PlayTime);
+        SceneManager.LoadScene("GameScene_Replay");
+    }
+
+    public void CloseMenuAndResume()
+    {
+        CloseMenu();
+        matchMain.ResumeRound();
     }
 
     void InitObjects()
