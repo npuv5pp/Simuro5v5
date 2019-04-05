@@ -12,7 +12,7 @@ namespace Simuro5v5
     /// </summary>
     public class DataRecorder
     {
-        public String Name { get; set; }
+        public String Name;
         private DateTime BeginTime;
 
         private List<MatchInfo> Data = new List<MatchInfo>();
@@ -61,6 +61,11 @@ namespace Simuro5v5
 
         public void Add(MatchInfo match)
         {
+            if (Name == null)
+            {
+                BeginTime = DateTime.Now;
+                Name = $"{BeginTime.Year}-{BeginTime.Month}-{BeginTime.Day}-{BeginTime.Hour}-{BeginTime.Minute}";
+            }
             Data.Add(match);
         }
 

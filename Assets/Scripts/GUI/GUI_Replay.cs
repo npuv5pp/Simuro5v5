@@ -4,20 +4,19 @@
  * 2.回放菜单：包括回到比赛、返回播放、退出
 ********************************************************************************/
 
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
+using TMPro;
 using Simuro5v5;
-using Event = Simuro5v5.EventSystem.Event;
 
 public class GUI_Replay : MonoBehaviour
 {
     public Slider Slider;
     public DataBoard DataBoard;
     public GameObject Entity;
+    public TextMeshProUGUI DataName;
+    public TMP_Dropdown SpeedDropdown;
 
     public static DataRecorder Recorder { get; set; }
     private ObjectManager ObjectManager { get; set; }
@@ -59,6 +58,11 @@ public class GUI_Replay : MonoBehaviour
         Paused = true;
     }
 
+    void Update()
+    {
+        DataName.SetText(Recorder.Name);
+    }
+
     void FixedUpdate()
     {
         if (!Paused)
@@ -85,10 +89,6 @@ public class GUI_Replay : MonoBehaviour
             ObjectManager.RevertScene(matchInfo);
             DataBoard.Render(matchInfo);
         }
-        else
-        {
-            Debug.Log("null matchinfo");
-        }
     }
 
     void TogglePause()
@@ -96,6 +96,10 @@ public class GUI_Replay : MonoBehaviour
         Paused = !Paused;
     }
 
+    /// <summary>
+    /// 可能的话，向后推一拍。
+    /// 通过将SliderPostion加一，自动调用Slider上绑定的函数。
+    /// </summary>
     void Next()
     {
         if (SliderPostion < Recorder.DataLength - 1)
@@ -104,6 +108,10 @@ public class GUI_Replay : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 可能的话，向前推一拍。
+    /// 通过将SliderPostion减一，自动调用Slider上绑定的函数。
+    /// </summary>
     void Previous()
     {
         if (SliderPostion > 0)
@@ -112,6 +120,9 @@ public class GUI_Replay : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 返回按钮点击
+    /// </summary>
     public void OnBackToGameClicked()
     {
         // 先禁用掉replay场景中的物体，防止与激活后的play场景物体发生碰撞
@@ -119,23 +130,68 @@ public class GUI_Replay : MonoBehaviour
         SceneManager.LoadScene("GameScene_Play");
     }
 
+    /// <summary>
+    /// 滑动条值改变
+    /// </summary>
     public void OnSliderValueChanged()
     {
         Render(Recorder.Get(SliderPostion));
     }
 
+    /// <summary>
+    /// 用户在滑动条上点击，则暂停播放
+    /// </summary>
+    public void OnSliderClicked()
+    {
+        Paused = true;
+    }
+
+    /// <summary>
+    /// 暂停按钮点击
+    /// </summary>
     public void OnPauseClicked()
     {
         TogglePause();
     }
 
+    /// <summary>
+    /// Next按钮点击。播放下一拍并暂停。
+    /// </summary>
     public void OnNextClicked()
     {
         Next();
+        Paused = true;
     }
 
+    /// <summary>
+    /// Previous按钮点击。播放上一拍并暂停。
+    /// </summary>
     public void OnPreviousClicked()
     {
         Previous();
+        Paused = true;
+    }
+
+    /// <summary>
+    /// 用户选择的速度改变，更改FixedUpdate频率。
+    /// </summary>
+    public void OnSpeedChanged()
+    {
+        switch (SpeedDropdown.value)
+        {
+            case 0:
+                Time.timeScale = 1;
+                break;
+            case 1:
+                Time.timeScale = 0.5f;
+                break;
+            case 2:
+                Time.timeScale = 0.2f;
+                break;
+            case 3:
+                Time.timeScale = 0.1f;
+                break;
+        }
+
     }
 }
