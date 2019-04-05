@@ -64,7 +64,7 @@ public class GUI_Play : MonoBehaviour
     static Text BlueTeamname { get; set; }
     static Text YellowTeamname { get; set; }
 
-    static List<GameObject> MenuStack { get; set; }
+    static Stack<GameObject> MenuStack { get; set; }
 
     void Start()
     {
@@ -77,7 +77,7 @@ public class GUI_Play : MonoBehaviour
         MenuObj_Main.SetActive(false);
         MenuObj_Strategy.SetActive(false);
 
-        MenuStack = new List<GameObject>();
+        MenuStack = new Stack<GameObject>();
         PushMenu(MenuObj_Main);
         OpenMenu();
 
@@ -87,10 +87,8 @@ public class GUI_Play : MonoBehaviour
         // Resume onClick() => GUI_Play.CloseMenuAndResume()
         // Replay onClick() => GUI_Play.LoadReplayScene()
         // Menu/Main/Strategy onClick() => GUI_Play.OpenMenuStrategy()
-
         // BeginBtn onClick() => GUI_Play.AnimInGameAndLoadStrategy()
         // UnloadBtn onClick() => GUI_Play.AnimOutGameAndRemoveStrategy()
-
         // Replay interactable => false;
         // Exit onClick() => GUI_Play.LoadMainScene()
 
@@ -147,9 +145,9 @@ public class GUI_Play : MonoBehaviour
 
     public void OpenMenuStrategy()
     {
-        MenuStack[MenuStack.Count - 1].SetActive(false);
+        MenuStack.Peek().SetActive(false);
         PushMenu(MenuObj_Strategy);
-        MenuStack[MenuStack.Count - 1].SetActive(true);
+        MenuStack.Peek().SetActive(true);
     }
 
     public void LoadReplayScene()
@@ -338,12 +336,12 @@ public class GUI_Play : MonoBehaviour
         if (menu_open)
         {
             CloseMenu();
-            MenuStack.Add(new_menu);
+            MenuStack.Push(new_menu);
             OpenMenu();
         }
         else
         {
-            MenuStack.Add(new_menu);
+            MenuStack.Push(new_menu);
         }
     }
 
@@ -353,8 +351,7 @@ public class GUI_Play : MonoBehaviour
         CloseMenu();
         if (MenuStack.Count >= 1)
         {
-            var curr = MenuStack[MenuStack.Count - 1];
-            MenuStack.Remove(curr);
+            MenuStack.Pop();
         }
         if (will_open)
         {
@@ -370,7 +367,7 @@ public class GUI_Play : MonoBehaviour
         if (MenuStack.Count > 0)
         {
             OpenBackground();
-            MenuStack[MenuStack.Count - 1].SetActive(true);
+            MenuStack.Peek().SetActive(true);
             menu_open = true;
         }
     }
@@ -382,7 +379,7 @@ public class GUI_Play : MonoBehaviour
     {
         if (MenuStack.Count > 0)
         {
-            MenuStack[MenuStack.Count - 1].SetActive(false);
+            MenuStack.Peek().SetActive(false);
         }
         CloseBackground();
         menu_open = false;
