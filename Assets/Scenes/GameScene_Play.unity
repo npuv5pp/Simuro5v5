@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.4482447, g: 0.4982717, b: 0.57558084, a: 1}
+  m_IndirectSpecularColor: {r: 0.4482447, g: 0.49827182, b: 0.5755813, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -276,7 +276,7 @@ GameObject:
   m_Component:
   - component: {fileID: 120878980}
   m_Layer: 5
-  m_Name: Teamname
+  m_Name: TeamName
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -314,7 +314,7 @@ GameObject:
   - component: {fileID: 157429515}
   - component: {fileID: 157429517}
   m_Layer: 5
-  m_Name: Bname
+  m_Name: BlueName
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -408,7 +408,7 @@ GameObject:
   - component: {fileID: 272392071}
   - component: {fileID: 272392073}
   m_Layer: 5
-  m_Name: Yname
+  m_Name: YellowName
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -751,8 +751,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 108961852}
-        m_MethodName: StartRound
+      - m_Target: {fileID: 1114279348}
+        m_MethodName: PlayMainStartRound
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2572,6 +2572,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43870238d7ef58f429a51f143b92b17d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playMain: {fileID: 108961852}
+  menuBackground: {fileID: 1727142382}
+  menuMain: {fileID: 292217339}
+  menuStrategy: {fileID: 1321613697}
+  newMatchButton: {fileID: 1817759835}
+  newRoundButton: {fileID: 365058919}
+  resumeButton: {fileID: 865555975}
+  replayButton: {fileID: 289315123}
+  blueInputField: {fileID: 891734120}
+  yellowInputField: {fileID: 924646131}
+  refereeAnim: {fileID: 114333408}
+  cameraAnim: {fileID: 789255919}
+  topAnim: {fileID: 2120607297}
+  blueScoreText: {fileID: 865233047}
+  yellowScoreText: {fileID: 1703246895}
+  timeText: {fileID: 433787149}
+  refereeLogText: {fileID: 114333405}
+  statusText: {fileID: 2145997370}
+  blueTeamName: {fileID: 157429515}
+  yellowTeamName: {fileID: 272392071}
 --- !u!1 &1157268903
 GameObject:
   m_ObjectHideFlags: 0
@@ -3760,8 +3780,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 108961852}
-        m_MethodName: StartMatch
+      - m_Target: {fileID: 1114279348}
+        m_MethodName: PlayMainStartMatch
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
