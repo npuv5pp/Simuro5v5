@@ -81,67 +81,73 @@ public class GUI_Play : MonoBehaviour
         PushMenu(MenuObj_Main);
         OpenMenu();
 
-        NewMatchObj.GetComponent<Button>().onClick.AddListener(delegate ()
-        {
-            Recorder = new DataRecorder();
-            Recorder.Begin();
-            matchMain.StartMatch();
-        });
-        NewRoundObj.GetComponent<Button>().onClick.AddListener(delegate ()
-        {
-            matchMain.StartRound();
-        });
-        ResumeObj.GetComponent<Button>().onClick.AddListener(delegate
-        {
-            CloseMenu();
-            matchMain.ResumeRound();
-        });
-        ReplayObj.GetComponent<Button>().onClick.AddListener(delegate
-        {
-            GUI_Replay.Recorder = Recorder;
-            Event.Send(Event.EventType0.PlaySceneExited);
-            SceneManager.LoadScene("GameScene_Replay");
-        });
-        StrategyMenuBtnObj.GetComponent<Button>().onClick.AddListener(delegate ()
-        {
-            MenuStack[MenuStack.Count - 1].SetActive(false);
-            PushMenu(MenuObj_Strategy);
-            MenuStack[MenuStack.Count - 1].SetActive(true);
-        });
+        // >>> SET IN EDITOR <<<
+        // NewMatch onClick() => PlayMain.StartMatch()
+        // NewRound onClick() => PlayMain.StartRound()
+        // Resume onClick() => GUI_Play.CloseMenuAndResume()
+        // Replay onClick() => GUI_Play.LoadReplayScene()
+        // Menu/Main/Strategy onClick() => GUI_Play.OpenMenuStrategy()
 
-        BeginObj.GetComponent<Button>().onClick.AddListener(delegate ()
-        {
-            try
-            {
-                matchMain.LoadStrategy(BlueInputField.text.Trim(), YellowInputField.text.Trim());
-            }
-            catch
-            {
-                return;
-            }
-            AnimInGame();
-        });
-        UnloadObj.GetComponent<Button>().onClick.AddListener(delegate ()
-        {
-            AnimOutGame();
-            try
-            {
-                matchMain.RemoveStrategy();
-                matchMain.StopMatch();
-            }
-            catch
-            {
-                AnimInGame();
-            }
-        });
+        // BeginBtn onClick() => GUI_Play.AnimInGameAndLoadStrategy()
+        // UnloadBtn onClick() => GUI_Play.AnimOutGameAndRemoveStrategy()
 
-        ExitObj.GetComponent<Button>().onClick.AddListener(delegate
-        {
-            Event.Send(Event.EventType0.PlaySceneExited);
-            SceneManager.LoadScene("MainScene");
-        });
+        // Replay interactable => false;
+        // Exit onClick() => GUI_Play.LoadMainScene()
 
         Event.Register(Event.EventType1.LogUpdate, SetRefereeInfo);
+    }
+
+    public void LoadMainScene()
+    {
+        Event.Send(Event.EventType0.PlaySceneExited);
+        SceneManager.LoadScene("MainScene");
+    }
+
+    public void LoadReplayScene()
+    {
+        GUI_Replay.Recorder = Recorder;
+        Event.Send(Event.EventType0.PlaySceneExited);
+        SceneManager.LoadScene("GameScene_Replay");
+    }
+
+    public void AnimOutGameAndRemoveStrategy()
+    {
+        AnimOutGame();
+        try
+        {
+            matchMain.RemoveStrategy();
+            matchMain.StopMatch();
+        }
+        catch
+        {
+            AnimInGame();
+        }
+    }
+
+    public void AnimInGameAndLoadStrategy()
+    {
+        AnimInGame();
+        try
+        {
+            matchMain.LoadStrategy(BlueInputField.text.Trim(), YellowInputField.text.Trim());
+        }
+        catch
+        {
+            AnimOutGame();
+        }
+    }
+
+    public void OpenMenuStrategy()
+    {
+        MenuStack[MenuStack.Count - 1].SetActive(false);
+        PushMenu(MenuObj_Strategy);
+        MenuStack[MenuStack.Count - 1].SetActive(true);
+    }
+
+    public void CloseMenuAndResume()
+    {
+        CloseMenu();
+        matchMain.ResumeRound();
     }
 
     void InitObjects()
@@ -169,7 +175,7 @@ public class GUI_Play : MonoBehaviour
         BeginObj = GameObject.Find("/Canvas/Menu/Strategy/BeginBtn");
         UnloadObj = GameObject.Find("/Canvas/Menu/Strategy/UnloadBtn");
 
-        BlueScoreText  = GameObject.Find("/Canvas/Top/Score/Blue").GetComponent<Text>();
+        BlueScoreText = GameObject.Find("/Canvas/Top/Score/Blue").GetComponent<Text>();
         YellowScoreText = GameObject.Find("/Canvas/Top/Score/Yellow").GetComponent<Text>();
         TimeText = GameObject.Find("/Canvas/Top/Time").GetComponent<Text>();
         RefereeLogText = GameObject.Find("/Canvas/Log/Referee").GetComponent<Text>();
@@ -340,6 +346,9 @@ public class GUI_Play : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 打开背景与 <code>MenuStack</code> 最后一项，并设置 <code>menu_open</code> 为真。
+    /// </summary>
     void OpenMenu()
     {
         if (MenuStack.Count > 0)
@@ -350,6 +359,9 @@ public class GUI_Play : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 关闭背景与 <code>MenuStack</code> 中最后一项。
+    /// </summary>
     void CloseMenu()
     {
         if (MenuStack.Count > 0)
@@ -417,7 +429,7 @@ public class GUI_Play : MonoBehaviour
         AnimReferee.InGame();
         AnimCamera.InGame();
     }
-    
+
     void AnimOutGame()
     {
         AnimTop.OutGame();
