@@ -118,8 +118,8 @@ namespace Simuro5v5
             {
                 if (OutputMatchInfo != null)
                 {
-                    OutputMatchInfo.BlueRobot[i].velocityLeft = ws.Wheels[i].left;
-                    OutputMatchInfo.BlueRobot[i].velocityRight = ws.Wheels[i].right;
+                    OutputMatchInfo.BlueRobots[i].velocityLeft = ws.Wheels[i].left;
+                    OutputMatchInfo.BlueRobots[i].velocityRight = ws.Wheels[i].right;
                 }
                 blueComponent[i].SetWheelVelocity(ws.Wheels[i]);
             }
@@ -131,8 +131,8 @@ namespace Simuro5v5
             {
                 if (OutputMatchInfo != null)
                 {
-                    OutputMatchInfo.YellowRobot[i].velocityLeft = ws.Wheels[i].left;
-                    OutputMatchInfo.YellowRobot[i].velocityRight = ws.Wheels[i].right;
+                    OutputMatchInfo.YellowRobots[i].velocityLeft = ws.Wheels[i].left;
+                    OutputMatchInfo.YellowRobots[i].velocityRight = ws.Wheels[i].right;
                 }
                 yellowComponent[i].SetWheelVelocity(ws.Wheels[i]);
             }
@@ -200,8 +200,8 @@ namespace Simuro5v5
         {
             for (int i = 0; i < 5; i++)
             {
-                blueComponent[i].Revert(matchInfo.BlueRobot[i]);
-                yellowComponent[i].Revert(matchInfo.YellowRobot[i]);
+                blueComponent[i].Revert(matchInfo.BlueRobots[i]);
+                yellowComponent[i].Revert(matchInfo.YellowRobots[i]);
             }
             ballComponent.Revert(matchInfo.Ball);
             OutputMatchInfo?.Update(matchInfo);

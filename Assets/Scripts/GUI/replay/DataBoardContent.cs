@@ -44,8 +44,8 @@ public class DataBoardContent : MonoBehaviour
     {
         for (int i = 0; i < 5; i++)
         {
-            blues[i].RenderData(matchinfo.BlueRobot[i]);
-            yellows[i].RenderData(matchinfo.YellowRobot[i]);
+            blues[i].RenderData(matchinfo.BlueRobots[i]);
+            yellows[i].RenderData(matchinfo.YellowRobots[i]);
         }
         ball.RenderData(matchinfo.Ball);
     }
