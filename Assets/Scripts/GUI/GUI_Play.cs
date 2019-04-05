@@ -73,8 +73,8 @@ public class GUI_Play : MonoBehaviour
         OpenMenu();
 
         // >>> SET IN EDITOR <<<
-        // NewMatch onClick() => PlayMain.StartMatch()
-        // NewRound onClick() => PlayMain.StartRound()
+        // NewMatch onClick() => GUI_Play.PlayMainStartMatch()
+        // NewRound onClick() => GUI_Play.PlayMainStartRound()
         // Resume onClick() => GUI_Play.CloseMenuAndResume()
         // Replay onClick() => GUI_Play.LoadReplayScene()
         // Menu/Main/Strategy onClick() => GUI_Play.OpenMenuStrategy()
@@ -152,6 +152,16 @@ public class GUI_Play : MonoBehaviour
     {
         CloseMenu();
         playMain.ResumeRound();
+    }
+
+    public void PlayMainStartMatch()
+    {
+        playMain.StartMatch();
+    }
+
+    public void PlayMainStartRound()
+    {
+        playMain.StartRound();
     }
 
     void InitObjects()
