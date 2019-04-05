@@ -38,7 +38,7 @@ public class GUI_Replay : MonoBehaviour
 
     void Start()
     {
-        if (Recorder == null)
+        if (Recorder == null || Recorder.DataLength == 0)
         {
             Recorder = new DataRecorder();
             for (int i = 0; i < 100; i++)
