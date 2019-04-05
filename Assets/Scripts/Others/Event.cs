@@ -75,6 +75,9 @@ namespace Simuro5v5.EventSystem
             RoundPause,
             RoundResume,
             RoundStop,
+
+            PlaySceneEntered,
+            PlaySceneExited,
         }
 
         /// <summary>
@@ -158,6 +161,12 @@ namespace Simuro5v5.EventSystem
                 EventMap0[eventType] += handler;
         }
 
+        public static void UnRegister(EventType0 eventType, ZeroObjEventHandler handler)
+        {
+            if (EventMap0.ContainsKey(eventType))
+                EventMap0[eventType] -= handler;
+        }
+
         /// <summary>
         /// 注册事件；事件接受一个参数
         /// </summary>
@@ -169,6 +178,12 @@ namespace Simuro5v5.EventSystem
                 EventMap1[eventType] += handler;
         }
 
+        public static void UnRegister(EventType1 eventType, OneObjEventHandler handler)
+        {
+            if (EventMap1.ContainsKey(eventType))
+                EventMap1[eventType] -= handler;
+        }
+
         /// <summary>
         /// 注册事件；事件接受两个参数
         /// </summary>
@@ -178,6 +193,12 @@ namespace Simuro5v5.EventSystem
         {
             if (EventMap2.ContainsKey(eventType))
                 EventMap2[eventType] += handler;
+        }
+
+        public static void UnRegister(EventType2 eventType, TwoObjEventHandler handler)
+        {
+            if (EventMap2.ContainsKey(eventType))
+                EventMap2[eventType] -= handler;
         }
 
         /// <summary>

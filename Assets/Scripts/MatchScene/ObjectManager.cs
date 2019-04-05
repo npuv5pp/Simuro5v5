@@ -32,6 +32,43 @@ namespace Simuro5v5
             OutputMatchInfo = matchInfo;
         }
 
+        public void RebindObject(GameObject entity)
+        {
+            ballObject = entity.transform.Find("Ball").gameObject;
+            blueObject = new GameObject[5]
+            {
+                entity.transform.Find("Robot/Blue/Blue0").gameObject,
+                entity.transform.Find("Robot/Blue/Blue1").gameObject,
+                entity.transform.Find("Robot/Blue/Blue2").gameObject,
+                entity.transform.Find("Robot/Blue/Blue3").gameObject,
+                entity.transform.Find("Robot/Blue/Blue4").gameObject
+            };
+            yellowObject = new GameObject[5]
+            {
+                entity.transform.Find("Robot/Yellow/Yellow0").gameObject,
+                entity.transform.Find("Robot/Yellow/Yellow1").gameObject,
+                entity.transform.Find("Robot/Yellow/Yellow2").gameObject,
+                entity.transform.Find("Robot/Yellow/Yellow3").gameObject,
+                entity.transform.Find("Robot/Yellow/Yellow4").gameObject
+            };
+
+            ballComponent = ballObject.GetComponent<ControlBall>();
+            blueComponent = new ControlRobot[5] {
+                blueObject[0].GetComponent<ControlRobot>(),
+                blueObject[1].GetComponent<ControlRobot>(),
+                blueObject[2].GetComponent<ControlRobot>(),
+                blueObject[3].GetComponent<ControlRobot>(),
+                blueObject[4].GetComponent<ControlRobot>(),
+            };
+            yellowComponent = new ControlRobot[5] {
+                yellowObject[0].GetComponent<ControlRobot>(),
+                yellowObject[1].GetComponent<ControlRobot>(),
+                yellowObject[2].GetComponent<ControlRobot>(),
+                yellowObject[3].GetComponent<ControlRobot>(),
+                yellowObject[4].GetComponent<ControlRobot>(),
+            };
+        }
+
         /// <summary>
         /// 重新绑定场景中的对象
         /// </summary>
@@ -79,8 +116,11 @@ namespace Simuro5v5
         {
             for (int i = 0; i < 5; i++)
             {
-                OutputMatchInfo.BlueRobot[i].velocityLeft = ws.Wheels[i].left;
-                OutputMatchInfo.BlueRobot[i].velocityRight = ws.Wheels[i].right;
+                if (OutputMatchInfo != null)
+                {
+                    OutputMatchInfo.BlueRobot[i].velocityLeft = ws.Wheels[i].left;
+                    OutputMatchInfo.BlueRobot[i].velocityRight = ws.Wheels[i].right;
+                }
                 blueComponent[i].SetWheelVelocity(ws.Wheels[i]);
             }
         }
@@ -89,8 +129,11 @@ namespace Simuro5v5
         {
             for (int i = 0; i < 5; i++)
             {
-                OutputMatchInfo.YellowRobot[i].velocityLeft = ws.Wheels[i].left;
-                OutputMatchInfo.YellowRobot[i].velocityRight = ws.Wheels[i].right;
+                if (OutputMatchInfo != null)
+                {
+                    OutputMatchInfo.YellowRobot[i].velocityLeft = ws.Wheels[i].left;
+                    OutputMatchInfo.YellowRobot[i].velocityRight = ws.Wheels[i].right;
+                }
                 yellowComponent[i].SetWheelVelocity(ws.Wheels[i]);
             }
         }
@@ -161,7 +204,7 @@ namespace Simuro5v5
                 yellowComponent[i].Revert(matchInfo.YellowRobot[i]);
             }
             ballComponent.Revert(matchInfo.Ball);
-            OutputMatchInfo.Update(matchInfo);
+            OutputMatchInfo?.Update(matchInfo);
         }
 
         /// <summary>
@@ -169,7 +212,27 @@ namespace Simuro5v5
         /// </summary>
         public void UpdateFromScene()
         {
-            OutputMatchInfo.UpdateEntity(ballObject, blueObject, yellowObject);
+            OutputMatchInfo?.UpdateEntity(ballObject, blueObject, yellowObject);
+        }
+
+        public void EnableRigidBody()
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                blueComponent[i].EnableRigidBodyAndCollider();
+                yellowComponent[i].EnableRigidBodyAndCollider();
+            }
+            ballComponent.EnableRigidBodyAndCollider();
+        }
+
+        public void DisableRigidBodyAndCollider()
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                blueComponent[i].DisableRigidBodyAndCollider();
+                yellowComponent[i].DisableRigidBodyAndCollider();
+            }
+            ballComponent.DisableRigidBodyAndCollider();
         }
 
         /// <summary>

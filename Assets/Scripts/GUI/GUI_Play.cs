@@ -10,15 +10,18 @@ using UnityEngine.SceneManagement;
 using System.Collections.Generic;
 using Simuro5v5;
 using Event = Simuro5v5.EventSystem.Event;
-using Simuro5v5.Strategy;
 
 public class GUI_Play : MonoBehaviour
 {
     bool menu_open = false;
-    bool GUI_on_Camera = true;
+
+    static DataRecorder Recorder;
 
     // 以下对象设为静态，防止之后注册事件函数后，闭包造成重载场景后的空引用
-    // public Popup popup;
+    static Popup Popup { get; set; }
+
+    static PlayMain matchMain { get; set; }
+    static MatchInfo matchInfo { get { return matchMain?.GlobalMatchInfo; } }
 
     public PlayMain playMain;
     static MatchInfo MatchInfo => PlayMain.GlobalMatchInfo;
@@ -83,28 +86,20 @@ public class GUI_Play : MonoBehaviour
         // Replay interactable => false;
         // Exit onClick() => GUI_Play.LoadMainScene()
 
-        Event.Register(Event.EventType0.RoundStart, delegate ()
-        {
-            SetRefereeInfo("Waiting For <b>Referee</b>");
-        });
-        //Event.Register(Event.EventType0.RoundResume, delegate ()
-        //{
-        //    Popup.Show("Round", "Round resume", 1500);
-        //});
-        //Event.Register(Event.EventType0.RoundPause, delegate ()
-        //{
-        //    Popup.Show("Round", "Round pause", 1500);
-        //});
-        //Event.Register(Event.EventType0.RoundStop, delegate ()
-        //{
-        //    Popup.Show("Round", "Round stop", 1500);
-        //});
         Event.Register(Event.EventType1.LogUpdate, SetRefereeInfo);
     }
 
     public void LoadMainScene()
     {
+        Event.Send(Event.EventType0.PlaySceneExited);
         SceneManager.LoadScene("MainScene");
+    }
+
+    public void LoadReplayScene()
+    {
+        GUI_Replay.Recorder = Recorder;
+        Event.Send(Event.EventType0.PlaySceneExited);
+        SceneManager.LoadScene("GameScene_Replay");
     }
 
     public void AnimOutGameAndRemoveStrategy()
@@ -139,13 +134,6 @@ public class GUI_Play : MonoBehaviour
         MenuStack.Peek().SetActive(false);
         PushMenu(menuStrategy);
         MenuStack.Peek().SetActive(true);
-    }
-
-    public void LoadReplayScene()
-    {
-        // 总拍数作为回放结束拍数
-        PlayerPrefs.SetInt("step_end", MatchInfo.PlayTime);
-        SceneManager.LoadScene("GameScene_Replay");
     }
 
     public void CloseMenuAndResume()
@@ -237,8 +225,8 @@ public class GUI_Play : MonoBehaviour
         }
         else
         {
-            SetBlueTeamname(PlayMain.StrategyManager.GetBlueTeaminfo().Name);
-            SetYellowTeamname(PlayMain.StrategyManager.GetYellowTeaminfo().Name);
+            SetBlueTeamname(matchMain.StrategyManager.GetBlueTeaminfo().Name);
+            SetYellowTeamname(matchMain.StrategyManager.GetYellowTeaminfo().Name);
         }
     }
 
@@ -283,7 +271,6 @@ public class GUI_Play : MonoBehaviour
         newMatchButton.interactable = playMain.LoadSucceed;
         newRoundButton.interactable = playMain.StartedMatch;
         resumeButton.interactable = playMain.InRound && playMain.PausedRound;
-        replayButton.interactable = false;
     }
 
     void UpdateTimeText()
@@ -408,7 +395,7 @@ public class GUI_Play : MonoBehaviour
         refereeAnim.InGame();
         cameraAnim.InGame();
     }
-    
+
     void AnimOutGame()
     {
         topAnim.OutGame();

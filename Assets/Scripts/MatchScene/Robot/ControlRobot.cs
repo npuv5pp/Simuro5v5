@@ -19,10 +19,12 @@ public class ControlRobot : MonoBehaviour
 
     GameObject leftwheel, rightwheel;
 
+    Collider Collider;
     Rigidbody rb;
 
     void Start()
     {
+        Collider = GetComponent<Collider>();
         rb = GetComponent<Rigidbody>();
         rb.maxAngularVelocity = (Const.Robot.maxAngularVelocity * Mathf.Deg2Rad);
 
@@ -113,6 +115,18 @@ public class ControlRobot : MonoBehaviour
         rb.angularVelocity = robot.GetAngularVelocityVector3();
 
         SetWheelVelocity((float)robot.velocityLeft, (float)robot.velocityRight);
+    }
+
+    public void DisableRigidBodyAndCollider()
+    {
+        Collider.enabled = false;
+        rb.isKinematic = true;
+    }
+
+    public void EnableRigidBodyAndCollider()
+    {
+        Collider.enabled = true;
+        rb.isKinematic = false;
     }
 
     void InitRobotParameter()
