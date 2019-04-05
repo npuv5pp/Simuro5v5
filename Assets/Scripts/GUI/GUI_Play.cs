@@ -20,7 +20,7 @@ public class GUI_Play : MonoBehaviour
     // 以下对象设为静态，防止之后注册事件函数后，闭包造成重载场景后的空引用
     static Popup Popup { get; set; }
 
-    public PlayMain playMain;
+    PlayMain playMain;
 
     MatchInfo MatchInfo => playMain.GlobalMatchInfo;
 
@@ -61,8 +61,8 @@ public class GUI_Play : MonoBehaviour
     void Start()
     {
         playMain = PlayMain.Singleton.GetComponent<PlayMain>();
-        InitObjects();
 
+        UpdateAnim();
         UpdateTimeText();
         UpdateScoreText();
 
@@ -138,12 +138,6 @@ public class GUI_Play : MonoBehaviour
     public void PlayMainStartRound()
     {
         playMain.StartRound();
-    }
-
-    void InitObjects()
-    {
-
-        UpdateAnim();
     }
 
     void Update()
