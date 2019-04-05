@@ -15,7 +15,7 @@ public class GUI_Play : MonoBehaviour
 {
     bool menu_open = false;
 
-    static DataRecorder Recorder;
+    DataRecorder Recorder;
 
     // 以下对象设为静态，防止之后注册事件函数后，闭包造成重载场景后的空引用
     static Popup Popup { get; set; }
@@ -73,6 +73,8 @@ public class GUI_Play : MonoBehaviour
         MenuStack = new Stack<GameObject>();
         PushMenu(menuMain);
         OpenMenu();
+
+        Recorder = new DataRecorder();
 
         Event.Register(Event.EventType1.LogUpdate, SetRefereeInfo);
     }
@@ -132,6 +134,7 @@ public class GUI_Play : MonoBehaviour
 
     public void PlayMainStartMatch()
     {
+        Recorder.Begin();
         playMain.StartMatch();
     }
 
