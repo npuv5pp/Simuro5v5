@@ -24,6 +24,7 @@ public class DataBoardContent : MonoBehaviour
             var go = Instantiate(template, transform);
             go.name = $"blue{i}";
             blues[i] = go.GetComponent<RobotDataModel>();
+            blues[i].SetNameColor(Const.Style.SideBlue);
             blues[i].SetName($"B{i}");
         }
         for (int i = 0; i < 5; i++)
@@ -31,6 +32,7 @@ public class DataBoardContent : MonoBehaviour
             var go = Instantiate(template, transform);
             go.name = $"yellow{i}";
             yellows[i] = go.GetComponent<RobotDataModel>();
+            yellows[i].SetNameColor(Const.Style.SideYellow);
             yellows[i].SetName($"Y{i}");
         }
         Destroy(template);

@@ -475,8 +475,8 @@ namespace Simuro5v5
 
         public void Normalize()
         {
-            if (left > Const.max_vec) { left = Const.max_vec; }
-            if (right > Const.max_vec) { right = Const.max_vec; }
+            if (left > Const.MaxWheelVelocity) { left = Const.MaxWheelVelocity; }
+            if (right > Const.MaxWheelVelocity) { right = Const.MaxWheelVelocity; }
         }
     }
 

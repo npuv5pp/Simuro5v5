@@ -12,19 +12,6 @@ public class RobotDataModel : MonoBehaviour
     string PlayerName { get; set; }
     Robot Robot { get; set; }
 
-    private void Start()
-    {
-        if (name.ToLower().StartsWith("blue"))
-        {
-            rowname.color = Color.blue;
-        }
-        else if (name.ToLower().StartsWith("yellow"))
-        {
-            rowname.color = Color.yellow;
-        }
-
-    }
-
     private void Update()
     {
         rowname.text = PlayerName;
@@ -40,6 +27,15 @@ public class RobotDataModel : MonoBehaviour
     public void RenderData(Robot robot)
     {
         Robot = robot;
+    }
+
+    /// <summary>
+    /// 设置标题的颜色
+    /// </summary>
+    /// <param name="color"></param>
+    public void SetNameColor(Color color)
+    {
+        rowname.color = color;
     }
 
     /// <summary>

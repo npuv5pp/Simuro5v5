@@ -5,8 +5,8 @@ namespace Simuro5v5
 {
     static class Const
     {
-        public readonly static int max_vec = 125;
-        public readonly static int min_vec = -125;
+        public readonly static int MaxWheelVelocity = 125;
+        public readonly static int MinWheelVelocity = -125;
         public readonly static float Zeit = (1.0f / 50.0f);                 // 模拟频率的倒数，即一拍的时间
         public readonly static float TimeScale = 1.0f;                      // 默认时间流速
         public readonly static float inch2cm = 2.54f;                       // 英寸转化成厘米
@@ -65,43 +65,20 @@ namespace Simuro5v5
         {
             public readonly static float mass = 10f;
             public readonly static float radius = 3.54018f * 10;
-
-            public readonly static float wheelDampingRate = 0.0001f;      // 0.25
-            public readonly static float suspensionDistance = 0.0f;     // 0.0
-            public readonly static float forceAppPointDistance = 0.0f;  // 0.3
-
-            public readonly static float brakeTorque = 30000f;          // 30000
-
-            public readonly static float extremumSlip_fF = 100f;        // 0.4
-            public readonly static float extremumValue_fF = 10f;       // 1.0
-            public readonly static float asymptoteSlip_fF = 100f;       // 0.8
-            public readonly static float asymptoteValue_fF = 10f;      // 0.5
-            public readonly static float stiffness_fF = 15f;           // 1.0
-
-            public readonly static float extremumSlip_sF = 0.2f;        // 0.2
-            public readonly static float extremumValue_sF = 1.0f;       // 1.0
-            public readonly static float asymptoteSlip_sF = 0.5f;       // 0.5
-            public readonly static float asymptoteValue_sF = 0.75f;     // 0.75
-            public readonly static float stiffness_sF = 0.0f;           // 1.0
-
-            public readonly static float damper = 0;                // 4500
-            public readonly static float spring = 0;               // 35000
-            public readonly static float targetPosition = 0;
-
-            // 低速时容易震动，所以多迭代几次
-            public readonly static float criticalSpeed = 25f;          // 5.0
-            public readonly static int stepsBelow = 8;                  // 5
-            public readonly static int stepsAbove = 8;                  // 1
         }
 
-        public static void DebugLog(string message)
+        /// <summary>
+        /// 平台样式的基本颜色
+        /// </summary>
+        public static class Style
         {
-            Debug.Log(message);
-        }
+            // UI上使用的颜色
+            public static Color UIBlue = new Color(65, 198, 236);
+            public static Color UIRed = new Color(242, 12, 0);
 
-        public static void DebugLog2(string message)
-        {
-            Debug.Log(message);
+            // 有关队伍的颜色
+            public static Color SideBlue = new Color(0, 87, 255);
+            public static Color SideYellow = new Color(248, 255, 0);
         }
     }
 }

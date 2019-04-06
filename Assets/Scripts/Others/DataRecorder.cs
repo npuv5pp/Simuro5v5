@@ -23,7 +23,6 @@ namespace Simuro5v5
         public string Name;
         private DateTime BeginTime;
 
-        private List<MatchInfo> _Data = new List<MatchInfo>();
         private List<BaseRecodeData> Data = new List<BaseRecodeData>();
 
         /// <summary>

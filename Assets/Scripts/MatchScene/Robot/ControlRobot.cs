@@ -17,7 +17,7 @@ public class ControlRobot : MonoBehaviour
     Vector3 forward_force, forward_drag;
     Vector3 torque, angular_drag;
 
-    GameObject leftwheel, rightwheel;
+    //GameObject leftwheel, rightwheel;
 
     Collider Collider;
     Rigidbody rb;
@@ -28,8 +28,8 @@ public class ControlRobot : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         rb.maxAngularVelocity = (Const.Robot.maxAngularVelocity * Mathf.Deg2Rad);
 
-        leftwheel = transform.Find("WheelL").gameObject;
-        rightwheel = transform.Find("WheelR").gameObject;
+        //leftwheel = transform.Find("WheelL").gameObject;
+        //rightwheel = transform.Find("WheelR").gameObject;
 
         InitRobotParameter();
     }
