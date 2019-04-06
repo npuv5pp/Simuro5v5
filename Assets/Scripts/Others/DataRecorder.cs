@@ -63,7 +63,7 @@ namespace Simuro5v5
             MatchInfo matchInfo = obj as MatchInfo;
             if (matchInfo != null)
             {
-                Data.Add(new StateRecodeData(DataType.InPlaying, matchInfo.Clone()));
+                Data.Add(new StateRecodeData(DataType.InPlaying, new MatchInfo(matchInfo)));
             }
             else
             {

@@ -109,7 +109,7 @@ namespace Simuro5v5
 
         public void SetToDefault()
         {
-            RevertScene(MatchInfo.DefaultMatch);
+            RevertScene(MatchInfo.newDefaultPreset());
         }
 
         public void SetBlueWheels(WheelInfo ws)

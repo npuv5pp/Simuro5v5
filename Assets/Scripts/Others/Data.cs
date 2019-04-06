@@ -2,7 +2,9 @@
 using UnityEngine;
 using Simuro5v5.Config;
 using Simuro5v5.Strategy;
+using System.Collections.Generic;
 using System;
+using System.Linq;
 
 namespace Simuro5v5
 {
@@ -70,83 +72,49 @@ namespace Simuro5v5
             UpdateEntity(ball, blue, yellow);
         }
 
-        public static MatchInfo DefaultMatch
+        public MatchInfo(MatchInfo another)
         {
-            get
-            {
-                var rv = new MatchInfo();
-
-                rv.Ball.pos.x = 0;
-                rv.Ball.pos.y = 0;
-                rv.Ball.angularVelocity = 0;
-                rv.Ball.linearVelocity = Vector2D.zero;
-
-                rv.BlueRobots[0].pos.x = 102.5F;
-                rv.BlueRobots[0].pos.y = 0;
-                rv.BlueRobots[0].rotation = -90;
-                rv.BlueRobots[1].pos.x = 81.2F;
-                rv.BlueRobots[1].pos.y = -48F;
-                rv.BlueRobots[1].rotation = 180;
-                rv.BlueRobots[2].pos.x = 81.2F;
-                rv.BlueRobots[2].pos.y = 48F;
-                rv.BlueRobots[2].rotation = 180;
-                rv.BlueRobots[3].pos.x = 29.8F;
-                rv.BlueRobots[3].pos.y = -48F;
-                rv.BlueRobots[3].rotation = 180;
-                rv.BlueRobots[4].pos.x = 29.8F;
-                rv.BlueRobots[4].pos.y = 48F;
-                rv.BlueRobots[4].rotation = 180;
-                for (int i = 0; i < Const.RobotsPerTeam; i++)
-                {
-                    rv.BlueRobots[i].velocityLeft = rv.BlueRobots[i].velocityRight = 0;
-                    rv.BlueRobots[i].linearVelocity = Vector2D.zero;
-                }
-
-                rv.YellowRobots[0].pos.x = -102.5F;
-                rv.YellowRobots[0].pos.y = 0;
-                rv.YellowRobots[0].rotation = 90;
-                rv.YellowRobots[1].pos.x = -81.2F;
-                rv.YellowRobots[1].pos.y = 48F;
-                rv.YellowRobots[1].rotation = 0;
-                rv.YellowRobots[2].pos.x = -81.2F;
-                rv.YellowRobots[2].pos.y = -48F;
-                rv.YellowRobots[2].rotation = 0;
-                rv.YellowRobots[3].pos.x = -29.8F;
-                rv.YellowRobots[3].pos.y = 48F;
-                rv.YellowRobots[3].rotation = 0;
-                rv.YellowRobots[4].pos.x = -29.8F;
-                rv.YellowRobots[4].pos.y = -48F;
-                rv.YellowRobots[4].rotation = 0;
-                for (int i = 0; i < Const.RobotsPerTeam; i++)
-                {
-                    rv.YellowRobots[i].velocityLeft = rv.YellowRobots[i].velocityRight = 0;
-                    rv.YellowRobots[i].linearVelocity = Vector2D.zero;
-                }
-
-                return rv;
-            }
+            Ball = another.Ball;
+            GameState = another.GameState;
+            WhosBall = another.WhosBall;
+            PlayTime = another.PlayTime;
+            Score = another.Score;
+            ControlState = another.ControlState;
+            Referee = another.Referee;
+            BlueRobots = (Robot[])another.BlueRobots.Clone();
+            YellowRobots = (Robot[])another.YellowRobots.Clone();
         }
 
-        public MatchInfo Clone()
+        public static MatchInfo newDefaultPreset()
         {
-            MatchInfo rv = new MatchInfo
-            {
-                Ball = Ball,
-                GameState = GameState,
-                WhosBall = WhosBall,
-                PlayTime = PlayTime,
-                Score = Score,
-                ControlState = ControlState,
-                Referee = Referee,
-            };
-            for (int i = 0; i < Const.RobotsPerTeam; i++)
-            {
-                rv.BlueRobots[i] = BlueRobots[i];
-                rv.YellowRobots[i] = YellowRobots[i];
-            }
-            return rv;
+            var info = new MatchInfo();
+            info.Ball.moveTo(0, 0);
+            info.Ball.angularVelocity = 0;
+            info.Ball.linearVelocity = Vector2D.Zero;
+            //x, y, rotation
+            var yellowData = new double[,]
+            { { -102.5, 0, 90 }, { -81.2, 48, 0 }, { -81.2, -48, 0 }, { -29.8, 48, 0 }, { -29.8, -48, 0 } };
+            var blueData = new double[,]
+            { { 102.5, 0, -90 }, { 81.2, -48, 180 }, { 81.2, 48, 180 }, { 29.8, -48, 180 }, { 29.8, 48, 180 } };
+            //C# 7.0 unavailable now
+            Func<Robot, double[,], int, Robot> InitRobot = (rb, data, elem) =>
+                {
+                    rb.pos.x = (float)data[elem, 0];
+                    rb.pos.y = (float)data[elem, 1];
+                    rb.rotation = data[elem, 2];
+                    rb.velocityLeft = rb.velocityRight = 0;
+                    rb.linearVelocity = Vector2D.Zero;
+                    return rb;
+                };
+            Func<IEnumerable<Robot>, double[,], Robot[]> InitMe = (rbs, data) =>
+                {
+                    return rbs.Select((rb, i) => InitRobot(rb, data, i)).ToArray();
+                };
+            info.YellowRobots = InitMe(info.YellowRobots, yellowData);
+            info.BlueRobots = InitMe(info.BlueRobots, blueData);
+            return info;
         }
-        
+
         public void Update(MatchInfo matchInfo)
         {
             for (int i = 0; i < Const.RobotsPerTeam; i++)
@@ -217,7 +185,8 @@ namespace Simuro5v5
 
         public SideInfo GetBlueSide()
         {
-            SideInfo rv = new SideInfo {
+            SideInfo rv = new SideInfo
+            {
                 currentBall = Ball,
                 whosBall = (int)WhosBall,
                 gameState = (int)GameState
@@ -225,7 +194,8 @@ namespace Simuro5v5
             for (int i = 0; i < Const.RobotsPerTeam; i++)
             {
                 rv.home[i] = BlueRobots[i];
-                rv.opp[i] = new OpponentRobot {
+                rv.opp[i] = new OpponentRobot
+                {
                     pos = YellowRobots[i].pos,
                     rotation = YellowRobots[i].rotation
                 };
@@ -235,7 +205,8 @@ namespace Simuro5v5
 
         public SideInfo GetYellowSide()
         {
-            SideInfo rv = new SideInfo {
+            SideInfo rv = new SideInfo
+            {
                 currentBall = Ball,
                 whosBall = (int)WhosBall,
                 gameState = (int)GameState
@@ -243,7 +214,8 @@ namespace Simuro5v5
             for (int i = 0; i < Const.RobotsPerTeam; i++)
             {
                 rv.home[i] = YellowRobots[i];
-                rv.opp[i] = new OpponentRobot {
+                rv.opp[i] = new OpponentRobot
+                {
                     pos = BlueRobots[i].pos,
                     rotation = BlueRobots[i].rotation
                 };
@@ -430,7 +402,7 @@ namespace Simuro5v5
             }
         }// 根据x,y坐标计算的相对原点的方向
 
-        public static Vector2D zero { get { return new Vector2D(); } }
+        public static Vector2D Zero { get { return new Vector2D(); } }
 
         public Vector3 GetUnityVector3()
         {
@@ -493,7 +465,7 @@ namespace Simuro5v5
         [JsonProperty("velocityRight")]
         public double velocityRight;
         public Vector2D linearVelocity;
-        public float angularVelocity;  
+        public float angularVelocity;
 
         public void Normalize(float right, float left, float top, float bottom)
         {
@@ -541,6 +513,12 @@ namespace Simuro5v5
         public Vector2D pos;
         public Vector2D linearVelocity;
         public float angularVelocity;
+
+        public void moveTo(float x, float y)
+        {
+            pos.x = x;
+            pos.y = y;
+        }
 
         public WhichDoor IsInDoor()
         {
