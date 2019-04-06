@@ -144,13 +144,16 @@ public class GUI_Play : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(1))
+        if (Input.GetMouseButtonDown(1) || Input.GetKeyUp(KeyCode.Escape))
         {
             // right clicked, pause and toggle menu
             if (menu_open)
             {
-                //CloseMenu();
                 PopMenu();
+                if (MenuStack.Count > 0)
+                {
+                    newMatchButton.Select();
+                }
             }
             else
             {
@@ -282,7 +285,7 @@ public class GUI_Play : MonoBehaviour
         }
     }
 
-    void PopMenu()
+    public void PopMenu()
     {
         bool will_open = menu_open;
         CloseMenu();
