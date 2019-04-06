@@ -162,10 +162,11 @@ public class GUI_Play : MonoBehaviour
                     playMain.PauseRound();
                     PushMenu(menuMain);
                     OpenMenu();
+                    resumeButton.Select();
                 }
             }
         }
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Return))
         {
             // left clicked, pause
             if (!menu_open)
