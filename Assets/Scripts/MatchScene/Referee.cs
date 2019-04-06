@@ -27,8 +27,8 @@ public class Referee
     public JudgeResult Judge(MatchInfo matchInfo)
     {
         this.matchInfo = matchInfo;
-        this.BlueRobots = matchInfo.BlueRobot;
-        this.YellowRobots = matchInfo.YellowRobot;
+        this.BlueRobots = matchInfo.BlueRobots;
+        this.YellowRobots = matchInfo.YellowRobots;
         this.GoalieBlueID = FindBlueGoalie();
         this.GoalieYellowID = FindYellowGoalie();
         this.StandoffTime = 0;
