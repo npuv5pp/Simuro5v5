@@ -394,4 +394,9 @@ public class GUI_Play : MonoBehaviour
         refereeAnim.Toggle();
         cameraAnim.Toggle();
     }
+
+    private void OnDestroy()
+    {
+        Event.UnRegister(Event.EventType1.LogUpdate, SetRefereeInfo);
+    }
 }
