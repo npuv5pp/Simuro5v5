@@ -204,7 +204,7 @@ namespace Simuro5v5.Strategy
         /// <param name="minfo">开始时的赛场信息</param>
         public void BeginBlue(MatchInfo minfo)
         {
-            blue.SendBegin(minfo.GetBlueSide());
+            blue.SendBegin(minfo.GetSide(Side.Blue));
         }
 
         /// <summary>
@@ -213,7 +213,7 @@ namespace Simuro5v5.Strategy
         /// <param name="minfo">开始时的赛场信息</param>
         public void BeginYellow(MatchInfo minfo)
         {
-            yellow.SendBegin(minfo.GetYellowSide());
+            yellow.SendBegin(minfo.GetSide(Side.Yellow));
         }
 
         /// <summary>
@@ -223,7 +223,7 @@ namespace Simuro5v5.Strategy
         /// <returns>策略返回的轮速</returns>>
         public WheelInfo NextBlue(MatchInfo minfo)
         {
-            return blue.SendNext(minfo.GetBlueSide());
+            return blue.SendNext(minfo.GetSide(Side.Blue));
         }
 
         /// <summary>
@@ -233,7 +233,7 @@ namespace Simuro5v5.Strategy
         /// <returns>策略返回的轮速</returns>>
         public WheelInfo NextYellow(MatchInfo minfo)
         {
-            return yellow.SendNext(minfo.GetYellowSide());
+            return yellow.SendNext(minfo.GetSide(Side.Yellow));
         }
 
         /// <summary>
@@ -243,7 +243,7 @@ namespace Simuro5v5.Strategy
         /// <returns>策略返回的摆位信息</returns>
         public PlacementInfo PlacementBlue(MatchInfo minfo)
         {
-            return blue.SendPlacement(minfo.GetBlueSide());
+            return blue.SendPlacement(minfo.GetSide(Side.Blue));
         }
 
         /// <summary>
@@ -253,7 +253,7 @@ namespace Simuro5v5.Strategy
         /// <returns>策略返回的摆位信息</returns>
         public PlacementInfo PlacementYellow(MatchInfo minfo)
         {
-            return yellow.SendPlacement(minfo.GetYellowSide());
+            return yellow.SendPlacement(minfo.GetSide(Side.Yellow));
         }
 
         /// <summary>
@@ -262,7 +262,7 @@ namespace Simuro5v5.Strategy
         /// <param name="minfo">当前的赛场信息</param>
         public void OverBlue(MatchInfo minfo)
         {
-            blue.SendOver(minfo.GetBlueSide());
+            blue.SendOver(minfo.GetSide(Side.Yellow));
         }
 
         /// <summary>
@@ -271,7 +271,7 @@ namespace Simuro5v5.Strategy
         /// <param name="minfo">当前的赛场信息</param>
         public void OverYellow(MatchInfo minfo)
         {
-            yellow.SendOver(minfo.GetYellowSide());
+            yellow.SendOver(minfo.GetSide(Side.Yellow));
         }
 
         private static IStrategy GetLocalDllStrategyFromPath(string dllpath, Side sidefor)

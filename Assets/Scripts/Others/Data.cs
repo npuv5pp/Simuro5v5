@@ -183,49 +183,28 @@ namespace Simuro5v5
             }
         }
 
-        public SideInfo GetBlueSide()
+        public SideInfo GetSide(Side side)
         {
-            SideInfo rv = new SideInfo
+            SideInfo si = new SideInfo
             {
                 currentBall = Ball,
                 whosBall = (int)WhosBall,
                 gameState = (int)GameState
             };
-            for (int i = 0; i < Const.RobotsPerTeam; i++)
+            Robot[] home = null, opp = null;
+            if (side == Side.Blue)
             {
-                rv.home[i] = BlueRobots[i];
-                rv.opp[i] = new OpponentRobot
-                {
-                    pos = YellowRobots[i].pos,
-                    rotation = YellowRobots[i].rotation
-                };
+                (home, opp) = (BlueRobots, YellowRobots);
             }
-            return rv;
-        }
-
-        public SideInfo GetYellowSide()
-        {
-            SideInfo rv = new SideInfo
+            else if(side==Side.Yellow)
             {
-                currentBall = Ball,
-                whosBall = (int)WhosBall,
-                gameState = (int)GameState
-            };
-            for (int i = 0; i < Const.RobotsPerTeam; i++)
-            {
-                rv.home[i] = YellowRobots[i];
-                rv.opp[i] = new OpponentRobot
-                {
-                    pos = BlueRobots[i].pos,
-                    rotation = BlueRobots[i].rotation
-                };
+                (home, opp) = (YellowRobots, BlueRobots);
             }
-            // 转换坐标
-            if (GeneralConfig.EnableConvertYellowData)
-            {
-                rv.ConvertToOtherSide();
-            }
-            return rv;
+            si.home = (Robot[])home.Clone();
+            si.opp = (from rb in opp
+                      select new OpponentRobot { pos = rb.pos, rotation = rb.rotation }).ToArray();
+            if (side == Side.Yellow) si.ConvertToOtherSide();
+            return si;
         }
     }
 

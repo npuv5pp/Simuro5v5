@@ -87,7 +87,7 @@ public class Referee
     /// <returns></returns>
     public bool Judge(MatchInfo matchInfo)
     {
-        pEnv = matchInfo.GetBlueSide();
+        pEnv = matchInfo.GetSide(Side.Blue);
         ChangeSystem(pEnv);
         statespace = new StateSpace(pEnv);
 
