@@ -166,7 +166,7 @@ public class GUI_Play : MonoBehaviour
                 }
             }
         }
-        if (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Return))
+        if (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Space))
         {
             // left clicked, pause
             if (!menu_open)
