@@ -437,6 +437,11 @@ namespace Simuro5v5
             return new Vector3 { x = x, z = y };
         }
 
+        public Vector2 GetUnityVector2()
+        {
+            return new Vector2 { x = x, y = y };
+        }
+
         public void NormalizeAsPosition(float right, float left, float top, float bottom)
         {
             // normalize to the specified box
@@ -456,6 +461,7 @@ namespace Simuro5v5
             {
                 y = bottom;
             }
+            
         }
 
         public void NormalizeAsPosition()

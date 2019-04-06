@@ -157,25 +157,46 @@ public class PlayMain : MonoBehaviour
             Event.Send(Event.EventType1.MatchInfoUpdate, GlobalMatchInfo);
 
             // 裁判判断
-            if (GlobalMatchInfo.Referee.Judge(GlobalMatchInfo))
+            JudgeResult judgeResult = GlobalMatchInfo.Referee.Judge(GlobalMatchInfo);
+            if(judgeResult.ResultType != ResultType.NormalMatch )
             {
                 InRound = false;
                 InPlacement = true;
                 GlobalMatchInfo.Referee = new Referee();
 
                 string log;
-                if (GlobalMatchInfo.WhosBall == Side.Blue)
+                if(judgeResult.Actor == "Blue")
                 {
-                    log = string.Format("Foul: {0}. <b><color=\"#0057FF\">Blue</color></b> team is offensive side",
-                         GlobalMatchInfo.GameState);
+                    log = string.Format("Foul: {0}  <b><color=\"#F8FF00\">Yellow</color></b> team is offensive side \n Reason:{1}", judgeResult.ResultType,judgeResult.Reason);
+
                 }
                 else
                 {
-                    log = string.Format("Foul: {0}. <b><color=\"#F8FF00\">Yellow</color></b> team is offensive side",
-                         GlobalMatchInfo.GameState);
+                    log = string.Format("Foul: {0}  <b><color=\"#0057FF\">Blue</color></b> team is offensive side \n Reason:{1}", judgeResult.ResultType, judgeResult.Reason);
+
                 }
                 Event.Send(Event.EventType1.LogUpdate, log);
             }
+
+            //if (GlobalMatchInfo.Referee.Judge(GlobalMatchInfo))
+            //{
+            //    InRound = false;
+            //    InPlacement = true;
+            //    //GlobalMatchInfo.Referee = new Referee();
+
+            //    string log;
+            //    if (GlobalMatchInfo.WhosBall == Side.Blue)
+            //    {
+            //        log = string.Format("Foul: {0}. <b><color=\"#0057FF\">Blue</color></b> team is offensive side",
+            //             GlobalMatchInfo.GameState);
+            //    }
+            //    else
+            //    {
+            //        log = string.Format("Foul: {0}. <b><color=\"#F8FF00\">Yellow</color></b> team is offensive side",
+            //             GlobalMatchInfo.GameState);
+            //    }
+            //    Event.Send(Event.EventType1.LogUpdate, log);
+            ////}
             else
             {
                 UpdateWheelsToScene();
