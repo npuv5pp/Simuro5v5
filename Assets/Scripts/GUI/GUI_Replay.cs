@@ -9,6 +9,7 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using TMPro;
 using Simuro5v5;
+using UnityEngine.EventSystems;
 
 public class GUI_Replay : MonoBehaviour
 {
@@ -18,6 +19,9 @@ public class GUI_Replay : MonoBehaviour
     public TextMeshProUGUI DataName;
     public TMP_Dropdown SpeedDropdown;
     public StateBoard StateBoard;
+    public Image PauseButtonImage;
+    public Sprite PauseButtonPaused;
+    public Sprite PauseButtonNonPaused;
 
     public static DataRecorder Recorder { get; set; }
     private ObjectManager ObjectManager { get; set; }
@@ -62,6 +66,14 @@ public class GUI_Replay : MonoBehaviour
     void Update()
     {
         DataName.SetText(Recorder.Name);
+        if (Paused)
+        {
+            PauseButtonImage.sprite = PauseButtonPaused;
+        }
+        else
+        {
+            PauseButtonImage.sprite = PauseButtonNonPaused;
+        }
     }
 
     void FixedUpdate()
@@ -109,6 +121,9 @@ public class GUI_Replay : MonoBehaviour
         StateBoard.Render(data.type);
     }
 
+    /// <summary>
+    /// 切换暂停事件
+    /// </summary>
     void TogglePause()
     {
         Paused = !Paused;
@@ -157,11 +172,21 @@ public class GUI_Replay : MonoBehaviour
     }
 
     /// <summary>
-    /// 用户在滑动条上点击，则暂停播放
+    /// 用户在进度条上点击，则暂停播放
     /// </summary>
     public void OnSliderClicked()
     {
         Paused = true;
+    }
+
+    /// <summary>
+    /// 鼠标在进度条上滑动
+    /// </summary>
+    /// <param name="_data"></param>
+    public void OnSliderScrolled(BaseEventData _data)
+    {
+        var data = _data as PointerEventData;
+        SliderPostion += (int)data.scrollDelta.y;
     }
 
     /// <summary>
@@ -211,5 +236,15 @@ public class GUI_Replay : MonoBehaviour
                 break;
         }
 
+    }
+
+    /// <summary>
+    /// 鼠标在速度滑动条上滑动事件。
+    /// </summary>
+    /// <param name="_data"></param>
+    public void OnSpeedScrolled(BaseEventData _data)
+    {
+        var data = _data as PointerEventData;
+        SpeedDropdown.value -= (int)data.scrollDelta.y;
     }
 }

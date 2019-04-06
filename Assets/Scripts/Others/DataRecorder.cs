@@ -38,7 +38,7 @@ namespace Simuro5v5
         public void Begin()
         {
             BeginTime = DateTime.Now;
-            Name = $"{BeginTime.Year}-{BeginTime.Month}-{BeginTime.Day}-{BeginTime.Hour}-{BeginTime.Minute}";
+            Name = $"{BeginTime.Year}/{BeginTime.Month}/{BeginTime.Day} {BeginTime.Hour}:{BeginTime.Minute}";
             Event.Register(Event.EventType1.MatchInfoUpdate, RecordMatchInfo);
             Event.Register(Event.EventType0.MatchStart, RecodeNewMatch);
             Event.Register(Event.EventType0.RoundStart, RecodeNewRound);
@@ -91,7 +91,7 @@ namespace Simuro5v5
             if (Name == null)
             {
                 BeginTime = DateTime.Now;
-                Name = $"{BeginTime.Year}-{BeginTime.Month}-{BeginTime.Day}-{BeginTime.Hour}-{BeginTime.Minute}";
+                Name = $"{BeginTime.Year}/{BeginTime.Month}/{BeginTime.Day} {BeginTime.Hour}:{BeginTime.Minute}";
             }
             Data.Add(data);
         }
