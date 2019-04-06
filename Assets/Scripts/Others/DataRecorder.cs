@@ -10,12 +10,21 @@ namespace Simuro5v5
     /// 用于记录赛场数据。
     /// 数据格式为<see cref="MatchInfo"/>的集合
     /// </summary>
-    public class DataRecorder
+    public class DataRecorder : IDisposable
     {
-        public String Name;
+        public enum DataType
+        {
+            AutoPlacement,
+            NewMatch,
+            NewRound,
+            InPlaying,
+        }
+
+        public string Name;
         private DateTime BeginTime;
 
-        private List<MatchInfo> Data = new List<MatchInfo>();
+        private List<MatchInfo> _Data = new List<MatchInfo>();
+        private List<BaseRecodeData> Data = new List<BaseRecodeData>();
 
         /// <summary>
         /// 已记录的数据长度
@@ -31,7 +40,9 @@ namespace Simuro5v5
         {
             BeginTime = DateTime.Now;
             Name = $"{BeginTime.Year}-{BeginTime.Month}-{BeginTime.Day}-{BeginTime.Hour}-{BeginTime.Minute}";
-            Event.Register(Event.EventType1.MatchInfoUpdate, Record);
+            Event.Register(Event.EventType1.MatchInfoUpdate, RecordMatchInfo);
+            Event.Register(Event.EventType0.MatchStart, RecodeNewMatch);
+            Event.Register(Event.EventType0.RoundStart, RecodeNewRound);
         }
 
         /// <summary>
@@ -39,19 +50,21 @@ namespace Simuro5v5
         /// </summary>
         public void Stop()
         {
-            Event.UnRegister(Event.EventType1.MatchInfoUpdate, Record);
+            Event.UnRegister(Event.EventType1.MatchInfoUpdate, RecordMatchInfo);
+            Event.UnRegister(Event.EventType0.MatchStart, RecodeNewMatch);
+            Event.UnRegister(Event.EventType0.RoundStart, RecodeNewRound);
         }
 
         /// <summary>
-        /// <see cref="Event.EventType1.MatchInfoUpdate"/>事件的回调函数，将当前的MatchInfo记录到List中。
+        /// <see cref="Event.EventType1.MatchInfoUpdate"/>MatchInfoUpdate事件的回调函数，将当前的MatchInfo记录到List中。
         /// </summary>
         /// <param name="obj"></param>
-        private void Record(object obj)
+        private void RecordMatchInfo(object obj)
         {
             MatchInfo matchInfo = obj as MatchInfo;
             if (matchInfo != null)
             {
-                Data.Add(matchInfo.Clone());
+                Data.Add(new StateRecodeData(DataType.InPlaying, matchInfo.Clone()));
             }
             else
             {
@@ -59,14 +72,29 @@ namespace Simuro5v5
             }
         }
 
-        public void Add(MatchInfo match)
+        private void RecodeNewMatch()
+        {
+            RecodeState(DataType.NewMatch);
+        }
+
+        private void RecodeNewRound()
+        {
+            RecodeState(DataType.NewRound);
+        }
+
+        private void RecodeState(DataType type)
+        {
+            Data.Add(new StateRecodeData(type));
+        }
+
+        public  void Add(BaseRecodeData data)
         {
             if (Name == null)
             {
                 BeginTime = DateTime.Now;
                 Name = $"{BeginTime.Year}-{BeginTime.Month}-{BeginTime.Day}-{BeginTime.Hour}-{BeginTime.Minute}";
             }
-            Data.Add(match);
+            Data.Add(data);
         }
 
         /// <summary>
@@ -81,7 +109,7 @@ namespace Simuro5v5
         /// 获取最后一拍的数据
         /// </summary>
         /// <returns></returns>
-        public MatchInfo GetLastInfo()
+        public BaseRecodeData GetLastInfo()
         {
             return Data.Count == 0 ? null : Data[Data.Count - 1];
         }
@@ -91,13 +119,43 @@ namespace Simuro5v5
         /// </summary>
         /// <param name="i">下标</param>
         /// <returns>第i个MatchInfo数据</returns>
-        public MatchInfo Get(int i)
+        public BaseRecodeData Get(int i)
         {
             if (i >= DataLength)
             {
                 return null;
             }
             return Data[i];
+        }
+
+        public void Dispose()
+        {
+            Stop();
+        }
+
+
+        /// <summary>
+        /// 基本数据类型
+        /// </summary>
+        public abstract class BaseRecodeData
+        {
+            public DataType type;
+        }
+
+        public class StateRecodeData : BaseRecodeData
+        {
+            public MatchInfo matchInfo;
+
+            public StateRecodeData(DataType type)
+            {
+                base.type = type;
+            }
+
+            public StateRecodeData(DataType type, MatchInfo match)
+            {
+                base.type = DataType.InPlaying;
+                matchInfo = match;
+            }
         }
     }
 }

@@ -56,7 +56,7 @@ public class GUI_Play : MonoBehaviour
     public Text blueTeamName;
     public Text yellowTeamName;
 
-    static Stack<GameObject> MenuStack { get; set; }
+    Stack<GameObject> MenuStack { get; set; }
 
     void Start()
     {

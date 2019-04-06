@@ -17,6 +17,7 @@ public class GUI_Replay : MonoBehaviour
     public GameObject Entity;
     public TextMeshProUGUI DataName;
     public TMP_Dropdown SpeedDropdown;
+    public StateBoard StateBoard;
 
     public static DataRecorder Recorder { get; set; }
     private ObjectManager ObjectManager { get; set; }
@@ -42,8 +43,8 @@ public class GUI_Replay : MonoBehaviour
             Recorder = new DataRecorder();
             for (int i = 0; i < 100; i++)
             {
-                Recorder.Add(new MatchInfo());
-                Recorder.Add(MatchInfo.DefaultMatch);
+                Recorder.Add(new DataRecorder.StateRecodeData(DataRecorder.DataType.InPlaying, new MatchInfo()));
+                Recorder.Add(new DataRecorder.StateRecodeData(DataRecorder.DataType.InPlaying, MatchInfo.DefaultMatch));
             }
         }
 
@@ -82,13 +83,30 @@ public class GUI_Replay : MonoBehaviour
     /// 渲染一拍的数据到场景中，包括：机器人和球的坐标，数据板
     /// </summary>
     /// <param name="matchInfo">要渲染的场景信息</param>
-    void Render(MatchInfo matchInfo)
+    void Render(DataRecorder.BaseRecodeData d)
     {
-        if (matchInfo != null)
+        var data = d as DataRecorder.StateRecodeData;
+        if (data == null)
         {
-            ObjectManager.RevertScene(matchInfo);
-            DataBoard.Render(matchInfo);
+            return;
         }
+        switch (data.type)
+        {
+            case DataRecorder.DataType.InPlaying:
+                {
+                    if (data  != null && data.matchInfo != null)
+                    {
+                        ObjectManager.RevertScene(data.matchInfo);
+                        DataBoard.Render(data.matchInfo);
+                    }
+                }
+                break;
+            case DataRecorder.DataType.NewMatch:
+            case DataRecorder.DataType.NewRound:
+            case DataRecorder.DataType.AutoPlacement:
+                break;
+        }
+        StateBoard.Render(data.type);
     }
 
     void TogglePause()
