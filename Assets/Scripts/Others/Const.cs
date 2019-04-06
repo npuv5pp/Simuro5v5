@@ -5,6 +5,7 @@ namespace Simuro5v5
 {
     static class Const
     {
+        public readonly static int RobotsPerTeam = 5;
         public readonly static int MaxWheelVelocity = 125;
         public readonly static int MinWheelVelocity = -125;
         public readonly static float Zeit = (1.0f / 50.0f);                 // 模拟频率的倒数，即一拍的时间

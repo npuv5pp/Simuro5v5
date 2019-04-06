@@ -39,8 +39,8 @@ namespace Simuro5v5
     /// </summary>
     public class MatchInfo
     {
-        public Robot[] BlueRobot { get; set; }
-        public Robot[] YellowRobot { get; set; }
+        public Robot[] BlueRobots { get; set; }
+        public Robot[] YellowRobots { get; set; }
         public Ball Ball;
 
         public int PlayTime;
@@ -54,16 +54,16 @@ namespace Simuro5v5
 
         public MatchInfo()
         {
-            BlueRobot = new Robot[5];
-            YellowRobot = new Robot[5];
+            BlueRobots = new Robot[Const.RobotsPerTeam];
+            YellowRobots = new Robot[Const.RobotsPerTeam];
             ControlState = ControlState.DefaultState;
             Referee = new Referee();
         }
 
         public MatchInfo(GameObject ball, GameObject[] blue, GameObject[] yellow)
         {
-            BlueRobot = new Robot[5];
-            YellowRobot = new Robot[5];
+            BlueRobots = new Robot[Const.RobotsPerTeam];
+            YellowRobots = new Robot[Const.RobotsPerTeam];
             ControlState = ControlState.DefaultState;
             Referee = new Referee();
 
@@ -81,46 +81,46 @@ namespace Simuro5v5
                 rv.Ball.angularVelocity = 0;
                 rv.Ball.linearVelocity = Vector2D.zero;
 
-                rv.BlueRobot[0].pos.x = 102.5F;
-                rv.BlueRobot[0].pos.y = 0;
-                rv.BlueRobot[0].rotation = -90;
-                rv.BlueRobot[1].pos.x = 81.2F;
-                rv.BlueRobot[1].pos.y = -48F;
-                rv.BlueRobot[1].rotation = 180;
-                rv.BlueRobot[2].pos.x = 81.2F;
-                rv.BlueRobot[2].pos.y = 48F;
-                rv.BlueRobot[2].rotation = 180;
-                rv.BlueRobot[3].pos.x = 29.8F;
-                rv.BlueRobot[3].pos.y = -48F;
-                rv.BlueRobot[3].rotation = 180;
-                rv.BlueRobot[4].pos.x = 29.8F;
-                rv.BlueRobot[4].pos.y = 48F;
-                rv.BlueRobot[4].rotation = 180;
-                for (int i = 0; i < 5; i++)
+                rv.BlueRobots[0].pos.x = 102.5F;
+                rv.BlueRobots[0].pos.y = 0;
+                rv.BlueRobots[0].rotation = -90;
+                rv.BlueRobots[1].pos.x = 81.2F;
+                rv.BlueRobots[1].pos.y = -48F;
+                rv.BlueRobots[1].rotation = 180;
+                rv.BlueRobots[2].pos.x = 81.2F;
+                rv.BlueRobots[2].pos.y = 48F;
+                rv.BlueRobots[2].rotation = 180;
+                rv.BlueRobots[3].pos.x = 29.8F;
+                rv.BlueRobots[3].pos.y = -48F;
+                rv.BlueRobots[3].rotation = 180;
+                rv.BlueRobots[4].pos.x = 29.8F;
+                rv.BlueRobots[4].pos.y = 48F;
+                rv.BlueRobots[4].rotation = 180;
+                for (int i = 0; i < Const.RobotsPerTeam; i++)
                 {
-                    rv.BlueRobot[i].velocityLeft = rv.BlueRobot[i].velocityRight = 0;
-                    rv.BlueRobot[i].linearVelocity = Vector2D.zero;
+                    rv.BlueRobots[i].velocityLeft = rv.BlueRobots[i].velocityRight = 0;
+                    rv.BlueRobots[i].linearVelocity = Vector2D.zero;
                 }
 
-                rv.YellowRobot[0].pos.x = -102.5F;
-                rv.YellowRobot[0].pos.y = 0;
-                rv.YellowRobot[0].rotation = 90;
-                rv.YellowRobot[1].pos.x = -81.2F;
-                rv.YellowRobot[1].pos.y = 48F;
-                rv.YellowRobot[1].rotation = 0;
-                rv.YellowRobot[2].pos.x = -81.2F;
-                rv.YellowRobot[2].pos.y = -48F;
-                rv.YellowRobot[2].rotation = 0;
-                rv.YellowRobot[3].pos.x = -29.8F;
-                rv.YellowRobot[3].pos.y = 48F;
-                rv.YellowRobot[3].rotation = 0;
-                rv.YellowRobot[4].pos.x = -29.8F;
-                rv.YellowRobot[4].pos.y = -48F;
-                rv.YellowRobot[4].rotation = 0;
-                for (int i = 0; i < 5; i++)
+                rv.YellowRobots[0].pos.x = -102.5F;
+                rv.YellowRobots[0].pos.y = 0;
+                rv.YellowRobots[0].rotation = 90;
+                rv.YellowRobots[1].pos.x = -81.2F;
+                rv.YellowRobots[1].pos.y = 48F;
+                rv.YellowRobots[1].rotation = 0;
+                rv.YellowRobots[2].pos.x = -81.2F;
+                rv.YellowRobots[2].pos.y = -48F;
+                rv.YellowRobots[2].rotation = 0;
+                rv.YellowRobots[3].pos.x = -29.8F;
+                rv.YellowRobots[3].pos.y = 48F;
+                rv.YellowRobots[3].rotation = 0;
+                rv.YellowRobots[4].pos.x = -29.8F;
+                rv.YellowRobots[4].pos.y = -48F;
+                rv.YellowRobots[4].rotation = 0;
+                for (int i = 0; i < Const.RobotsPerTeam; i++)
                 {
-                    rv.YellowRobot[i].velocityLeft = rv.YellowRobot[i].velocityRight = 0;
-                    rv.YellowRobot[i].linearVelocity = Vector2D.zero;
+                    rv.YellowRobots[i].velocityLeft = rv.YellowRobots[i].velocityRight = 0;
+                    rv.YellowRobots[i].linearVelocity = Vector2D.zero;
                 }
 
                 return rv;
@@ -139,20 +139,20 @@ namespace Simuro5v5
                 ControlState = ControlState,
                 Referee = Referee,
             };
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < Const.RobotsPerTeam; i++)
             {
-                rv.BlueRobot[i] = BlueRobot[i];
-                rv.YellowRobot[i] = YellowRobot[i];
+                rv.BlueRobots[i] = BlueRobots[i];
+                rv.YellowRobots[i] = YellowRobots[i];
             }
             return rv;
         }
         
         public void Update(MatchInfo matchInfo)
         {
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < Const.RobotsPerTeam; i++)
             {
-                BlueRobot[i] = matchInfo.BlueRobot[i];
-                YellowRobot[i] = matchInfo.YellowRobot[i];
+                BlueRobots[i] = matchInfo.BlueRobots[i];
+                YellowRobots[i] = matchInfo.YellowRobots[i];
             }
             Ball = matchInfo.Ball;
             PlayTime = matchInfo.PlayTime;
@@ -165,28 +165,28 @@ namespace Simuro5v5
 
         public void UpdateEntity(GameObject ball, GameObject[] blue, GameObject[] yellow)
         {
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < Const.RobotsPerTeam; i++)
             {
                 Rigidbody blueTemp = blue[i].GetComponent<Rigidbody>();
-                BlueRobot[i].mass = blueTemp.mass;
-                BlueRobot[i].pos.x = blueTemp.position.x;
-                BlueRobot[i].pos.y = blueTemp.position.z;
-                BlueRobot[i].rotation = blueTemp.rotation.eulerAngles.y.FormatUnity2Old().FormatOld();
-                BlueRobot[i].linearVelocity.x = blueTemp.velocity.x;
-                BlueRobot[i].linearVelocity.y = blueTemp.velocity.z;
-                BlueRobot[i].angularVelocity = blueTemp.angularVelocity.y;
+                BlueRobots[i].mass = blueTemp.mass;
+                BlueRobots[i].pos.x = blueTemp.position.x;
+                BlueRobots[i].pos.y = blueTemp.position.z;
+                BlueRobots[i].rotation = blueTemp.rotation.eulerAngles.y.FormatUnity2Old().FormatOld();
+                BlueRobots[i].linearVelocity.x = blueTemp.velocity.x;
+                BlueRobots[i].linearVelocity.y = blueTemp.velocity.z;
+                BlueRobots[i].angularVelocity = blueTemp.angularVelocity.y;
                 //BlueRobot[i].angularVelocity.x = blueTemp.angularVelocity.x;
                 //BlueRobot[i].angularVelocity.y = blueTemp.angularVelocity.z;
                 //BlueRobot[i].angularVelocity.z = blueTemp.angularVelocity.y;
 
                 Rigidbody yellowTemp = yellow[i].GetComponent<Rigidbody>();
-                YellowRobot[i].mass = yellowTemp.mass;
-                YellowRobot[i].pos.x = yellowTemp.position.x;
-                YellowRobot[i].pos.y = yellowTemp.position.z;
-                YellowRobot[i].rotation = yellowTemp.rotation.eulerAngles.y.FormatUnity2Old().FormatOld();
-                YellowRobot[i].linearVelocity.x = yellowTemp.velocity.x;
-                YellowRobot[i].linearVelocity.y = yellowTemp.velocity.z;
-                YellowRobot[i].angularVelocity = yellowTemp.angularVelocity.y;
+                YellowRobots[i].mass = yellowTemp.mass;
+                YellowRobots[i].pos.x = yellowTemp.position.x;
+                YellowRobots[i].pos.y = yellowTemp.position.z;
+                YellowRobots[i].rotation = yellowTemp.rotation.eulerAngles.y.FormatUnity2Old().FormatOld();
+                YellowRobots[i].linearVelocity.x = yellowTemp.velocity.x;
+                YellowRobots[i].linearVelocity.y = yellowTemp.velocity.z;
+                YellowRobots[i].angularVelocity = yellowTemp.angularVelocity.y;
                 //YellowRobot[i].angularVelocity.x = yellowTemp.angularVelocity.x;
                 //YellowRobot[i].angularVelocity.y = yellowTemp.angularVelocity.z;
                 //YellowRobot[i].angularVelocity.z = yellowTemp.angularVelocity.y;
@@ -222,12 +222,12 @@ namespace Simuro5v5
                 whosBall = (int)WhosBall,
                 gameState = (int)GameState
             };
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < Const.RobotsPerTeam; i++)
             {
-                rv.home[i] = BlueRobot[i];
+                rv.home[i] = BlueRobots[i];
                 rv.opp[i] = new OpponentRobot {
-                    pos = YellowRobot[i].pos,
-                    rotation = YellowRobot[i].rotation
+                    pos = YellowRobots[i].pos,
+                    rotation = YellowRobots[i].rotation
                 };
             }
             return rv;
@@ -240,12 +240,12 @@ namespace Simuro5v5
                 whosBall = (int)WhosBall,
                 gameState = (int)GameState
             };
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < Const.RobotsPerTeam; i++)
             {
-                rv.home[i] = YellowRobot[i];
+                rv.home[i] = YellowRobots[i];
                 rv.opp[i] = new OpponentRobot {
-                    pos = BlueRobot[i].pos,
-                    rotation = BlueRobot[i].rotation
+                    pos = BlueRobots[i].pos,
+                    rotation = BlueRobots[i].rotation
                 };
             }
             // 转换坐标
@@ -303,9 +303,9 @@ namespace Simuro5v5
     public class SideInfo
     {
         [JsonProperty("home")]
-        public Robot[] home = new Robot[5];
+        public Robot[] home = new Robot[Const.RobotsPerTeam];
         [JsonProperty("opp")]
-        public OpponentRobot[] opp = new OpponentRobot[5];
+        public OpponentRobot[] opp = new OpponentRobot[Const.RobotsPerTeam];
         [JsonProperty("currentBall")]
         public Ball currentBall;
         [JsonProperty("gameState")]
@@ -322,7 +322,7 @@ namespace Simuro5v5
 
             currentBall.pos.x = ht - currentBall.pos.x;
             currentBall.pos.y = vt - currentBall.pos.y;
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < Const.RobotsPerTeam; i++)
             {
                 home[i].pos.x = ht - home[i].pos.x;
                 home[i].pos.y = vt - home[i].pos.y;
@@ -353,14 +353,14 @@ namespace Simuro5v5
     public class PlacementInfo
     {
         [JsonProperty("robot")]
-        public Robot[] Robot = new Robot[5];
+        public Robot[] Robot = new Robot[Const.RobotsPerTeam];
         [JsonProperty("ball")]
         public Ball Ball = new Ball();
 
         public void Normalize()
         {
             // TODO 保证不会出界、不会重叠
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < Const.RobotsPerTeam; i++)
             {
                 Robot[i].Normalize(
                     Const.Field.Right - 10 * i + 1,
@@ -379,7 +379,7 @@ namespace Simuro5v5
 
             Ball.pos.x = ht - Ball.pos.x;
             Ball.pos.y = vt - Ball.pos.y;
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < Const.RobotsPerTeam; i++)
             {
                 Robot[i].pos.x = ht - Robot[i].pos.x;
                 Robot[i].pos.y = vt - Robot[i].pos.y;
@@ -400,13 +400,13 @@ namespace Simuro5v5
     public class WheelInfo
     {
         [JsonProperty("wheels")]
-        public Wheel[] Wheels = new Wheel[5];
+        public Wheel[] Wheels = new Wheel[Const.RobotsPerTeam];
 
         public WheelInfo() { }
 
         public void Normalize()
         {
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < Const.RobotsPerTeam; i++)
             {
                 Wheels[i].Normalize();
                 //w.left *= Const.inch2cm;
