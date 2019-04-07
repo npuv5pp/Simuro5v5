@@ -23,3 +23,4 @@ obj
 /StrategyServer/dll2.dll
 /StrategyServer/dll123_x64.dll
 /dlltest.dll
+*.swp

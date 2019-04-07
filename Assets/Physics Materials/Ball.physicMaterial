@@ -4,10 +4,11 @@
 PhysicMaterial:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
   m_Name: Ball
   dynamicFriction: 0
   staticFriction: 0
-  bounciness: 0.6
+  bounciness: 1
   frictionCombine: 0
   bounceCombine: 0

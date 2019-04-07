@@ -35,13 +35,13 @@ public class Referee
 
         JudgeResult judgeResult = new JudgeResult();
 
-        if(JudgePlace(judgeResult) == false)
+        if (JudgePlace(judgeResult) == false)
         {
-            if(JudgePenalty(judgeResult) == false)
+            if (JudgePenalty(judgeResult) == false)
             {
-                if(JudgeGoalie(judgeResult) == false)
+                if (JudgeGoalie(judgeResult) == false)
                 {
-                    if(JudgeFree(judgeResult) == false)
+                    if (JudgeFree(judgeResult) == false)
                     {
                         judgeResult.ResultType = ResultType.NormalMatch;
                         judgeResult.Actor = "None";
@@ -50,16 +50,16 @@ public class Referee
                 }
             }
         }
-    
+
         return judgeResult;
     }
 
     private int FindBlueGoalie()
     {
         int ID = -1;
-        for (int i = 0; i<=4; i++)
+        for (int i = 0; i <= 4; i++)
         {
-            if(BlueRobots[i].pos.x < -74.4 && BlueRobots[i].pos.y > -25 && BlueRobots[i].pos.y < 25)
+            if (BlueRobots[i].pos.x > 94.4 && BlueRobots[i].pos.y > -25 && BlueRobots[i].pos.y < 25)
             {
                 ID = i;
             }
@@ -72,7 +72,7 @@ public class Referee
         int ID = -1;
         for (int i = 0; i <= 4; i++)
         {
-            if (YellowRobots[i].pos.x > 74.4 && YellowRobots[i].pos.y > -25 && YellowRobots[i].pos.y < 25)
+            if (YellowRobots[i].pos.x < -94.4 && YellowRobots[i].pos.y > -25 && YellowRobots[i].pos.y < 25)
             {
                 ID = i;
             }
@@ -82,7 +82,7 @@ public class Referee
 
     private bool JudgePlace(JudgeResult judgeResult)
     {
-        if(matchInfo.Ball.pos.x <= -112 && matchInfo.Ball.pos.y >=-15 && matchInfo.Ball.pos.y <= 15 )
+        if (matchInfo.Ball.pos.x <= -112 && matchInfo.Ball.pos.y >= -15 && matchInfo.Ball.pos.y <= 15)
         {
             judgeResult.Actor = "Yellow";
             judgeResult.Reason = "Be scored and PlaceKick again";
@@ -90,7 +90,7 @@ public class Referee
             Event.Send(Event.EventType1.Goal, true); //黄方被进球
             return true;
         }
-        else if(matchInfo.Ball.pos.x >= 112 && matchInfo.Ball.pos.y >= -15 && matchInfo.Ball.pos.y <= 15)
+        else if (matchInfo.Ball.pos.x >= 112 && matchInfo.Ball.pos.y >= -15 && matchInfo.Ball.pos.y <= 15)
         {
             judgeResult.Actor = "Blue";
             judgeResult.Reason = "Be scored and PlaceKick again";
@@ -106,29 +106,29 @@ public class Referee
 
     private bool JudgePenalty(JudgeResult judgeResult)
     {
-        if(matchInfo.Ball.pos.x > 0)
+        if (matchInfo.Ball.pos.x > 0)
         {
             int SmallStateNum = 0;
             int BigStateNum = 0;
-            for(int i = 0;i < 4; i++)
+            for (int i = 0; i < 4; i++)
             {
-                if(BlueRobots[i].pos.x > 74.4 && BlueRobots[i].pos.y >-40 && BlueRobots[i].pos.y < 40)
+                if (BlueRobots[i].pos.x > 74.4 && BlueRobots[i].pos.y > -40 && BlueRobots[i].pos.y < 40)
                 {
                     BigStateNum++;
                 }
-                if(BlueRobots[i].pos.x > 94.4 && BlueRobots[i].pos.y > -25 && BlueRobots[i].pos.y < 25)
+                if (BlueRobots[i].pos.x > 94.4 && BlueRobots[i].pos.y > -25 && BlueRobots[i].pos.y < 25)
                 {
                     SmallStateNum++;
                 }
             }
-            if(BigStateNum >= 4)
+            if (BigStateNum >= 4)
             {
                 judgeResult.ResultType = ResultType.PenaltyKick;
                 judgeResult.Actor = "Yellow";
                 judgeResult.Reason = "Defenders have four robots in BigState";
                 return true;
             }
-            if(SmallStateNum >= 2)
+            if (SmallStateNum >= 2)
             {
                 judgeResult.ResultType = ResultType.PenaltyKick;
                 judgeResult.Actor = "Yellow";
@@ -171,13 +171,13 @@ public class Referee
 
     private bool JudgeGoalie(JudgeResult judgeResult)
     {
-        if(matchInfo.Ball.pos.x >= 74.4 && matchInfo.Ball.pos.y >= -40 && matchInfo.Ball.pos.y <=40)
+        if (matchInfo.Ball.pos.x >= 74.4 && matchInfo.Ball.pos.y >= -40 && matchInfo.Ball.pos.y <= 40)
         {
             int SmallStateNum = 0;
             int BigStateNum = 0;
             for (int i = 0; i <= 4; i++)
             {
-                if(GoalieBlueID!=-1 && JudgeCollision(BlueObject[GoalieBlueID],YellowObject[i]))
+                if (GoalieBlueID != -1 && JudgeCollision(BlueObject[GoalieBlueID], YellowObject[i]))
                 {
                     judgeResult.ResultType = ResultType.GoalKick;
                     judgeResult.Actor = "Blue";
@@ -214,7 +214,7 @@ public class Referee
             int BigStateNum = 0;
             for (int i = 0; i <= 4; i++)
             {
-                if (GoalieYellowID!=-1 && JudgeCollision(YellowObject[GoalieYellowID], BlueObject[i]))
+                if (GoalieYellowID != -1 && JudgeCollision(YellowObject[GoalieYellowID], BlueObject[i]))
                 {
                     judgeResult.ResultType = ResultType.GoalKick;
                     judgeResult.Actor = "Yellow";
@@ -247,16 +247,16 @@ public class Referee
         }
 
         return false;
-       
+
     }
     private bool JudgeFree(JudgeResult judgeResult)
     {
-        if(matchInfo.Ball.linearVelocity.GetUnityVector2().magnitude <5)
+        if (matchInfo.Ball.linearVelocity.GetUnityVector2().magnitude < 5)
         {
             StandoffTime++;
             if (StandoffTime > 500)
             {
-                if(matchInfo.Ball.pos.x > 0 && matchInfo.Ball.pos.y > 0)
+                if (matchInfo.Ball.pos.x > 0 && matchInfo.Ball.pos.y > 0)
                 {
                     judgeResult.ResultType = ResultType.FreeKick;
                     judgeResult.Actor = "Blue";
@@ -277,7 +277,7 @@ public class Referee
                     judgeResult.Reason = "LeftTop Standoff time longer than 10 seconds in game";
                     return true;
                 }
-                else 
+                else
                 {
                     judgeResult.ResultType = ResultType.FreeKick;
                     judgeResult.Actor = "Yellow";
@@ -287,7 +287,7 @@ public class Referee
             }
             else
             {
-                return false;   
+                return false;
             }
         }
         else
@@ -316,8 +316,4 @@ public class Referee
             return true;
         }
     }
-
-
 }
-
-

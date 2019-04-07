@@ -45,7 +45,6 @@ public class ControlRobot : MonoBehaviour
         _physicsEnabled = true;
         Collider = GetComponent<Collider>();
         rb = GetComponent<Rigidbody>();
-        rb.maxAngularVelocity = (Const.Robot.maxAngularVelocity * Mathf.Deg2Rad);
 
         //leftwheel = transform.Find("WheelL").gameObject;
         //rightwheel = transform.Find("WheelR").gameObject;
@@ -62,7 +61,14 @@ public class ControlRobot : MonoBehaviour
 
         // TODO 零减速
         forward_force = -transform.up * (LeftVelocity + RightVelocity) * ForwardFactor;
-        forward_drag = rb.velocity * -Drag;
+        if (LeftVelocity == 0 && RightVelocity == 0)
+        {
+            forward_drag = rb.velocity * -Drag * 5;
+        }
+        else
+        {
+            forward_drag = rb.velocity * -Drag;
+        }
         rb.AddForce(forward_force + forward_drag);
 
         torque = Vector3.up * (LeftVelocity - RightVelocity) * TorqueFactor;

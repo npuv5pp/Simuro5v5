@@ -25,16 +25,16 @@ namespace Simuro5v5
         public static class Robot
         {
             public readonly static float ForwardForceFactor = 47.5f;
-            public readonly static float TorqueFactor = 304;
+            public readonly static float TorqueFactor = 325;
             public readonly static float DragFactor = 50;
             public readonly static float DoubleZeroDragFactor = 4;
-            public readonly static float AngularDragFactor = 1300;
+            public readonly static float AngularDragFactor = 1400;
             public readonly static float Mass = 10;
 
             public readonly static float RL = 7.8670658f;                   // 机器人边长         // 有舍入误差
             public readonly static float HRL = 3.9335329f;                  // 机器人半边长       // 有舍入误差
             public readonly static float maxVelocity = 125.0f;              // 机器人最大线速度
-            public readonly static float maxAngularVelocity = 70.07121363f; // 机器人最大角速度，角度制
+            public readonly static float maxAngularVelocity = float.MaxValue; // 机器人最大角速度，角度制
             //public readonly static float maxAngularVelocity = 4024.07121363f; // 机器人最大角速度，角度制
             public readonly static float kv = 66.0f;                        // 使加速度为1时需要乘的系数
             public readonly static float kv1 = 75.81f;                      // 使加速度为1时需要乘的系数，f=1.0
@@ -55,7 +55,7 @@ namespace Simuro5v5
 
         public static class Ball
         {
-            public readonly static float mass = 3;
+            public readonly static float mass = 1;
 
             public readonly static float BL = 5.043424f;                    // 球的直径
             public readonly static float HBL = 2.521712f;                   // 球的半径
