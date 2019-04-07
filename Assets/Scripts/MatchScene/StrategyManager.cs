@@ -298,7 +298,7 @@ namespace Simuro5v5.Strategy
         /// <summary>
         /// 策略的描述信息
         /// </summary>
-        Teaminfo Teaminfo { get; set; }
+        Teaminfo Teaminfo { get; }
 
         /// <summary>
         /// 以返回值判断是否连接
