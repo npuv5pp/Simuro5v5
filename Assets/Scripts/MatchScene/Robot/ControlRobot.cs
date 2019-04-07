@@ -35,8 +35,6 @@ public class ControlRobot : MonoBehaviour
     Vector3 forward_force, forward_drag;
     Vector3 torque, angular_drag;
 
-    //GameObject leftwheel, rightwheel;
-
     Collider Collider;
     Rigidbody rb;
 
@@ -45,10 +43,6 @@ public class ControlRobot : MonoBehaviour
         _physicsEnabled = true;
         Collider = GetComponent<Collider>();
         rb = GetComponent<Rigidbody>();
-
-        //leftwheel = transform.Find("WheelL").gameObject;
-        //rightwheel = transform.Find("WheelR").gameObject;
-
         InitParameter();
     }
 
@@ -59,11 +53,10 @@ public class ControlRobot : MonoBehaviour
             return;
         }
 
-        // TODO 零减速
         forward_force = -transform.up * (LeftVelocity + RightVelocity) * ForwardFactor;
         if (LeftVelocity == 0 && RightVelocity == 0)
         {
-            forward_drag = rb.velocity * -Drag * 5;
+            forward_drag = rb.velocity * -DoubleZeroDrag;
         }
         else
         {

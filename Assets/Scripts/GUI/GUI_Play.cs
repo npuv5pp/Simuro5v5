@@ -96,15 +96,8 @@ public class GUI_Play : MonoBehaviour
     public void AnimOutGameAndRemoveStrategy()
     {
         AnimOutGame();
-        try
-        {
-            playMain.RemoveStrategy();
-            playMain.StopMatch();
-        }
-        catch
-        {
-            AnimInGame();
-        }
+        playMain.RemoveStrategy();
+        playMain.StopMatch();
     }
 
     public void AnimInGameAndLoadStrategy()

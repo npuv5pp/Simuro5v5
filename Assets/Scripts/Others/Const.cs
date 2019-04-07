@@ -25,10 +25,10 @@ namespace Simuro5v5
         public static class Robot
         {
             public readonly static float ForwardForceFactor = 47.5f;
-            public readonly static float TorqueFactor = 325;
+            public readonly static float TorqueFactor = 300;
             public readonly static float DragFactor = 50;
-            public readonly static float DoubleZeroDragFactor = 4;
-            public readonly static float AngularDragFactor = 1400;
+            public readonly static float DoubleZeroDragFactor = DragFactor * 10;
+            public readonly static float AngularDragFactor = 1300;
             public readonly static float Mass = 10;
 
             public readonly static float RL = 7.8670658f;                   // 机器人边长         // 有舍入误差
