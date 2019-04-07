@@ -42,6 +42,7 @@ namespace Simuro5v5
             Event.Register(Event.EventType1.MatchInfoUpdate, RecordMatchInfo);
             Event.Register(Event.EventType0.MatchStart, RecodeNewMatch);
             Event.Register(Event.EventType0.RoundStart, RecodeNewRound);
+            Event.Register(Event.EventType0.AutoPlacement, RecodeAutoPlacement);
         }
 
         /// <summary>
@@ -79,6 +80,11 @@ namespace Simuro5v5
         private void RecodeNewRound()
         {
             RecodeState(DataType.NewRound);
+        }
+
+        private void RecodeAutoPlacement()
+        {
+            RecodeState(DataType.AutoPlacement);
         }
 
         private void RecodeState(DataType type)

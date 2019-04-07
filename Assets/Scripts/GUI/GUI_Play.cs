@@ -9,6 +9,7 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.Collections.Generic;
 using Simuro5v5;
+using TMPro;
 using Event = Simuro5v5.EventSystem.Event;
 using static Simuro5v5.Strategy.NetStrategy;
 
@@ -44,14 +45,14 @@ public class GUI_Play : MonoBehaviour
     public AnimControl topAnim;
 
     // other ui items
-    public Text blueScoreText;
-    public Text yellowScoreText;
-    public Text timeText;
-    public Text refereeLogText;
-    public Text statusText;
+    public TMP_Text blueScoreText;
+    public TMP_Text yellowScoreText;
+    public TMP_Text timeText;
+    public TMP_Text refereeLogText;
+    public TMP_Text statusText;
 
-    public Text blueTeamName;
-    public Text yellowTeamName;
+    public TMP_Text blueTeamName;
+    public TMP_Text yellowTeamName;
 
     Stack<GameObject> MenuStack { get; set; }
 
@@ -76,7 +77,7 @@ public class GUI_Play : MonoBehaviour
             Recorder = new DataRecorder();
         }
 
-        Event.Register(Event.EventType1.LogUpdate, SetRefereeInfo);
+        Event.Register(Event.EventType1.RefereeLogUpdate, SetRefereeInfo);
     }
 
     public void LoadMainScene()
@@ -402,6 +403,6 @@ public class GUI_Play : MonoBehaviour
 
     private void OnDestroy()
     {
-        Event.UnRegister(Event.EventType1.LogUpdate, SetRefereeInfo);
+        Event.UnRegister(Event.EventType1.RefereeLogUpdate, SetRefereeInfo);
     }
 }

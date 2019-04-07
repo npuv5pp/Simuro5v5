@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Text;
 using Simuro5v5;
 using UnityEngine;
 using Event = Simuro5v5.EventSystem.Event;
@@ -44,7 +45,7 @@ public class Referee
                     if (JudgeFree(judgeResult) == false)
                     {
                         judgeResult.ResultType = ResultType.NormalMatch;
-                        judgeResult.Actor = "None";
+                        judgeResult.Actor = Side.None;
                         judgeResult.Reason = "Normal competition";
                     }
                 }
@@ -84,7 +85,7 @@ public class Referee
     {
         if (matchInfo.Ball.pos.x <= -112 && matchInfo.Ball.pos.y >= -15 && matchInfo.Ball.pos.y <= 15)
         {
-            judgeResult.Actor = "Yellow";
+            judgeResult.Actor = Side.Yellow;
             judgeResult.Reason = "Be scored and PlaceKick again";
             judgeResult.ResultType = ResultType.PlaceKick;
             Event.Send(Event.EventType1.Goal, true); //黄方被进球
@@ -92,7 +93,7 @@ public class Referee
         }
         else if (matchInfo.Ball.pos.x >= 112 && matchInfo.Ball.pos.y >= -15 && matchInfo.Ball.pos.y <= 15)
         {
-            judgeResult.Actor = "Blue";
+            judgeResult.Actor = Side.Blue; 
             judgeResult.Reason = "Be scored and PlaceKick again";
             judgeResult.ResultType = ResultType.PlaceKick;
             Event.Send(Event.EventType1.Goal, false); //蓝方被进球
@@ -124,14 +125,14 @@ public class Referee
             if (BigStateNum >= 4)
             {
                 judgeResult.ResultType = ResultType.PenaltyKick;
-                judgeResult.Actor = "Yellow";
+                judgeResult.Actor = Side.Yellow;
                 judgeResult.Reason = "Defenders have four robots in BigState";
                 return true;
             }
             if (SmallStateNum >= 2)
             {
                 judgeResult.ResultType = ResultType.PenaltyKick;
-                judgeResult.Actor = "Yellow";
+                judgeResult.Actor = Side.Blue;
                 judgeResult.Reason = "Defenders have two robots in SmallState";
                 return true;
             }
@@ -154,14 +155,14 @@ public class Referee
             if (BigStateNum >= 4)
             {
                 judgeResult.ResultType = ResultType.PenaltyKick;
-                judgeResult.Actor = "Blue";
+                judgeResult.Actor = Side.Blue;
                 judgeResult.Reason = "Defenders have four robots in BigState";
                 return true;
             }
             if (SmallStateNum >= 2)
             {
                 judgeResult.ResultType = ResultType.PenaltyKick;
-                judgeResult.Actor = "Blue";
+                judgeResult.Actor = Side.Blue;
                 judgeResult.Reason = "Defenders have two robots in SmallState";
                 return true;
             }
@@ -180,7 +181,7 @@ public class Referee
                 if (GoalieBlueID != -1 && JudgeCollision(BlueObject[GoalieBlueID], YellowObject[i]))
                 {
                     judgeResult.ResultType = ResultType.GoalKick;
-                    judgeResult.Actor = "Blue";
+                    judgeResult.Actor = Side.Blue;
                     judgeResult.Reason = "Attacker hit the Goalie";
                     return true;
                 }
@@ -196,14 +197,14 @@ public class Referee
             if (BigStateNum >= 4)
             {
                 judgeResult.ResultType = ResultType.GoalKick;
-                judgeResult.Actor = "Blue";
+                judgeResult.Actor = Side.Blue;
                 judgeResult.Reason = "Attacker have four robots in BigState";
                 return true;
             }
             if (SmallStateNum >= 2)
             {
                 judgeResult.ResultType = ResultType.GoalKick;
-                judgeResult.Actor = "Blue";
+                judgeResult.Actor = Side.Blue;
                 judgeResult.Reason = "Attacker have two robots in SmallState";
                 return true;
             }
@@ -217,7 +218,7 @@ public class Referee
                 if (GoalieYellowID != -1 && JudgeCollision(YellowObject[GoalieYellowID], BlueObject[i]))
                 {
                     judgeResult.ResultType = ResultType.GoalKick;
-                    judgeResult.Actor = "Yellow";
+                    judgeResult.Actor = Side.Yellow;
                     judgeResult.Reason = "Attacker hit the Goalie";
                     return true;
                 }
@@ -233,14 +234,14 @@ public class Referee
             if (BigStateNum >= 4)
             {
                 judgeResult.ResultType = ResultType.GoalKick;
-                judgeResult.Actor = "Yellow";
+                judgeResult.Actor = Side.Yellow;
                 judgeResult.Reason = "Attacker have four robots in BigState";
                 return true;
             }
             if (SmallStateNum >= 2)
             {
                 judgeResult.ResultType = ResultType.GoalKick;
-                judgeResult.Actor = "Yellow";
+                judgeResult.Actor = Side.Yellow;
                 judgeResult.Reason = "Attacker have two robots in SmallState";
                 return true;
             }
@@ -259,28 +260,28 @@ public class Referee
                 if (matchInfo.Ball.pos.x > 0 && matchInfo.Ball.pos.y > 0)
                 {
                     judgeResult.ResultType = ResultType.FreeKick;
-                    judgeResult.Actor = "Blue";
+                    judgeResult.Actor = Side.Blue;
                     judgeResult.Reason = "RightTop Standoff time longer than 10 seconds in game";
                     return true;
                 }
                 else if (matchInfo.Ball.pos.x > 0 && matchInfo.Ball.pos.y < 0)
                 {
                     judgeResult.ResultType = ResultType.FreeKick;
-                    judgeResult.Actor = "Blue";
+                    judgeResult.Actor = Side.Blue;
                     judgeResult.Reason = "RightBot Standoff time longer than 10 seconds in game";
                     return true;
                 }
                 else if (matchInfo.Ball.pos.x < 0 && matchInfo.Ball.pos.y > 0)
                 {
                     judgeResult.ResultType = ResultType.FreeKick;
-                    judgeResult.Actor = "Yellow";
+                    judgeResult.Actor = Side.Yellow;
                     judgeResult.Reason = "LeftTop Standoff time longer than 10 seconds in game";
                     return true;
                 }
                 else
                 {
                     judgeResult.ResultType = ResultType.FreeKick;
-                    judgeResult.Actor = "Yellow";
+                    judgeResult.Actor = Side.Yellow;
                     judgeResult.Reason = "LeftBot Standoff time longer than 10 seconds in game";
                     return true;
                 }

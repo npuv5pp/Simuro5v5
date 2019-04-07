@@ -157,45 +157,15 @@ public class PlayMain : MonoBehaviour
 
             // 裁判判断
             JudgeResult judgeResult = GlobalMatchInfo.Referee.Judge(GlobalMatchInfo);
-            if(judgeResult.ResultType != ResultType.NormalMatch )
+            if (judgeResult.ResultType != ResultType.NormalMatch)
             {
                 InRound = false;
                 InPlacement = true;
                 GlobalMatchInfo.Referee = new Referee();
 
-                string log;
-                if(judgeResult.Actor == "Blue")
-                {
-                    log = string.Format("Foul: {0}  <b><color=\"#F8FF00\">Yellow</color></b> team is offensive side \n Reason:{1}", judgeResult.ResultType,judgeResult.Reason);
-
-                }
-                else
-                {
-                    log = string.Format("Foul: {0}  <b><color=\"#0057FF\">Blue</color></b> team is offensive side \n Reason:{1}", judgeResult.ResultType, judgeResult.Reason);
-
-                }
-                Event.Send(Event.EventType1.LogUpdate, log);
+                Event.Send(Event.EventType1.RefereeLogUpdate, judgeResult.ToRichText());
+                Event.Send(Event.EventType0.AutoPlacement);
             }
-
-            //if (GlobalMatchInfo.Referee.Judge(GlobalMatchInfo))
-            //{
-            //    InRound = false;
-            //    InPlacement = true;
-            //    //GlobalMatchInfo.Referee = new Referee();
-
-            //    string log;
-            //    if (GlobalMatchInfo.WhosBall == Side.Blue)
-            //    {
-            //        log = string.Format("Foul: {0}. <b><color=\"#0057FF\">Blue</color></b> team is offensive side",
-            //             GlobalMatchInfo.GameState);
-            //    }
-            //    else
-            //    {
-            //        log = string.Format("Foul: {0}. <b><color=\"#F8FF00\">Yellow</color></b> team is offensive side",
-            //             GlobalMatchInfo.GameState);
-            //    }
-            //    Event.Send(Event.EventType1.LogUpdate, log);
-            ////}
             else
             {
                 UpdateWheelsToScene();

@@ -22,6 +22,7 @@ namespace Simuro5v5
     {
         Yellow,
         Blue,
+        None,
     };
 
     /// <summary>

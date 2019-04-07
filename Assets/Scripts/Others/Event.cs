@@ -75,6 +75,7 @@ namespace Simuro5v5.EventSystem
             RoundPause,
             RoundResume,
             RoundStop,
+            AutoPlacement,
 
             PlaySceneEntered,
             PlaySceneExited,
@@ -88,7 +89,7 @@ namespace Simuro5v5.EventSystem
             // 事件名称                 // 传入参数
             MatchInfoUpdate,            // 更新后的赛场信息
             Goal,                       // 进球
-            LogUpdate,                  // 更新比赛状态信息
+            RefereeLogUpdate,                  // 更新比赛状态信息
 
             StrategyBlueLoaded,         // IStrategy策略实例
             StrategyYellowLoaded,       // IStrategy策略实例

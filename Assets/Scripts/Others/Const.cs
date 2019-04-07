@@ -83,5 +83,12 @@ namespace Simuro5v5
             public static Color SideBlue = new Color(0, 87, 255);
             public static Color SideYellow = new Color(248, 255, 0);
         }
+
+        public static string ToHex(this Color color)
+        {
+            return Convert.ToString((int)color.r, 16).PadLeft(2, '0') +
+                Convert.ToString((int)color.g, 16).PadLeft(2, '0') + 
+                Convert.ToString((int)color.b, 16).PadLeft(2, '0');
+        }
     }
 }

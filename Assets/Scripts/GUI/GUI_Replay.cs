@@ -16,7 +16,7 @@ public class GUI_Replay : MonoBehaviour
     public Slider Slider;
     public DataBoard DataBoard;
     public GameObject Entity;
-    public TextMeshProUGUI DataName;
+    public TMP_Text DataName;
     public TMP_Dropdown SpeedDropdown;
     public StateBoard StateBoard;
     public Image PauseButtonImage;
@@ -74,6 +74,19 @@ public class GUI_Replay : MonoBehaviour
         {
             PauseButtonImage.sprite = PauseButtonNonPaused;
         }
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            OnPauseClicked();
+        }
+        if (Input.GetKeyDown(KeyCode.UpArrow))
+        {
+            SpeedDropdown.value -= 1;
+        }
+        else if (Input.GetKeyDown(KeyCode.DownArrow))
+        {
+            SpeedDropdown.value += 1;
+        }
     }
 
     void FixedUpdate()
@@ -88,6 +101,16 @@ public class GUI_Replay : MonoBehaviour
             {
                 Next();
             }
+        }
+
+        // 先放到FixedUpdate中，避免回放进行太快
+        if (Input.GetKey(KeyCode.LeftArrow))
+        {
+            OnPreviousClicked();
+        }
+        if (Input.GetKey(KeyCode.RightArrow))
+        {
+            OnNextClicked();
         }
     }
 
@@ -218,7 +241,7 @@ public class GUI_Replay : MonoBehaviour
     /// <summary>
     /// 用户选择的速度改变，更改FixedUpdate频率。
     /// </summary>
-    public void OnSpeedChanged()
+    public void OnSpeedChanged(int value = -1)
     {
         switch (SpeedDropdown.value)
         {
