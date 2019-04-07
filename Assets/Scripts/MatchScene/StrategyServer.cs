@@ -593,6 +593,18 @@ namespace ServerMessage
         {
             return JObjectData == null ? null : JObjectData.ToObject(MsgType.DataType);
         }
+
+        public T GetData<T>()
+        {
+            try
+            {
+                return JObjectData.ToObject<T>();
+            }
+            catch
+            {
+                return default;
+            }
+        }
     }
 
     class MessageTypeError : Exception

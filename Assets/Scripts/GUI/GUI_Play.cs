@@ -10,6 +10,7 @@ using UnityEngine.SceneManagement;
 using System.Collections.Generic;
 using Simuro5v5;
 using Event = Simuro5v5.EventSystem.Event;
+using static Simuro5v5.Strategy.NetStrategy;
 
 public class GUI_Play : MonoBehaviour
 {
@@ -112,8 +113,9 @@ public class GUI_Play : MonoBehaviour
         {
             playMain.LoadStrategy(blueInputField.text.Trim(), yellowInputField.text.Trim());
         }
-        catch
+        catch (LoadDllFailed e)
         {
+            Debug.LogError(e.Message);
             AnimOutGame();
         }
     }

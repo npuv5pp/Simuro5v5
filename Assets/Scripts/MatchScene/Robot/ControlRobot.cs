@@ -11,6 +11,24 @@ public class ControlRobot : MonoBehaviour
 
     public bool Debugging;
 
+    bool _physicsEnabled;
+    public bool physicsEnabled
+    {
+        get { return _physicsEnabled; }
+        set
+        {
+            if (value)
+            {
+                EnableRigidBodyAndCollider();
+            }
+            else
+            {
+                DisableRigidBodyAndCollider();
+            }
+            _physicsEnabled = value;
+        }
+    }
+
     float LeftVelocity { get; set; }
     float RightVelocity { get; set; }
 
@@ -24,6 +42,7 @@ public class ControlRobot : MonoBehaviour
 
     void Start()
     {
+        _physicsEnabled = true;
         Collider = GetComponent<Collider>();
         rb = GetComponent<Rigidbody>();
         rb.maxAngularVelocity = (Const.Robot.maxAngularVelocity * Mathf.Deg2Rad);
@@ -31,11 +50,16 @@ public class ControlRobot : MonoBehaviour
         //leftwheel = transform.Find("WheelL").gameObject;
         //rightwheel = transform.Find("WheelR").gameObject;
 
-        InitRobotParameter();
+        InitParameter();
     }
 
     void FixedUpdate()
     {
+        if (!physicsEnabled)
+        {
+            return;
+        }
+
         // TODO 零减速
         forward_force = -transform.up * (LeftVelocity + RightVelocity) * ForwardFactor;
         forward_drag = rb.velocity * -Drag;
@@ -44,16 +68,6 @@ public class ControlRobot : MonoBehaviour
         torque = Vector3.up * (LeftVelocity - RightVelocity) * TorqueFactor;
         angular_drag = rb.angularVelocity * -AngularDrag;
         rb.AddTorque(torque + angular_drag);
-    }
-
-    private void LateUpdate()
-    {
-        if (Debugging)
-        {
-            Debug.Log($"{transform.up}, {transform.forward}");
-        }
-        Debug.DrawRay(transform.position, transform.forward * 10, Color.red);
-        Debug.DrawRay(transform.position, transform.up * 10, Color.black);
     }
 
     public void SetWheelVelocity(Wheel ws)
@@ -68,7 +82,7 @@ public class ControlRobot : MonoBehaviour
     }
 
     /// <summary>
-    /// 设置位置，速度设为0
+    /// 设置位置
     /// </summary>
     /// <param name="robot"></param>
     public void SetPlacement(Robot robot)
@@ -89,48 +103,68 @@ public class ControlRobot : MonoBehaviour
             z = 0,
         };
         transform.rotation = rot;
-        SetStill();
-    }
-
-    public void SetStill()
-    {
-        SetWheelVelocity(0, 0);
-        rb.angularVelocity = Vector3.zero;
-        rb.velocity = Vector3.zero;
-        //rb.Sleep();
-        //rb.WakeUp();
     }
 
     /// <summary>
-    /// 设置速度和位置，完全还原状态
+    /// 设置速度和位置
     /// </summary>
     /// <param name="robot"></param>
     public void Revert(Robot robot)
     {
-        // 设置位置信息，并静止
+        // 设置位置信息
         SetPlacement(robot);
-
-        // 设置刚体的线速度和角速度
-        rb.velocity = robot.GetLinearVelocityVector3();
-        rb.angularVelocity = robot.GetAngularVelocityVector3();
-
         SetWheelVelocity((float)robot.velocityLeft, (float)robot.velocityRight);
+        if (physicsEnabled)
+        {
+            // 设置刚体的线速度和角速度
+            rb.velocity = robot.GetLinearVelocityVector3();
+            rb.angularVelocity = robot.GetAngularVelocityVector3();
+        }
     }
 
-    public void DisableRigidBodyAndCollider()
+    /// <summary>
+    /// 使静止
+    /// </summary>
+    public void SetStill()
+    {
+        SetWheelVelocity(0, 0);
+        if (physicsEnabled)
+        {
+            rb.angularVelocity = Vector3.zero;
+            rb.velocity = Vector3.zero;
+            rb.Sleep();
+            rb.WakeUp();
+        }
+    }
+
+    /// <summary>
+    /// 禁用碰撞体，移除刚体
+    /// </summary>
+    void DisableRigidBodyAndCollider()
     {
         Collider.enabled = false;
-        rb.isKinematic = true;
+        Destroy(rb);
     }
 
-    public void EnableRigidBodyAndCollider()
+    /// <summary>
+    /// 启用碰撞体，添加刚体
+    /// </summary>
+    void EnableRigidBodyAndCollider()
     {
         Collider.enabled = true;
-        rb.isKinematic = false;
+        rb = gameObject.AddComponent<Rigidbody>();
+        InitParameter();
     }
 
-    void InitRobotParameter()
+    /// <summary>
+    /// 设置参数
+    /// </summary>
+    void InitParameter()
     {
+        if (!physicsEnabled)
+        {
+            throw new PhysicsDisabledException();
+        }
         rb.mass = Const.Robot.Mass;
         rb.drag = rb.angularDrag = 0;
         rb.useGravity = true;

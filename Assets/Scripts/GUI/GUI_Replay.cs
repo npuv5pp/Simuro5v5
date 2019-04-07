@@ -54,7 +54,7 @@ public class GUI_Replay : MonoBehaviour
 
         ObjectManager = new ObjectManager();
         ObjectManager.RebindObject(Entity);
-        ObjectManager.DisableRigidBodyAndCollider();
+        ObjectManager.DisablePhysics();
         ObjectManager.Resume();
         Slider.minValue = 0;
         Slider.maxValue = Recorder.DataLength == 0 ? 0 : Recorder.DataLength - 1;

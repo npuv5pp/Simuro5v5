@@ -55,6 +55,8 @@ namespace Simuro5v5
 
         public static class Ball
         {
+            public readonly static float mass = 3;
+
             public readonly static float BL = 5.043424f;                    // 球的直径
             public readonly static float HBL = 2.521712f;                   // 球的半径
             public readonly static float dyF = 1.0f;                        // 球的动摩擦因数

@@ -4,7 +4,6 @@ using UnityEngine;
 using Simuro5v5;
 using Simuro5v5.Config;
 using Simuro5v5.Strategy;
-using Logger = Simuro5v5.Logger;
 using Event = Simuro5v5.EventSystem.Event;
 
 public class PlayMain : MonoBehaviour
@@ -395,6 +394,7 @@ public class PlayMain : MonoBehaviour
         }
         ObjectManager.SetBluePlacement(blueInfo);
         ObjectManager.SetYellowPlacement(yellowInfo);
+        ObjectManager.SetStill();
 
         if (GlobalMatchInfo.WhosBall == 0)                        // 先摆后摆另考虑
         {

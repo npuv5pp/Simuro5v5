@@ -1,5 +1,5 @@
-﻿using UnityEngine;
-using UnityEngine.SceneManagement;
+﻿using System;
+using UnityEngine;
 
 namespace Simuro5v5
 {
@@ -182,6 +182,9 @@ namespace Simuro5v5
             ballComponent.SetPlacement(b);
         }
 
+        /// <summary>
+        /// 所有物体静止
+        /// </summary>
         public void SetStill()
         {
             for (int i = 0; i < 5; i++)
@@ -215,24 +218,30 @@ namespace Simuro5v5
             OutputMatchInfo?.UpdateEntity(ballObject, blueObject, yellowObject);
         }
 
-        public void EnableRigidBody()
+        /// <summary>
+        /// 启用物理计算
+        /// </summary>
+        public void EnablePhysics()
         {
             for (int i = 0; i < 5; i++)
             {
-                blueComponent[i].EnableRigidBodyAndCollider();
-                yellowComponent[i].EnableRigidBodyAndCollider();
+                blueComponent[i].physicsEnabled = true;
+                yellowComponent[i].physicsEnabled = true;
             }
-            ballComponent.EnableRigidBodyAndCollider();
+            ballComponent.physicsEnabled = true;
         }
 
-        public void DisableRigidBodyAndCollider()
+        /// <summary>
+        /// 禁用物理计算
+        /// </summary>
+        public void DisablePhysics()
         {
             for (int i = 0; i < 5; i++)
             {
-                blueComponent[i].DisableRigidBodyAndCollider();
-                yellowComponent[i].DisableRigidBodyAndCollider();
+                blueComponent[i].physicsEnabled = false;
+                yellowComponent[i].physicsEnabled = false;
             }
-            ballComponent.DisableRigidBodyAndCollider();
+            ballComponent.physicsEnabled = false;
         }
 
         /// <summary>
@@ -251,4 +260,10 @@ namespace Simuro5v5
             Time.timeScale = 0.0f;
         }
     }
+}
+
+public class PhysicsDisabledException : Exception
+{
+    public PhysicsDisabledException() { }
+    public PhysicsDisabledException(string message) : base(message) { }
 }

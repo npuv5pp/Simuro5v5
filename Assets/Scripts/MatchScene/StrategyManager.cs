@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 using System.Net;
 
 namespace Simuro5v5.Strategy
@@ -6,6 +7,7 @@ namespace Simuro5v5.Strategy
     using ServerMessage;
     using Simuro5v5.EventSystem;
     using System.Collections.Generic;
+    using System.Runtime.Serialization;
 
     /// <summary>
     /// 策略管理器
@@ -376,11 +378,26 @@ namespace Simuro5v5.Strategy
             }
         }
 
-        protected bool SendLoad()
+        protected void SendLoad()
         {
             var resp = Conn.SendThenRecv(new Message(MessageType.MSG_load, new FileMsgContainer { FileName = DllPath }));
-            LoadSucceed = resp.MsgType == MessageType.MSG_fin;
-            return LoadSucceed;
+            if (resp.MsgType == MessageType.MSG_fin)
+            {
+                LoadSucceed = true;
+            }
+            else
+            {
+                if (resp.MsgType == MessageType.MSG_error)
+                {
+                    var err = resp.GetData<ErrorMsgContainer>();
+                    var msg = $"An error occured when dll loading(`{DllPath}`): {err.Description}";
+                    throw new LoadDllFailed(msg);
+                }
+                else
+                {
+                    throw new LoadDllFailed("unknown message");
+                }
+            }
         }
 
         public void CheckReady_ex()
@@ -437,9 +454,16 @@ namespace Simuro5v5.Strategy
             var msg = Conn.SendThenRecv(new Message(MessageType.MSG_getteaminfo, null));
             Teaminfo = (Teaminfo)msg.GetData();
         }
+
+        public class LoadDllFailed : Exception
+        {
+            public LoadDllFailed() { }
+
+            public LoadDllFailed(string message) : base(message) { }
+        }
     }
 
-    class DebugStrategy : IStrategy
+class DebugStrategy : IStrategy
     {
         WheelInfo output_wheelinfo;
 
