@@ -36,8 +36,8 @@ public class GUI_Play : MonoBehaviour
     public Button replayButton;
 
     // strategy menu items
-    public InputField blueInputField;
-    public InputField yellowInputField;
+    public TMP_InputField blueInputField;
+    public TMP_InputField yellowInputField;
 
     // animation control items
     public AnimControl refereeAnim;
