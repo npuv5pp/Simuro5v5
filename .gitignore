@@ -24,3 +24,6 @@ obj
 /StrategyServer/dll123_x64.dll
 /dlltest.dll
 *.swp
+*.pyc
+/StrategyServer/build.bat
+/StrategyServer/src/test.py
