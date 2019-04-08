@@ -66,14 +66,7 @@ public class GUI_Replay : MonoBehaviour
     void Update()
     {
         DataName.SetText(Recorder.Name);
-        if (Paused)
-        {
-            PauseButtonImage.sprite = PauseButtonPaused;
-        }
-        else
-        {
-            PauseButtonImage.sprite = PauseButtonNonPaused;
-        }
+        PauseButtonImage.sprite = Paused ? PauseButtonPaused : PauseButtonNonPaused;
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
@@ -124,8 +117,7 @@ public class GUI_Replay : MonoBehaviour
     /// <param name="matchInfo">要渲染的场景信息</param>
     void Render(DataRecorder.BaseRecodeData d)
     {
-        var data = d as DataRecorder.StateRecodeData;
-        if (data == null)
+        if (!(d is DataRecorder.StateRecodeData data))
         {
             return;
         }
@@ -133,7 +125,7 @@ public class GUI_Replay : MonoBehaviour
         {
             case DataRecorder.DataType.InPlaying:
                 {
-                    if (data  != null && data.matchInfo != null)
+                    if (data.matchInfo != null)
                     {
                         ObjectManager.RevertScene(data.matchInfo);
                         DataBoard.Render(data.matchInfo);
