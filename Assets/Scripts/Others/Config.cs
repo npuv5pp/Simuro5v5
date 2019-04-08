@@ -39,8 +39,8 @@ namespace Simuro5v5.Config
 
             RunStrategyServer = true;
             EnableStrategyLog = true;
-            BlueStrategyLogFile = @"BlueStrategy.log";
-            YellowStrategyLogFile = @"YellowStrategy.log";
+            BlueStrategyLogFile = @"StrategyServer\BlueStrategy.log";
+            YellowStrategyLogFile = @"StrategyServer\YellowStrategy.log";
 
             StrategyServer = @"StrategyServer\dist\server\server.exe";
             StrategyServerScript = @"";

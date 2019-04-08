@@ -15,5 +15,6 @@ obj
 *.swp
 *.pyc
 
+config.json
 StrategyServer/.idea
 StrategyServer/__pycache__
