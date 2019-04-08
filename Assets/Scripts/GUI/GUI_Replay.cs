@@ -79,6 +79,10 @@ public class GUI_Replay : MonoBehaviour
         {
             OnPauseClicked();
         }
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            OnBackToGameClicked();
+        }
         if (Input.GetKeyDown(KeyCode.UpArrow))
         {
             SpeedDropdown.value -= 1;
