@@ -16,5 +16,6 @@ obj
 *.swp
 *.pyc
 
+Build.zip
 config.json
 
