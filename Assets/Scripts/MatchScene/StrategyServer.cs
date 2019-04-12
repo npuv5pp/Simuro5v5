@@ -488,7 +488,7 @@ namespace ServerMessage
             MSG_fin = new MessageType("fin", null);
             MSG_error = new MessageType("error", typeof(ErrorMsgContainer));
             MSG_getteaminfo = new MessageType("getteaminfo", null);
-            MSG_setteaminfo = new MessageType("setteaminfo", typeof(Teaminfo));
+            MSG_setteaminfo = new MessageType("setteaminfo", typeof(TeamInfo));
         }
 
         public string TypeName { get; private set; }

@@ -59,18 +59,18 @@ namespace Simuro5v5.Strategy
         /// 获得当前蓝方策略的描述信息
         /// </summary>
         /// <returns>描述信息</returns>
-        public Teaminfo GetBlueTeaminfo()
+        public TeamInfo GetBlueTeaminfo()
         {
-            return blue?.Teaminfo;
+            return blue?.TeamInfo;
         }
 
         /// <summary>
         /// 获得当前黄方策略的描述信息
         /// </summary>
         /// <returns>描述信息</returns>
-        public Teaminfo GetYellowTeaminfo()
+        public TeamInfo GetYellowTeaminfo()
         {
-            return yellow?.Teaminfo;
+            return yellow?.TeamInfo;
         }
 
         public void LoadLastSaved()
@@ -298,7 +298,7 @@ namespace Simuro5v5.Strategy
         /// <summary>
         /// 策略的描述信息
         /// </summary>
-        Teaminfo Teaminfo { get; }
+        TeamInfo TeamInfo { get; }
 
         /// <summary>
         /// 以返回值判断是否连接
@@ -356,7 +356,7 @@ namespace Simuro5v5.Strategy
         public int ServerPort { get { return Conn.ServerPort; } }
         public bool LoadSucceed { get; private set; }
 
-        public Teaminfo Teaminfo { get; set; }
+        public TeamInfo TeamInfo { get; set; }
 
         private ConnectionHandle Conn;
 
@@ -452,7 +452,7 @@ namespace Simuro5v5.Strategy
         public void SendGetTeaminfo()
         {
             var msg = Conn.SendThenRecv(new Message(MessageType.MSG_getteaminfo, null));
-            Teaminfo = (Teaminfo)msg.GetData();
+            TeamInfo = (TeamInfo)msg.GetData();
         }
 
         public class LoadDllFailed : Exception
@@ -493,7 +493,7 @@ class DebugStrategy : IStrategy
             output_wheelinfo = wi;
         }
 
-        public Teaminfo Teaminfo { get; set; }
+        public TeamInfo TeamInfo { get; set; }
 
         public void CheckReady_ex() { }
 
@@ -524,7 +524,7 @@ class DebugStrategy : IStrategy
 
         public void SendGetTeaminfo()
         {
-            Teaminfo = new Teaminfo { Name = "DebugTeam" };
+            TeamInfo = new TeamInfo { Name = "DebugTeam" };
         }
     }
 

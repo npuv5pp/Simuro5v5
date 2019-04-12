@@ -14,7 +14,7 @@ namespace Simuro5v5
         FreeBallTop = 1,
         FreeBallBottom = 2,
         PlaceKick = 3,
-        Plenalty = 4,
+        Penalty = 4,
         GoalKick = 5,
     }
 
@@ -162,13 +162,13 @@ namespace Simuro5v5
             }
 
             Rigidbody ballTemp = ball.GetComponent<Rigidbody>();
-            Ball newBall = new Ball();
-            newBall.mass = ballTemp.mass;
-            newBall.pos.x = ballTemp.position.x;
-            newBall.pos.y = ballTemp.position.z;
-            newBall.linearVelocity.x = ballTemp.velocity.x;
-            newBall.linearVelocity.y = ballTemp.velocity.z;
-            newBall.angularVelocity = ballTemp.angularVelocity.y;
+            Ball newBall = new Ball
+            {
+                mass = ballTemp.mass,
+                pos = {x = ballTemp.position.x, y = ballTemp.position.z},
+                linearVelocity = {x = ballTemp.velocity.x, y = ballTemp.velocity.z},
+                angularVelocity = ballTemp.angularVelocity.y
+            };
             //newBall.angularVelocity.x = ballTemp.angularVelocity.x;
             //newBall.angularVelocity.y = ballTemp.angularVelocity.z;
             //newBall.angularVelocity.z = ballTemp.angularVelocity.y;
@@ -229,20 +229,15 @@ namespace Simuro5v5
             InPlacement = false;
         }
 
-        public static ControlState DefaultState
-        {
-            get
+        public static ControlState DefaultState =>
+            new ControlState
             {
-                return new ControlState
-                {
 
-                    StartedMatch = false,
-                    InRound = false,
-                    PausedRound = true,
-                    InPlacement = false,
-                };
-            }
-        }
+                StartedMatch = false,
+                InRound = false,
+                PausedRound = true,
+                InPlacement = false,
+            };
     }
 
     public struct MatchScore
@@ -382,7 +377,7 @@ namespace Simuro5v5
             }
         }// 根据x,y坐标计算的相对原点的方向
 
-        public static Vector2D Zero { get { return new Vector2D(); } }
+        public static Vector2D Zero => new Vector2D();
 
         public Vector3 GetUnityVector3()
         {
@@ -537,7 +532,7 @@ namespace Simuro5v5
     }
 
     [JsonObject(MemberSerialization.OptIn)]
-    public class Teaminfo
+    public class TeamInfo
     {
         [JsonProperty("name")]
         public string Name { get; set; }
