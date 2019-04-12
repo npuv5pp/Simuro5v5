@@ -70,7 +70,7 @@ namespace Simuro5v5
             ControlState = ControlState.DefaultState;
             Referee = new Referee();
 
-            UpdateEntity(ball, blue, yellow);
+            UpdateFrom(ball, blue, yellow);
         }
 
         public MatchInfo(MatchInfo another)
@@ -86,7 +86,7 @@ namespace Simuro5v5
             YellowRobots = (Robot[])another.YellowRobots.Clone();
         }
 
-        public static MatchInfo newDefaultPreset()
+        public static MatchInfo NewDefaultPreset()
         {
             var info = new MatchInfo();
             info.Ball.moveTo(0, 0);
@@ -97,32 +97,39 @@ namespace Simuro5v5
             { { -102.5, 0, 90 }, { -81.2, 48, 0 }, { -81.2, -48, 0 }, { -29.8, 48, 0 }, { -29.8, -48, 0 } };
             var blueData = new double[,]
             { { 102.5, 0, -90 }, { 81.2, -48, 180 }, { 81.2, 48, 180 }, { 29.8, -48, 180 }, { 29.8, 48, 180 } };
-            //C# 7.0 unavailable now
-            Func<Robot, double[,], int, Robot> InitRobot = (rb, data, elem) =>
-                {
-                    rb.pos.x = (float)data[elem, 0];
-                    rb.pos.y = (float)data[elem, 1];
-                    rb.rotation = data[elem, 2];
-                    rb.velocityLeft = rb.velocityRight = 0;
-                    rb.linearVelocity = Vector2D.Zero;
-                    return rb;
-                };
-            Func<IEnumerable<Robot>, double[,], Robot[]> InitMe = (rbs, data) =>
-                {
-                    return rbs.Select((rb, i) => InitRobot(rb, data, i)).ToArray();
-                };
+            Robot InitRobot(Robot rb, double[,] data, int elem)
+            {
+                rb.pos.x = (float)data[elem, 0];
+                rb.pos.y = (float)data[elem, 1];
+                rb.rotation = data[elem, 2];
+                rb.velocityLeft = rb.velocityRight = 0;
+                rb.linearVelocity = Vector2D.Zero;
+                return rb;
+            }
+            Robot[] InitMe(IEnumerable<Robot> rbs, double[,] data)
+            {
+                return rbs.Select((rb, i) => InitRobot(rb, data, i)).ToArray();
+            }
             info.YellowRobots = InitMe(info.YellowRobots, yellowData);
             info.BlueRobots = InitMe(info.BlueRobots, blueData);
             return info;
         }
 
-        public void Update(MatchInfo matchInfo)
+        private static void UpdateFromRigidbody(ref Robot robot,in Rigidbody rb)
         {
-            for (int i = 0; i < Const.RobotsPerTeam; i++)
-            {
-                BlueRobots[i] = matchInfo.BlueRobots[i];
-                YellowRobots[i] = matchInfo.YellowRobots[i];
-            }
+            robot.mass = rb.mass;
+            robot.pos.x = rb.position.x;
+            robot.pos.y = rb.position.z;
+            robot.rotation = rb.rotation.eulerAngles.y.FormatUnity2Old().FormatOld();
+            robot.linearVelocity.x = rb.velocity.x;
+            robot.linearVelocity.y = rb.velocity.z;
+            robot.angularVelocity = rb.angularVelocity.y;
+        }
+
+        public void UpdateFrom(MatchInfo matchInfo)
+        {
+            BlueRobots = (Robot[])matchInfo.BlueRobots.Clone();
+            YellowRobots = (Robot[])matchInfo.YellowRobots.Clone();
             Ball = matchInfo.Ball;
             PlayTime = matchInfo.PlayTime;
             GameState = matchInfo.GameState;
@@ -132,35 +139,14 @@ namespace Simuro5v5
             Referee = matchInfo.Referee;
         }
 
-        public void UpdateEntity(GameObject ball, GameObject[] blue, GameObject[] yellow)
+        public void UpdateFrom(GameObject ball, GameObject[] blue, GameObject[] yellow)
         {
+            
             for (int i = 0; i < Const.RobotsPerTeam; i++)
             {
-                Rigidbody blueTemp = blue[i].GetComponent<Rigidbody>();
-                BlueRobots[i].mass = blueTemp.mass;
-                BlueRobots[i].pos.x = blueTemp.position.x;
-                BlueRobots[i].pos.y = blueTemp.position.z;
-                BlueRobots[i].rotation = blueTemp.rotation.eulerAngles.y.FormatUnity2Old().FormatOld();
-                BlueRobots[i].linearVelocity.x = blueTemp.velocity.x;
-                BlueRobots[i].linearVelocity.y = blueTemp.velocity.z;
-                BlueRobots[i].angularVelocity = blueTemp.angularVelocity.y;
-                //BlueRobot[i].angularVelocity.x = blueTemp.angularVelocity.x;
-                //BlueRobot[i].angularVelocity.y = blueTemp.angularVelocity.z;
-                //BlueRobot[i].angularVelocity.z = blueTemp.angularVelocity.y;
-
-                Rigidbody yellowTemp = yellow[i].GetComponent<Rigidbody>();
-                YellowRobots[i].mass = yellowTemp.mass;
-                YellowRobots[i].pos.x = yellowTemp.position.x;
-                YellowRobots[i].pos.y = yellowTemp.position.z;
-                YellowRobots[i].rotation = yellowTemp.rotation.eulerAngles.y.FormatUnity2Old().FormatOld();
-                YellowRobots[i].linearVelocity.x = yellowTemp.velocity.x;
-                YellowRobots[i].linearVelocity.y = yellowTemp.velocity.z;
-                YellowRobots[i].angularVelocity = yellowTemp.angularVelocity.y;
-                //YellowRobot[i].angularVelocity.x = yellowTemp.angularVelocity.x;
-                //YellowRobot[i].angularVelocity.y = yellowTemp.angularVelocity.z;
-                //YellowRobot[i].angularVelocity.z = yellowTemp.angularVelocity.y;
+                UpdateFromRigidbody(ref BlueRobots[i], blue[i].GetComponent<Rigidbody>());
+                UpdateFromRigidbody(ref YellowRobots[i], yellow[i].GetComponent<Rigidbody>());
             }
-
             Rigidbody ballTemp = ball.GetComponent<Rigidbody>();
             Ball newBall = new Ball
             {

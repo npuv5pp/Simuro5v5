@@ -109,7 +109,7 @@ namespace Simuro5v5
 
         public void SetToDefault()
         {
-            RevertScene(MatchInfo.newDefaultPreset());
+            RevertScene(MatchInfo.NewDefaultPreset());
         }
 
         public void SetBlueWheels(WheelInfo ws)
@@ -207,7 +207,7 @@ namespace Simuro5v5
                 yellowComponent[i].Revert(matchInfo.YellowRobots[i]);
             }
             ballComponent.Revert(matchInfo.Ball);
-            OutputMatchInfo?.Update(matchInfo);
+            OutputMatchInfo?.UpdateFrom(matchInfo);
         }
 
         /// <summary>
@@ -215,7 +215,7 @@ namespace Simuro5v5
         /// </summary>
         public void UpdateFromScene()
         {
-            OutputMatchInfo?.UpdateEntity(ballObject, blueObject, yellowObject);
+            OutputMatchInfo?.UpdateFrom(ballObject, blueObject, yellowObject);
         }
 
         /// <summary>

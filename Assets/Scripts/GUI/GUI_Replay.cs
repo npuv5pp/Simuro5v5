@@ -48,7 +48,7 @@ public class GUI_Replay : MonoBehaviour
             for (int i = 0; i < 100; i++)
             {
                 Recorder.Add(new DataRecorder.StateRecodeData(DataRecorder.DataType.InPlaying, new MatchInfo()));
-                Recorder.Add(new DataRecorder.StateRecodeData(DataRecorder.DataType.InPlaying, MatchInfo.newDefaultPreset()));
+                Recorder.Add(new DataRecorder.StateRecodeData(DataRecorder.DataType.InPlaying, MatchInfo.NewDefaultPreset()));
             }
         }
 

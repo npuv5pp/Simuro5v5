@@ -123,7 +123,7 @@ public class PlayMain : MonoBehaviour
         }
 
         StrategyManager = new StrategyManager();
-        GlobalMatchInfo = MatchInfo.newDefaultPreset();
+        GlobalMatchInfo = MatchInfo.NewDefaultPreset();
 
         Event.Register(Event.EventType1.Goal, delegate (object obj)
         {
