@@ -115,7 +115,7 @@ namespace Simuro5v5
             return info;
         }
 
-        private static void UpdateFromRigidbody(ref Robot robot,in Rigidbody rb)
+        private static void UpdateFromRigidbody(ref Robot robot, in Rigidbody rb)
         {
             robot.mass = rb.mass;
             robot.pos.x = rb.position.x;
@@ -141,7 +141,7 @@ namespace Simuro5v5
 
         public void UpdateFrom(GameObject ball, GameObject[] blue, GameObject[] yellow)
         {
-            
+
             for (int i = 0; i < Const.RobotsPerTeam; i++)
             {
                 UpdateFromRigidbody(ref BlueRobots[i], blue[i].GetComponent<Rigidbody>());
@@ -151,8 +151,8 @@ namespace Simuro5v5
             Ball newBall = new Ball
             {
                 mass = ballTemp.mass,
-                pos = {x = ballTemp.position.x, y = ballTemp.position.z},
-                linearVelocity = {x = ballTemp.velocity.x, y = ballTemp.velocity.z},
+                pos = { x = ballTemp.position.x, y = ballTemp.position.z },
+                linearVelocity = { x = ballTemp.velocity.x, y = ballTemp.velocity.z },
                 angularVelocity = ballTemp.angularVelocity.y
             };
             //newBall.angularVelocity.x = ballTemp.angularVelocity.x;
@@ -183,7 +183,7 @@ namespace Simuro5v5
             {
                 (home, opp) = (BlueRobots, YellowRobots);
             }
-            else if(side==Side.Yellow)
+            else if (side == Side.Yellow)
             {
                 (home, opp) = (YellowRobots, BlueRobots);
             }
@@ -375,31 +375,16 @@ namespace Simuro5v5
             return new Vector2 { x = x, y = y };
         }
 
-        public void NormalizeAsPosition(float right, float left, float top, float bottom)
+        public void ClampToRect(float right, float left, float top, float bottom)
         {
             // normalize to the specified box
-            if (x > right)
-            {
-                x = right;
-            }
-            else if (x < left)
-            {
-                x = left;
-            }
-            if (y > top)
-            {
-                y = top;
-            }
-            else if (y < bottom)
-            {
-                y = bottom;
-            }
-            
+            x = Utils.Clamp(x, left, right);
+            y = Utils.Clamp(y, bottom, top);
         }
 
-        public void NormalizeAsPosition()
+        public void ClampToField()
         {
-            NormalizeAsPosition(Const.Field.Right, Const.Field.Left, Const.Field.Top, Const.Field.Bottom);
+            ClampToRect(Const.Field.Right, Const.Field.Left, Const.Field.Top, Const.Field.Bottom);
         }
     }
 
@@ -414,8 +399,8 @@ namespace Simuro5v5
 
         public void Normalize()
         {
-            if (left > Const.MaxWheelVelocity) { left = Const.MaxWheelVelocity; }
-            if (right > Const.MaxWheelVelocity) { right = Const.MaxWheelVelocity; }
+            left = Utils.Clamp(left, Const.MinWheelVelocity, Const.MaxWheelVelocity);
+            right = Utils.Clamp(right, Const.MinWheelVelocity, Const.MaxWheelVelocity);
         }
     }
 
@@ -436,7 +421,7 @@ namespace Simuro5v5
 
         public void Normalize(float right, float left, float top, float bottom)
         {
-            pos.NormalizeAsPosition(right, left, top, bottom);
+            pos.ClampToRect(right, left, top, bottom);
             var wv = new Wheel { left = velocityLeft, right = velocityRight };
             wv.Normalize();
             velocityLeft = wv.left;
@@ -445,7 +430,7 @@ namespace Simuro5v5
 
         public void Normalize()
         {
-            pos.NormalizeAsPosition();
+            pos.ClampToField();
             var wv = new Wheel { left = velocityLeft, right = velocityRight };
             wv.Normalize();
             velocityLeft = wv.left;
@@ -505,12 +490,12 @@ namespace Simuro5v5
 
         public void Normalize(float right, float left, float top, float bottom)
         {
-            pos.NormalizeAsPosition(right, left, top, bottom);
+            pos.ClampToRect(right, left, top, bottom);
         }
 
         public void Normalize()
         {
-            pos.NormalizeAsPosition();
+            pos.ClampToField();
         }
 
         public Vector3 GetLinearVelocityVector3() { return linearVelocity.GetUnityVector3(); }

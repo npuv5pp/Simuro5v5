@@ -34,4 +34,11 @@ static class Utils
         foreach (T item in list)
             action(item);
     }
+
+    public static T Clamp<T>(T x, T min, T max) where T : IComparable
+    {
+        if (x.CompareTo(min) < 0) return min;
+        if (x.CompareTo(max) > 0) return max;
+        return x;
+    }
 }
