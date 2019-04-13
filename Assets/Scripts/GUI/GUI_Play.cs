@@ -15,7 +15,7 @@ using static Simuro5v5.Strategy.NetStrategy;
 
 public class GUI_Play : MonoBehaviour
 {
-    bool menuOpen = false;
+    bool MenuOpen => MenuStack.Count > 0;
 
     static DataRecorder recorder;
 
@@ -72,7 +72,6 @@ public class GUI_Play : MonoBehaviour
 
         MenuStack = new Stack<GameObject>();
         PushMenu(menuMain);
-        OpenMenu();
 
         if (recorder == null)
         {
@@ -118,14 +117,12 @@ public class GUI_Play : MonoBehaviour
 
     public void OpenMenuStrategy()
     {
-        MenuStack.Peek().SetActive(false);
         PushMenu(menuStrategy);
-        MenuStack.Peek().SetActive(true);
     }
 
     public void CloseMenuAndResume()
     {
-        CloseMenu();
+        PopMenu();
         playMain.ResumeRound();
     }
 
@@ -145,7 +142,7 @@ public class GUI_Play : MonoBehaviour
         if (Input.GetMouseButtonDown(1) || Input.GetKeyUp(KeyCode.Escape))
         {
             // right clicked, pause and toggle menu
-            if (menuOpen)
+            if (MenuOpen)
             {
                 PopMenu();
                 if (MenuStack.Count > 0)
@@ -159,7 +156,6 @@ public class GUI_Play : MonoBehaviour
                 {
                     playMain.PauseRound();
                     PushMenu(menuMain);
-                    OpenMenu();
                     resumeButton.Select();
                 }
             }
@@ -167,7 +163,7 @@ public class GUI_Play : MonoBehaviour
         if (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Space))
         {
             // left clicked, pause
-            if (!menuOpen)
+            if (!MenuOpen)
             {
                 if (playMain.StartedMatch && playMain.InRound)
                 {
@@ -266,65 +262,50 @@ public class GUI_Play : MonoBehaviour
 
     void PushMenu(GameObject newMenu)
     {
-        if (menuOpen)
+        if (MenuOpen)
         {
-            CloseMenu();
-            MenuStack.Push(newMenu);
-            OpenMenu();
+            HideMenu();
         }
-        else
-        {
-            MenuStack.Push(newMenu);
-        }
+
+        MenuStack.Push(newMenu);
+        ShowMenu();
     }
 
-    public void PopMenu()
+    void PopMenu()
     {
-        bool will_open = menuOpen;
-        CloseMenu();
-        if (MenuStack.Count >= 1)
+        HideMenu();
+        if (MenuOpen)
         {
             MenuStack.Pop();
         }
-        if (will_open)
+        // 如果栈上还有菜单，就打开它
+        if (MenuOpen)
         {
-            OpenMenu();
+            ShowMenu();
         }
     }
 
     /// <summary>
     /// 打开背景与 <code>MenuStack</code> 最后一项，并设置 <code>menu_open</code> 为真。
     /// </summary>
-    void OpenMenu()
+    void ShowMenu()
     {
-        if (MenuStack.Count > 0)
+        if (MenuOpen)
         {
-            OpenBackground();
+            menuBackground.SetActive(true);
             MenuStack.Peek().SetActive(true);
-            menuOpen = true;
         }
     }
 
     /// <summary>
     /// 关闭背景与 <code>MenuStack</code> 中最后一项。
     /// </summary>
-    void CloseMenu()
+    void HideMenu()
     {
-        if (MenuStack.Count > 0)
+        if (MenuOpen)
         {
             MenuStack.Peek().SetActive(false);
         }
-        CloseBackground();
-        menuOpen = false;
-    }
-
-    void OpenBackground()
-    {
-        menuBackground.SetActive(true);
-    }
-
-    void CloseBackground()
-    {
         menuBackground.SetActive(false);
     }
 
