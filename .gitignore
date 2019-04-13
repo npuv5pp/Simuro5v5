@@ -1,9 +1,9 @@
+# unity3d generated
 Temp
 Library
 Build
 UIElementsSchema
 obj
-
 *.sln
 .vs
 *.csproj
@@ -12,10 +12,9 @@ obj
 *.DS_Store
 
 *.log
-/dlltest.dll
 *.swp
 *.pyc
 
+/*.dll
 Build.zip
 config.json
-
