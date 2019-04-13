@@ -43,6 +43,7 @@ public class PlayMain : MonoBehaviour
         set { GlobalMatchInfo.ControlState.InPlacement = value; }
     }
 
+    int timeTick = 0;       // 时间计时器。每次物理拍加一。FixedUpdate奇数拍运行，偶数拍跳过.
     public static GameObject Singleton;
     public StrategyManager StrategyManager { get; private set; }
     public MatchInfo GlobalMatchInfo { get; private set; }
@@ -91,6 +92,16 @@ public class PlayMain : MonoBehaviour
 
     void FixedUpdate()
     {
+        if (timeTick % 2 == 0) // 偶数拍
+        {
+            timeTick++;
+            return;
+        }
+        else
+        {
+            timeTick++;
+        }
+
         ObjectManager.UpdateFromScene();
         if (LoadSucceed && StartedMatch)
         {
