@@ -34,6 +34,8 @@ public class GUI_Play : MonoBehaviour
     public Button newRoundButton;
     public Button resumeButton;
     public Button replayButton;
+    public Button loadButton;
+    public Button unloadButton;
 
     // strategy menu items
     public TMP_InputField blueInputField;
@@ -255,6 +257,7 @@ public class GUI_Play : MonoBehaviour
         newMatchButton.interactable = playMain.LoadSucceed;
         newRoundButton.interactable = playMain.StartedMatch;
         resumeButton.interactable = playMain.InRound && playMain.PausedRound;
+        unloadButton.interactable = playMain.LoadSucceed;
     }
 
     void UpdateTimeText()
