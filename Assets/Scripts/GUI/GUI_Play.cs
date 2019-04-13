@@ -15,9 +15,9 @@ using static Simuro5v5.Strategy.NetStrategy;
 
 public class GUI_Play : MonoBehaviour
 {
-    bool menu_open = false;
+    bool menuOpen = false;
 
-    static DataRecorder Recorder;
+    static DataRecorder recorder;
 
     PlayMain playMain;
     MatchInfo MatchInfo => playMain.GlobalMatchInfo;
@@ -66,7 +66,7 @@ public class GUI_Play : MonoBehaviour
         UpdateTimeText();
         UpdateScoreText();
 
-        CloseBackground();
+        menuBackground.SetActive(false);
         menuMain.SetActive(false);
         menuStrategy.SetActive(false);
 
@@ -74,9 +74,9 @@ public class GUI_Play : MonoBehaviour
         PushMenu(menuMain);
         OpenMenu();
 
-        if (Recorder == null)
+        if (recorder == null)
         {
-            Recorder = new DataRecorder();
+            recorder = new DataRecorder();
         }
 
         Event.Register(Event.EventType1.RefereeLogUpdate, SetRefereeInfo);
@@ -90,7 +90,7 @@ public class GUI_Play : MonoBehaviour
 
     public void LoadReplayScene()
     {
-        GUI_Replay.Recorder = Recorder;
+        GUI_Replay.Recorder = recorder;
         Event.Send(Event.EventType0.PlaySceneExited);
         SceneManager.LoadScene("GameScene_Replay");
     }
@@ -131,7 +131,7 @@ public class GUI_Play : MonoBehaviour
 
     public void PlayMainStartMatch()
     {
-        Recorder.Begin();
+        recorder.Begin();
         playMain.StartMatch();
     }
 
@@ -145,7 +145,7 @@ public class GUI_Play : MonoBehaviour
         if (Input.GetMouseButtonDown(1) || Input.GetKeyUp(KeyCode.Escape))
         {
             // right clicked, pause and toggle menu
-            if (menu_open)
+            if (menuOpen)
             {
                 PopMenu();
                 if (MenuStack.Count > 0)
@@ -167,7 +167,7 @@ public class GUI_Play : MonoBehaviour
         if (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Space))
         {
             // left clicked, pause
-            if (!menu_open)
+            if (!menuOpen)
             {
                 if (playMain.StartedMatch && playMain.InRound)
                 {
@@ -206,8 +206,8 @@ public class GUI_Play : MonoBehaviour
     {
         if (!playMain.LoadSucceed)
         {
-            SetBlueTeamname("Blueteam");
-            SetYellowTeamname("Yellowteam");
+            SetBlueTeamname("Blue team");
+            SetYellowTeamname("Yellow team");
         }
         else
         {
@@ -230,19 +230,12 @@ public class GUI_Play : MonoBehaviour
         {
             if (playMain.InPlacement)
             {
-                SetStatusInfo("Auto placementing");
+                SetStatusInfo("Auto placement");
             }
             else if (playMain.InRound)
             {
                 // In round
-                if (playMain.PausedRound)
-                {
-                    SetStatusInfo("Paused round");
-                }
-                else
-                {
-                    SetStatusInfo("In playing");
-                }
+                SetStatusInfo(playMain.PausedRound ? "Paused round" : "In playing");
             }
             else
             {
@@ -268,26 +261,26 @@ public class GUI_Play : MonoBehaviour
     void UpdateScoreText()
     {
         SetBlueScoreText(MatchInfo.Score.BlueScore);
-        SetBlueScoreText(MatchInfo.Score.YellowScore);
+        SetYellowScoreText(MatchInfo.Score.YellowScore);
     }
 
-    void PushMenu(GameObject new_menu)
+    void PushMenu(GameObject newMenu)
     {
-        if (menu_open)
+        if (menuOpen)
         {
             CloseMenu();
-            MenuStack.Push(new_menu);
+            MenuStack.Push(newMenu);
             OpenMenu();
         }
         else
         {
-            MenuStack.Push(new_menu);
+            MenuStack.Push(newMenu);
         }
     }
 
     public void PopMenu()
     {
-        bool will_open = menu_open;
+        bool will_open = menuOpen;
         CloseMenu();
         if (MenuStack.Count >= 1)
         {
@@ -308,7 +301,7 @@ public class GUI_Play : MonoBehaviour
         {
             OpenBackground();
             MenuStack.Peek().SetActive(true);
-            menu_open = true;
+            menuOpen = true;
         }
     }
 
@@ -322,7 +315,7 @@ public class GUI_Play : MonoBehaviour
             MenuStack.Peek().SetActive(false);
         }
         CloseBackground();
-        menu_open = false;
+        menuOpen = false;
     }
 
     void OpenBackground()
@@ -357,7 +350,7 @@ public class GUI_Play : MonoBehaviour
 
     void SetRefereeInfo(object obj)
     {
-        var info = obj as string;
+        var info = (string) obj;
         SetRefereeInfo(info);
     }
 
