@@ -99,7 +99,7 @@ public class Referee
 
     private bool JudgePlace(JudgeResult judgeResult)
     {
-        if (BlueGoalState.InSquare(matchInfo.Ball.pos))
+        if (YellowGoalState.InSquare(matchInfo.Ball.pos))
         {
             judgeResult.Actor = Side.Yellow;
             judgeResult.Reason = "Be scored and PlaceKick again";
@@ -107,7 +107,8 @@ public class Referee
             Event.Send(Event.EventType1.Goal, true); //黄方被进球
             return true;
         }
-        else if (YellowGoalState.InSquare(matchInfo.Ball.pos))
+
+        if (BlueGoalState.InSquare(matchInfo.Ball.pos))
         {
             judgeResult.Actor = Side.Blue;
             judgeResult.Reason = "Be scored and PlaceKick again";
@@ -115,10 +116,8 @@ public class Referee
             Event.Send(Event.EventType1.Goal, false); //蓝方被进球
             return true;
         }
-        else
-        {
-            return false;
-        }
+
+        return false;
     }
 
     private bool JudgePenalty(JudgeResult judgeResult)
