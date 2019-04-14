@@ -364,13 +364,6 @@ public class GUI_Play : MonoBehaviour
         cameraAnim.OutGame();
     }
 
-    void AnimToggleGame()
-    {
-        topAnim.Toggle();
-        refereeAnim.Toggle();
-        cameraAnim.Toggle();
-    }
-
     private void OnDestroy()
     {
         Event.UnRegister(Event.EventType1.RefereeLogUpdate, SetRefereeInfo);
