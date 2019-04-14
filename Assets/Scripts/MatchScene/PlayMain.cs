@@ -8,39 +8,35 @@ using Event = Simuro5v5.EventSystem.Event;
 
 public class PlayMain : MonoBehaviour
 {
-    public bool Debugging;
-    public Wheel[] DebugWheels;
+    public bool debugging;
+    public Wheel[] debugWheels;
 
     // 比赛已经开始
     public bool StartedMatch
     {
-        get { return GlobalMatchInfo.ControlState.StartedMatch; }
-        set { GlobalMatchInfo.ControlState.StartedMatch = value; }
+        get => GlobalMatchInfo.ControlState.StartedMatch;
+        set => GlobalMatchInfo.ControlState.StartedMatch = value;
     }
     // 策略已经加载成功
-    public bool LoadSucceed
-    {
-        get { return StrategyManager.IsBlueReady && StrategyManager.IsYellowReady; }
-        //get { return GlobalMatchInfo.ControlState.LoadSucceed; }
-        //set { GlobalMatchInfo.ControlState.LoadSucceed = value; }
-    }
+    public bool LoadSucceed => StrategyManager.IsBlueReady && StrategyManager.IsYellowReady;
+
     // 回合已经开始
     public bool InRound
     {
-        get { return GlobalMatchInfo.ControlState.InRound; }
-        set { GlobalMatchInfo.ControlState.InRound = value; }
+        get => GlobalMatchInfo.ControlState.InRound;
+        private set => GlobalMatchInfo.ControlState.InRound = value;
     }
     // 回合已经暂停
     public bool PausedRound
     {
-        get { return GlobalMatchInfo.ControlState.PausedRound; }
-        set { GlobalMatchInfo.ControlState.PausedRound = value; }
+        get => GlobalMatchInfo.ControlState.PausedRound;
+        private set => GlobalMatchInfo.ControlState.PausedRound = value;
     }
     // 在摆位中
     public bool InPlacement
     {
-        get { return GlobalMatchInfo.ControlState.InPlacement; }
-        set { GlobalMatchInfo.ControlState.InPlacement = value; }
+        get => GlobalMatchInfo.ControlState.InPlacement;
+        private set => GlobalMatchInfo.ControlState.InPlacement = value;
     }
 
     int timeTick = 0;       // 时间计时器。每次物理拍加一。FixedUpdate奇数拍运行，偶数拍跳过.
@@ -51,7 +47,7 @@ public class PlayMain : MonoBehaviour
 
     public delegate void TimedPauseCallback();
     bool TimedPausing { get; set; }
-    readonly object TimedPausingLock = new object();
+    readonly object timedPausingLock = new object();
 
     // 进入场景之后
     void OnEnable()
@@ -60,7 +56,7 @@ public class PlayMain : MonoBehaviour
         {
             if (gameObject != Singleton)
             {
-                // 此时新的gameobject已经创建，调用DestroyImmediate而不是Destroy以确保新的go不会与已存在的go碰撞
+                // 此时新的gameObject已经创建，调用DestroyImmediate而不是Destroy以确保新的go不会与已存在的go碰撞
                 DestroyImmediate(gameObject);
             }
             else
@@ -92,14 +88,11 @@ public class PlayMain : MonoBehaviour
 
     void FixedUpdate()
     {
+        timeTick++;
+        
         if (timeTick % 2 == 0) // 偶数拍
         {
-            timeTick++;
             return;
-        }
-        else
-        {
-            timeTick++;
         }
 
         ObjectManager.UpdateFromScene();
@@ -128,10 +121,7 @@ public class PlayMain : MonoBehaviour
 
     void NewMatch()
     {
-        if (StrategyManager != null)
-        {
-            StrategyManager.Dispose();
-        }
+        StrategyManager?.Dispose();
 
         StrategyManager = new StrategyManager();
         GlobalMatchInfo = MatchInfo.NewDefaultPreset();
@@ -264,7 +254,7 @@ public class PlayMain : MonoBehaviour
     {
         yield return new WaitUntil(delegate ()
         {
-            lock (TimedPausingLock)
+            lock (timedPausingLock)
             {
                 return TimedPausing == false;
             }
@@ -297,24 +287,24 @@ public class PlayMain : MonoBehaviour
     {
         if (StartedMatch)
         {
-            Debug.Log("auto placementing");
+            Debug.Log("auto placement...");
             UpdatePlacementToScene();
         }
     }
 
     public void LoadStrategy(string blue, string yellow)
     {
-        if (Debugging)
+        if (debugging)
         {
-            if (DebugWheels == null)
+            if (debugWheels == null)
             {
                 StrategyManager.LoadBlueDebugStrategy();
                 StrategyManager.LoadYellowDebugStrategy();
             }
             else
             {
-                StrategyManager.LoadBlueDebugStrategy(new WheelInfo { Wheels = DebugWheels });
-                StrategyManager.LoadYellowDebugStrategy(new WheelInfo { Wheels = DebugWheels });
+                StrategyManager.LoadBlueDebugStrategy(new WheelInfo { Wheels = debugWheels });
+                StrategyManager.LoadYellowDebugStrategy(new WheelInfo { Wheels = debugWheels });
             }
         }
         else
@@ -326,17 +316,17 @@ public class PlayMain : MonoBehaviour
 
     public void LoadStrategy()
     {
-        if (Debugging)
+        if (debugging)
         {
-            if (DebugWheels == null)
+            if (debugWheels == null)
             {
                 StrategyManager.LoadBlueDebugStrategy();
                 StrategyManager.LoadYellowDebugStrategy();
             }
             else
             {
-                StrategyManager.LoadBlueDebugStrategy(new WheelInfo { Wheels = DebugWheels });
-                StrategyManager.LoadYellowDebugStrategy(new WheelInfo { Wheels = DebugWheels });
+                StrategyManager.LoadBlueDebugStrategy(new WheelInfo { Wheels = debugWheels });
+                StrategyManager.LoadYellowDebugStrategy(new WheelInfo { Wheels = debugWheels });
             }
         }
         else
@@ -353,13 +343,13 @@ public class PlayMain : MonoBehaviour
 
     void UpdateWheelsToScene()
     {
-        WheelInfo wheelsblue = StrategyManager.NextBlue(GlobalMatchInfo);
-        WheelInfo wheelsyellow = StrategyManager.NextYellow(GlobalMatchInfo);
-        wheelsblue.Normalize();     //轮速规整化
-        wheelsyellow.Normalize();   //轮速规整化
+        WheelInfo wheelsBlue = StrategyManager.NextBlue(GlobalMatchInfo);
+        WheelInfo wheelsYellow = StrategyManager.NextYellow(GlobalMatchInfo);
+        wheelsBlue.Normalize();     //轮速规整化
+        wheelsYellow.Normalize();   //轮速规整化
 
-        ObjectManager.SetBlueWheels(wheelsblue);
-        ObjectManager.SetYellowWheels(wheelsyellow);
+        ObjectManager.SetBlueWheels(wheelsBlue);
+        ObjectManager.SetYellowWheels(wheelsYellow);
     }
 
     void UpdatePlacementToScene()
