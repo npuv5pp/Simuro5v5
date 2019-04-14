@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Text;
+using Assets.Scripts.MatchScene.Referee;
 using Simuro5v5;
 using UnityEngine;
 using Event = Simuro5v5.EventSystem.Event;
@@ -13,12 +14,27 @@ public class Referee
     private MatchInfo matchInfo;
     private Robot[] BlueRobots;
     private Robot[] YellowRobots;
+
     private int GoalieBlueID;
     private int GoalieYellowID;
     private int StandoffTime;
 
+    private Square YellowGoalState;
+    private Square YellowBigState;
+    private Square YellowSmallState;
+    private Square BlueGoalState;
+    private Square BlueBigState;
+    private Square BlueSmallState;
+
     public Referee()
     {
+        YellowGoalState = new Square(-125, -110, 20, -20);
+        YellowBigState = new Square(-125, -75, 40, -40);
+        YellowSmallState = new Square(-125, -95, 25, -25);
+
+        BlueGoalState = new Square(110, 125, 20, -20);
+        BlueBigState = new Square(75, 125, 40, -40);
+        BlueSmallState = new Square(95, 125, 25, -25);
 
     }
 
@@ -60,7 +76,7 @@ public class Referee
         int ID = -1;
         for (int i = 0; i <= 4; i++)
         {
-            if (BlueRobots[i].pos.x > 94.4 && BlueRobots[i].pos.y > -25 && BlueRobots[i].pos.y < 25)
+            if (BlueSmallState.InSquare(BlueRobots[i].pos))
             {
                 ID = i;
             }
@@ -73,7 +89,7 @@ public class Referee
         int ID = -1;
         for (int i = 0; i <= 4; i++)
         {
-            if (YellowRobots[i].pos.x < -94.4 && YellowRobots[i].pos.y > -25 && YellowRobots[i].pos.y < 25)
+            if (YellowSmallState.InSquare(YellowRobots[i].pos))
             {
                 ID = i;
             }
@@ -83,7 +99,7 @@ public class Referee
 
     private bool JudgePlace(JudgeResult judgeResult)
     {
-        if (matchInfo.Ball.pos.x <= -112 && matchInfo.Ball.pos.y >= -15 && matchInfo.Ball.pos.y <= 15)
+        if (BlueGoalState.InSquare(matchInfo.Ball.pos))
         {
             judgeResult.Actor = Side.Yellow;
             judgeResult.Reason = "Be scored and PlaceKick again";
@@ -91,9 +107,9 @@ public class Referee
             Event.Send(Event.EventType1.Goal, true); //黄方被进球
             return true;
         }
-        else if (matchInfo.Ball.pos.x >= 112 && matchInfo.Ball.pos.y >= -15 && matchInfo.Ball.pos.y <= 15)
+        else if (YellowGoalState.InSquare(matchInfo.Ball.pos))
         {
-            judgeResult.Actor = Side.Blue; 
+            judgeResult.Actor = Side.Blue;
             judgeResult.Reason = "Be scored and PlaceKick again";
             judgeResult.ResultType = ResultType.PlaceKick;
             Event.Send(Event.EventType1.Goal, false); //蓝方被进球
@@ -113,11 +129,11 @@ public class Referee
             int BigStateNum = 0;
             for (int i = 0; i < 4; i++)
             {
-                if (BlueRobots[i].pos.x > 74.4 && BlueRobots[i].pos.y > -40 && BlueRobots[i].pos.y < 40)
+                if (BlueBigState.InSquare(BlueRobots[i].pos))
                 {
                     BigStateNum++;
                 }
-                if (BlueRobots[i].pos.x > 94.4 && BlueRobots[i].pos.y > -25 && BlueRobots[i].pos.y < 25)
+                if (BlueSmallState.InSquare(BlueRobots[i].pos))
                 {
                     SmallStateNum++;
                 }
@@ -143,11 +159,11 @@ public class Referee
             int BigStateNum = 0;
             for (int i = 0; i < 4; i++)
             {
-                if (YellowRobots[i].pos.x < -74.4 && YellowRobots[i].pos.y > -40 && YellowRobots[i].pos.y < 40)
+                if (YellowBigState.InSquare(YellowRobots[i].pos))
                 {
                     BigStateNum++;
                 }
-                if (YellowRobots[i].pos.x < -94.4 && YellowRobots[i].pos.y > -25 && YellowRobots[i].pos.y < 25)
+                if (YellowSmallState.InSquare(YellowRobots[i].pos))
                 {
                     SmallStateNum++;
                 }
@@ -172,7 +188,7 @@ public class Referee
 
     private bool JudgeGoalie(JudgeResult judgeResult)
     {
-        if (matchInfo.Ball.pos.x >= 74.4 && matchInfo.Ball.pos.y >= -40 && matchInfo.Ball.pos.y <= 40)
+        if (BlueBigState.InSquare(matchInfo.Ball.pos))
         {
             int SmallStateNum = 0;
             int BigStateNum = 0;
@@ -185,11 +201,11 @@ public class Referee
                     judgeResult.Reason = "Attacker hit the Goalie";
                     return true;
                 }
-                if (YellowRobots[i].pos.x < -74.4 && YellowRobots[i].pos.y > -40 && YellowRobots[i].pos.y < 40)
+                if (BlueBigState.InSquare(YellowRobots[i].pos))
                 {
                     BigStateNum++;
                 }
-                if (YellowRobots[i].pos.x < -94.4 && YellowRobots[i].pos.y > -25 && YellowRobots[i].pos.y < 25)
+                if (BlueSmallState.InSquare(YellowRobots[i].pos))
                 {
                     SmallStateNum++;
                 }
@@ -209,7 +225,7 @@ public class Referee
                 return true;
             }
         }
-        else if (matchInfo.Ball.pos.x <= -74.4 && matchInfo.Ball.pos.y >= -40 && matchInfo.Ball.pos.y <= 40)
+        else if (YellowBigState.InSquare(matchInfo.Ball.pos))
         {
             int SmallStateNum = 0;
             int BigStateNum = 0;
@@ -222,11 +238,11 @@ public class Referee
                     judgeResult.Reason = "Attacker hit the Goalie";
                     return true;
                 }
-                if (BlueRobots[i].pos.x < -74.4 && BlueRobots[i].pos.y > -40 && YellowRobots[i].pos.y < 40)
+                if (YellowBigState.InSquare(BlueRobots[i].pos))
                 {
                     BigStateNum++;
                 }
-                if (BlueRobots[i].pos.x < -94.4 && BlueRobots[i].pos.y > -25 && YellowRobots[i].pos.y < 25)
+                if (YellowSmallState.InSquare(BlueRobots[i].pos))
                 {
                     SmallStateNum++;
                 }
@@ -317,4 +333,6 @@ public class Referee
             return true;
         }
     }
+
+
 }
