@@ -15,7 +15,7 @@ public class PlayMain : MonoBehaviour
     public bool StartedMatch
     {
         get => GlobalMatchInfo.ControlState.StartedMatch;
-        set => GlobalMatchInfo.ControlState.StartedMatch = value;
+        private set => GlobalMatchInfo.ControlState.StartedMatch = value;
     }
     // 策略已经加载成功
     public bool LoadSucceed => StrategyManager.IsBlueReady && StrategyManager.IsYellowReady;
@@ -311,27 +311,6 @@ public class PlayMain : MonoBehaviour
         {
             StrategyManager.LoadBlueDll(blue);
             StrategyManager.LoadYellowDll(yellow);
-        }
-    }
-
-    public void LoadStrategy()
-    {
-        if (debugging)
-        {
-            if (debugWheels == null)
-            {
-                StrategyManager.LoadBlueDebugStrategy();
-                StrategyManager.LoadYellowDebugStrategy();
-            }
-            else
-            {
-                StrategyManager.LoadBlueDebugStrategy(new WheelInfo { Wheels = debugWheels });
-                StrategyManager.LoadYellowDebugStrategy(new WheelInfo { Wheels = debugWheels });
-            }
-        }
-        else
-        {
-            StrategyManager.LoadLastSaved();
         }
     }
 
