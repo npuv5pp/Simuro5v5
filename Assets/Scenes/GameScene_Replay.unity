@@ -2282,7 +2282,6 @@ GameObject:
   - component: {fileID: 855673831}
   - component: {fileID: 855673833}
   - component: {fileID: 855673832}
-  - component: {fileID: 855673834}
   m_Layer: 0
   m_Name: CameraOverlook
   m_TagString: Cam
@@ -2357,19 +2356,6 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
---- !u!114 &855673834
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 855673830}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9d7e18dbaa5527947a50de9a5cc7ae40, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  target: {fileID: 0}
 --- !u!1001 &912430856
 PrefabInstance:
   m_ObjectHideFlags: 0
