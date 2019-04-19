@@ -141,7 +141,7 @@ public class ControlRobot : MonoBehaviour
     /// </summary>
     void DisableRigidBodyAndCollider()
     {
-        Collider.enabled = false;
+        // Collider.enabled = false;
         Destroy(rb);
     }
 
@@ -150,7 +150,7 @@ public class ControlRobot : MonoBehaviour
     /// </summary>
     void EnableRigidBodyAndCollider()
     {
-        Collider.enabled = true;
+        // Collider.enabled = true;
         rb = gameObject.AddComponent<Rigidbody>();
         InitParameter();
     }

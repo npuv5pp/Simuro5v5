@@ -80,7 +80,7 @@ public class ControlBall : MonoBehaviour
     /// </summary>
     void EnableRigidBodyAndCollider()
     {
-        Collider.enabled = true;
+        // Collider.enabled = true;
         rb = gameObject.AddComponent<Rigidbody>();
         InitParameter();
     }
@@ -90,7 +90,7 @@ public class ControlBall : MonoBehaviour
     /// </summary>
     void DisableRigidBodyAndCollider()
     {
-        Collider.enabled = false;
+        // Collider.enabled = false;
         Destroy(rb);
     }
 
