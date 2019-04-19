@@ -108,7 +108,7 @@ public class GUI_Play : MonoBehaviour
         AnimInGame();
         try
         {
-            playMain.LoadStrategy(blueInputField.text.Trim(), yellowInputField.text.Trim());
+            playMain.LoadStrategy();
         }
         catch (LoadDllFailed e)
         {
@@ -214,8 +214,8 @@ public class GUI_Play : MonoBehaviour
         }
         else
         {
-            SetBlueTeamname(playMain.StrategyManager.GetBlueTeaminfo().Name);
-            SetYellowTeamname(playMain.StrategyManager.GetYellowTeaminfo().Name);
+            SetBlueTeamname(playMain.StrategyManager.BlueTeamInfo.Name);
+            SetYellowTeamname(playMain.StrategyManager.YellowTeamInfo.Name);
         }
     }
 

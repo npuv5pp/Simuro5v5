@@ -9,7 +9,6 @@ using Event = Simuro5v5.EventSystem.Event;
 public class PlayMain : MonoBehaviour
 {
     public bool debugging;
-    public Wheel[] debugWheels;
 
     // 比赛已经开始
     public bool StartedMatch
@@ -41,7 +40,7 @@ public class PlayMain : MonoBehaviour
 
     int timeTick = 0;       // 时间计时器。每次物理拍加一。FixedUpdate奇数拍运行，偶数拍跳过.
     public static GameObject Singleton;
-    public StrategyManager StrategyManager { get; private set; }
+    public StrategyManagerRPC StrategyManager { get; private set; }
     public MatchInfo GlobalMatchInfo { get; private set; }
     public static ObjectManager ObjectManager { get; private set; }
 
@@ -128,9 +127,10 @@ public class PlayMain : MonoBehaviour
 
     void NewMatch()
     {
-        StrategyManager?.Dispose();
+        StrategyManager?.CloseBlue();
+        StrategyManager?.CloseYellow();
 
-        StrategyManager = new StrategyManager();
+        StrategyManager = new StrategyManagerRPC();
         GlobalMatchInfo = MatchInfo.NewDefaultPreset();
 
         Event.Register(Event.EventType1.GetGoal, delegate (object obj)
@@ -157,10 +157,6 @@ public class PlayMain : MonoBehaviour
 
         try
         {
-            // 检查策略
-            StrategyManager.CheckBlueReady_ex();
-            StrategyManager.CheckYellowReady_ex();
-
             // 广播信息
             Event.Send(Event.EventType1.MatchInfoUpdate, GlobalMatchInfo);
 
@@ -203,9 +199,8 @@ public class PlayMain : MonoBehaviour
         GlobalMatchInfo.PlayTime = 0;
         GlobalMatchInfo.Referee = new Referee();
 
-        StrategyManager.CheckReady_ex();
-        StrategyManager.BeginBlue(GlobalMatchInfo);
-        StrategyManager.BeginYellow(GlobalMatchInfo);
+        StrategyManager.BlueStrategy.OnMatchStart();
+        StrategyManager.YellowStrategy.OnMatchStart();
 
         StartedMatch = true;
         Event.Send(Event.EventType0.MatchStart);
@@ -215,6 +210,9 @@ public class PlayMain : MonoBehaviour
     {
         GlobalMatchInfo.ControlState.Reset();
         ObjectManager.Pause();
+
+        StrategyManager.BlueStrategy.OnMatchStop();
+        StrategyManager.YellowStrategy.OnMatchStop();
         Event.Send(Event.EventType0.MatchStop);
     }
 
@@ -224,6 +222,9 @@ public class PlayMain : MonoBehaviour
         {
             InRound = true;
             PauseRound();
+
+            StrategyManager.BlueStrategy.OnRoundStart();
+            StrategyManager.YellowStrategy.OnRoundStart();
             Event.Send(Event.EventType0.RoundStart);
         }
     }
@@ -245,6 +246,9 @@ public class PlayMain : MonoBehaviour
         {
             PausedRound = true;
             ObjectManager.Pause();
+
+            StrategyManager.BlueStrategy.OnRoundStop();
+            StrategyManager.YellowStrategy.OnRoundStop();
             Event.Send(Event.EventType0.RoundPause);
         }
     }
@@ -300,38 +304,22 @@ public class PlayMain : MonoBehaviour
         }
     }
 
-    public void LoadStrategy(string blue, string yellow)
+    public void LoadStrategy()
     {
-        if (debugging)
-        {
-            if (debugWheels == null)
-            {
-                StrategyManager.LoadBlueDebugStrategy();
-                StrategyManager.LoadYellowDebugStrategy();
-            }
-            else
-            {
-                StrategyManager.LoadBlueDebugStrategy(new WheelInfo { Wheels = debugWheels });
-                StrategyManager.LoadYellowDebugStrategy(new WheelInfo { Wheels = debugWheels });
-            }
-        }
-        else
-        {
-            StrategyManager.LoadBlueDll(blue);
-            StrategyManager.LoadYellowDll(yellow);
-        }
+        StrategyManager.ConnectBlue(StrategyConfig.BlueStrategyPort);
+        StrategyManager.ConnectYellow(StrategyConfig.YellowStrategyPort);
     }
 
     public void RemoveStrategy()
     {
-        StrategyManager.RemoveBlueDll();
-        StrategyManager.RemoveYellowDll();
+        StrategyManager.CloseBlue();
+        StrategyManager.CloseYellow();
     }
 
     void UpdateWheelsToScene()
     {
-        WheelInfo wheelsBlue = StrategyManager.NextBlue(GlobalMatchInfo);
-        WheelInfo wheelsYellow = StrategyManager.NextYellow(GlobalMatchInfo);
+        WheelInfo wheelsBlue = StrategyManager.BlueStrategy.GetInstruction(GlobalMatchInfo.GetSide(Side.Blue));
+        WheelInfo wheelsYellow = StrategyManager.YellowStrategy.GetInstruction(GlobalMatchInfo.GetSide(Side.Yellow));
         wheelsBlue.Normalize();     //轮速规整化
         wheelsYellow.Normalize();   //轮速规整化
 
@@ -342,8 +330,8 @@ public class PlayMain : MonoBehaviour
     void UpdatePlacementToScene()
     {
         ObjectManager.UpdateFromScene();
-        PlacementInfo blueInfo = StrategyManager.PlacementBlue(GlobalMatchInfo);
-        PlacementInfo yellowInfo = StrategyManager.PlacementYellow(GlobalMatchInfo);
+        PlacementInfo blueInfo = StrategyManager.BlueStrategy.GetPlacement(GlobalMatchInfo.GetSide(Side.Blue));
+        PlacementInfo yellowInfo = StrategyManager.YellowStrategy.GetPlacement(GlobalMatchInfo.GetSide(Side.Yellow));
         blueInfo.Normalize();
         yellowInfo.Normalize();
         if (GeneralConfig.EnableConvertYellowData)

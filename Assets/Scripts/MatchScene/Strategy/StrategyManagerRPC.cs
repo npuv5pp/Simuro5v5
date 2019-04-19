@@ -3,13 +3,19 @@ using V5RPC;
 
 namespace Simuro5v5.Strategy
 {
-    class StrategyManagerRPC
+    public class StrategyManagerRPC
     {
         int blue_local_port;
         int yellow_local_port;
 
         public IStrategyRPC BlueStrategy { get; private set; }
         public IStrategyRPC YellowStrategy { get; private set; }
+
+        public TeamInfo BlueTeamInfo { get; set; }
+        public TeamInfo YellowTeamInfo { get; set; }
+
+        public bool IsBlueReady => BlueStrategy !=null;
+        public bool IsYellowReady => YellowStrategy !=null;
 
         public StrategyManagerRPC(int blue_local_port = 8200, int yellow_local_port = 8201)
         {
@@ -20,11 +26,13 @@ namespace Simuro5v5.Strategy
         public void ConnectBlue(int server_port)
         {
             BlueStrategy = new RPCStrategy(Config.StrategyConfig.BlueStrategyPort);
+            BlueTeamInfo = BlueStrategy.GetTeamInfo();
         }
 
         public void ConnectYellow(int server_port)
         {
             YellowStrategy = new RPCStrategy(Config.StrategyConfig.YellowStrategyPort);
+            YellowTeamInfo = YellowStrategy.GetTeamInfo();
         }
 
         public void CloseBlue()
@@ -40,7 +48,7 @@ namespace Simuro5v5.Strategy
         }
     }
 
-    interface IStrategyRPC
+    public interface IStrategyRPC
     {
         TeamInfo GetTeamInfo();
         void OnMatchStart();
