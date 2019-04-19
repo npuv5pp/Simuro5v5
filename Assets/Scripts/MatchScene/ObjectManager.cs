@@ -142,7 +142,7 @@ namespace Simuro5v5
         {
             for (int i = 0; i < 5; i++)
             {
-                blueComponent[i].SetPlacement(sInfo.Robot[i]);
+                blueComponent[i].SetPlacement(sInfo.Robots[i]);
             }
         }
 
@@ -158,7 +158,7 @@ namespace Simuro5v5
         {
             for (int i = 0; i < 5; i++)
             {
-                yellowComponent[i].SetPlacement(sInfo.Robot[i]);
+                yellowComponent[i].SetPlacement(sInfo.Robots[i]);
             }
         }
 
