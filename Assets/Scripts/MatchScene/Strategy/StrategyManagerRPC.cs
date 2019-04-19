@@ -80,11 +80,12 @@ namespace Simuro5v5.Strategy
 
         public PlacementInfo GetPlacement(SideInfo sideInfo)
         {
-            var robots = client.GetPlacement(sideInfo.ToProto());
+            var placement = client.GetPlacement(sideInfo.ToProto());
             var rv = new PlacementInfo { Robots = new Robot[Const.RobotsPerTeam] };
             for (int i = 0; i < Const.RobotsPerTeam; i++)
             {
-                rv.Robots[i] = robots[i].ToNative();
+                rv.Robots[i] = placement.Robots[i].ToNative();
+                rv.Ball = placement.Ball.ToNative();
             }
             // TODO: ball
             return rv;
@@ -163,36 +164,6 @@ namespace Simuro5v5.Strategy
             return new TeamInfo
             {
                 Name = proto.TeamName
-            };
-        }
-
-        public static PlacementInfo ToNative(this V5RPC.Proto.GetPlacementResult proto)
-        {
-            Robot[] robots = new Robot[Const.RobotsPerTeam];
-            for (int i = 0; i < Const.RobotsPerTeam; i++)
-            {
-                robots[i] = proto.Robots[i].ToNative();
-            }
-
-            return new PlacementInfo
-            {
-                // TODO: ball
-                //Ball = proto.Ball.ToNative(),
-                Robots = robots
-            };
-        }
-
-        public static WheelInfo ToNative(this V5RPC.Proto.GetInstructionResult proto)
-        {
-            Wheel[] wheels = new Wheel[Const.RobotsPerTeam];
-            for (int i = 0; i < 5; i++)
-            {
-                wheels[i] = proto.Wheels[i].ToNative();
-            }
-
-            return new WheelInfo
-            {
-                Wheels = wheels
             };
         }
 
