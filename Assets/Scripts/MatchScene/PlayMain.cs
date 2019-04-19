@@ -126,16 +126,17 @@ public class PlayMain : MonoBehaviour
         StrategyManager = new StrategyManager();
         GlobalMatchInfo = MatchInfo.NewDefaultPreset();
 
-        Event.Register(Event.EventType1.Goal, delegate (object obj)
+        Event.Register(Event.EventType1.GetGoal, delegate (object obj)
         {
-            bool who = (bool)obj;
-            if (who)
+            Side who = (Side)obj;
+            switch (who)
             {
-                GlobalMatchInfo.Score.BlueScore++;
-            }
-            else
-            {
-                GlobalMatchInfo.Score.YellowScore++;
+                case Side.Blue:
+                    GlobalMatchInfo.Score.BlueScore++;
+                    break;
+                case Side.Yellow:
+                    GlobalMatchInfo.Score.YellowScore++;
+                    break;
             }
         });
     }
