@@ -18,3 +18,5 @@ obj
 /*.dll
 Build.zip
 config.json
+
+/Assets/BinDeps/
