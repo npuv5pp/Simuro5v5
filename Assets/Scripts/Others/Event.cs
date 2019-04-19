@@ -216,7 +216,7 @@ namespace Simuro5v5.EventSystem
                 }
                 catch (Exception ex)
                 {
-                    Debug.LogError("An exception occured while event(" + eventType.ToString() + ") send. " + ex.ToString());
+                    Debug.LogError($"An exception occured while event({eventType}) send. {ex}");
                 }
             }
         }
@@ -236,7 +236,7 @@ namespace Simuro5v5.EventSystem
                 }
                 catch (Exception ex)
                 {
-                    Debug.LogError("An exception occured while event(" + eventType.ToString() + ") send. " + ex.ToString());
+                    Debug.LogError($"An exception occured while event({eventType}) send. {ex}");
                 }
             }
         }
@@ -257,7 +257,7 @@ namespace Simuro5v5.EventSystem
                 }
                 catch (Exception ex)
                 {
-                    Debug.LogError("An exception occured while event(" + eventType.ToString() + ") send. " + ex.ToString());
+                    Debug.LogError($"An exception occured while event({eventType}) send. {ex}");
                 }
             }
         }
