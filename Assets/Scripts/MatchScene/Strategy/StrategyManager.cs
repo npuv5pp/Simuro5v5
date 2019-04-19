@@ -517,7 +517,7 @@ class DebugStrategy : IStrategy
         {
             return new PlacementInfo
             {
-                Robot = sideInfo.home,
+                Robots = sideInfo.home,
                 Ball = sideInfo.currentBall
             };
         }

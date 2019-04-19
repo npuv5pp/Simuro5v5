@@ -218,7 +218,6 @@ namespace Simuro5v5
         public static ControlState DefaultState =>
             new ControlState
             {
-
                 StartedMatch = false,
                 InRound = false,
                 PausedRound = true,
@@ -286,7 +285,7 @@ namespace Simuro5v5
     public class PlacementInfo
     {
         [JsonProperty("robot")]
-        public Robot[] Robot = new Robot[Const.RobotsPerTeam];
+        public Robot[] Robots = new Robot[Const.RobotsPerTeam];
         [JsonProperty("ball")]
         public Ball Ball = new Ball();
 
@@ -295,7 +294,7 @@ namespace Simuro5v5
             // TODO 保证不会出界、不会重叠
             for (int i = 0; i < Const.RobotsPerTeam; i++)
             {
-                Robot[i].Normalize(
+                Robots[i].Normalize(
                     Const.Field.Right - 10 * i + 1,
                     Const.Field.Left - 10 * i + 1,
                     Const.Field.Top - 10 * i + 1,
@@ -314,15 +313,15 @@ namespace Simuro5v5
             Ball.pos.y = vt - Ball.pos.y;
             for (int i = 0; i < Const.RobotsPerTeam; i++)
             {
-                Robot[i].pos.x = ht - Robot[i].pos.x;
-                Robot[i].pos.y = vt - Robot[i].pos.y;
-                if (Robot[i].rotation > 0)
+                Robots[i].pos.x = ht - Robots[i].pos.x;
+                Robots[i].pos.y = vt - Robots[i].pos.y;
+                if (Robots[i].rotation > 0)
                 {
-                    Robot[i].rotation = Robot[i].rotation - 180;
+                    Robots[i].rotation = Robots[i].rotation - 180;
                 }
-                else if (Robot[i].rotation <= 0)
+                else if (Robots[i].rotation <= 0)
                 {
-                    Robot[i].rotation = Robot[i].rotation + 180;
+                    Robots[i].rotation = Robots[i].rotation + 180;
                 }
             }
         }
