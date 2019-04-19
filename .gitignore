@@ -19,5 +19,11 @@ obj
 Build.zip
 config.json
 
+Assets/Plugins
+Assets/Plugins.meta
+.idea
+*.DotSettings
+*.DotSettings.user
+
 /Assets/BinDeps/
 /Assets/BinDeps.meta
