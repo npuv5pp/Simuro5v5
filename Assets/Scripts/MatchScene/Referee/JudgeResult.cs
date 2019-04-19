@@ -13,21 +13,11 @@ public enum ResultType
 
 public class JudgeResult
 {
-    public ResultType ResultType;
-    public Side Actor;
-    public string Reason;
-
-    public JudgeResult(ResultType result, Side actor, string reason)
-    {
-        ResultType = result;
-        Actor = actor;
-        Reason = reason;
-    }
-
-    public JudgeResult() { }
+    public ResultType ResultType { get; set; }
+    public Side Actor { get; set; }
+    public string Reason { get; set; }
 
     public string ToRichText()
-
     {
 
         var rv = $"Foul: {ResultType}\t";
