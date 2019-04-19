@@ -213,8 +213,8 @@ namespace Simuro5v5.Strategy
             var field = new V5RPC.Proto.Field();
             for (int i = 0; i < 5; i++)
             {
-                field.OurRobots[i] = native.home[i].ToProto();
-                field.OpponentRobots[i] = native.opp[i].ToProto();
+                field.OurRobots.Add(native.home[i].ToProto());
+                field.OpponentRobots.Add(native.opp[i].ToProto());
             }
             field.Ball = native.currentBall.ToProto();
             return field;
