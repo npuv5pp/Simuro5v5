@@ -17,11 +17,7 @@ namespace Simuro5v5.Strategy
         public bool IsBlueReady => BlueStrategy !=null;
         public bool IsYellowReady => YellowStrategy !=null;
 
-        public StrategyManagerRPC(int blue_local_port = 8200, int yellow_local_port = 8201)
-        {
-            this.blue_local_port = blue_local_port;
-            this.yellow_local_port = yellow_local_port;
-        }
+        public StrategyManagerRPC() { }
 
         public void ConnectBlue(int server_port)
         {
