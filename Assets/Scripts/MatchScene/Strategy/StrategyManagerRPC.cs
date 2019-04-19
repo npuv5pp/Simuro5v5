@@ -95,7 +95,6 @@ namespace Simuro5v5.Strategy
                 rv.Robots[i] = placement.Robots[i].ToNative();
                 rv.Ball = placement.Ball.ToNative();
             }
-            // TODO: ball
             return rv;
         }
 

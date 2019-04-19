@@ -8,6 +8,7 @@ public class ControlRobot : MonoBehaviour
     public float Drag;
     public float AngularDrag;
     public float DoubleZeroDrag;
+    public float DoubleZeroAngularDrag;
 
     public bool Debugging;
 
@@ -56,6 +57,7 @@ public class ControlRobot : MonoBehaviour
         forward_force = -transform.up * (LeftVelocity + RightVelocity) * ForwardFactor;
         if (LeftVelocity == 0 && RightVelocity == 0)
         {
+            // 双减速
             forward_drag = rb.velocity * -DoubleZeroDrag;
         }
         else
@@ -66,6 +68,15 @@ public class ControlRobot : MonoBehaviour
 
         torque = Vector3.up * (LeftVelocity - RightVelocity) * TorqueFactor;
         angular_drag = rb.angularVelocity * -AngularDrag;
+        if (LeftVelocity == 0 && RightVelocity == 0)
+        {
+            // 双减速
+            angular_drag = rb.angularVelocity * -DoubleZeroAngularDrag;
+        }
+        else
+        {
+            angular_drag = rb.angularVelocity * -AngularDrag;
+        }
         rb.AddTorque(torque + angular_drag);
     }
 
