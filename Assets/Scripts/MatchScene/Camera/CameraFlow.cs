@@ -64,7 +64,7 @@ public class CameraFlow : MonoBehaviour
             Ray ray = cam.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
 
-            if (Physics.Raycast(ray, out hit) && FindHost(hit))
+            if (Physics.Raycast(ray, out hit) && FindHostByMouse(hit))
             {
                 target = hit.transform.transform;
                 CameraState = CameraState.LocateObject;
@@ -73,14 +73,22 @@ public class CameraFlow : MonoBehaviour
 
         }
 
+        if(FindHostByKey())
+        {
+            if(CameraState == CameraState.OverLooking)
+            {
+                CameraState = CameraState.LocateObject;
+            }
+        }
+
         if (Input.GetKeyDown(KeyCode.X))
         {
             CameraState = CameraState.OverLooking;
         }
 
-        if (Input.GetKeyDown(KeyCode.K) && (CameraState == CameraState.FirstPersonReverse || CameraState == CameraState.LocateObject))
+        if (Input.GetKeyDown(KeyCode.K) && (CameraState == CameraState.FirstPersonReverse || CameraState == CameraState.LocateObject || CameraState == CameraState.FirstPersonForward))
         {
-            if(CameraState == CameraState.FirstPersonForward)
+            if (CameraState == CameraState.FirstPersonForward)
             {
                 CameraState = CameraState.LocateObject;
             }
@@ -90,7 +98,7 @@ public class CameraFlow : MonoBehaviour
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.L) && (CameraState == CameraState.FirstPersonForward || CameraState == CameraState.LocateObject))
+        if (Input.GetKeyDown(KeyCode.L) && (CameraState == CameraState.FirstPersonForward || CameraState == CameraState.LocateObject || CameraState == CameraState.FirstPersonReverse))
         {
             if (CameraState == CameraState.FirstPersonReverse)
             {
@@ -101,6 +109,67 @@ public class CameraFlow : MonoBehaviour
                 CameraState = CameraState.FirstPersonReverse;
             }
         }
+
+    }
+
+    private bool FindHostByKey()
+    {
+        if(Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            target = GameObject.Find("Blue0").transform;
+            return true;
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            target = GameObject.Find("Blue1").transform;
+            return true;
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            target = GameObject.Find("Blue2").transform;
+            return true;
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha4))
+        {
+            target = GameObject.Find("Blue3").transform;
+            return true;
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha5))
+        {
+            target = GameObject.Find("Blue4").transform;
+            return true;
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha6))
+        {
+            target = GameObject.Find("Yellow0").transform;
+            return true;
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha7))
+        {
+            target = GameObject.Find("Yellow1").transform;
+            return true;
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha8))
+        {
+            target = GameObject.Find("Yellow2").transform;
+            return true;
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha9))
+        {
+            target = GameObject.Find("Yellow3").transform;
+            return true;
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha0))
+        {
+            target = GameObject.Find("Yellow4").transform;
+            return true;
+        }
+        if (Input.GetKeyDown(KeyCode.Minus))
+        {
+            target = GameObject.Find("Ball").transform;
+            return true;
+        }
+        return false;
 
     }
 
@@ -117,7 +186,7 @@ public class CameraFlow : MonoBehaviour
 
     }
 
-    private bool FindHost(RaycastHit hit)
+    private bool FindHostByMouse(RaycastHit hit)
     {
         if (hit.transform.tag == "Ball" || hit.transform.tag == "Robot")
         {
