@@ -70,28 +70,46 @@ public class StrategyServer : MonoBehaviour
 
         if (StrategyConfig.UseUdp)
         {
-            if (BlueHandle == null || !BlueHandle.Established)
+            if (BlueHandle == null)
             {
-                BlueHandle = new UDPConnectionHandle(IPAddress.Loopback, StrategyConfig.BlueStrategyPort);
+                BlueHandle = new TCPConnectionHandle(IPAddress.Loopback, StrategyConfig.BlueStrategyPort);
                 BlueHandle.Connect(8, StrategyConfig.ConnectTimeout);
             }
-            if (YellowHandle == null || !YellowHandle.Established)
+            else if (!BlueHandle.Established)
             {
-                YellowHandle = new UDPConnectionHandle(IPAddress.Loopback, StrategyConfig.YellowStrategyPort);
+                BlueHandle.Reconnect(8, StrategyConfig.ConnectTimeout);
+            }
+
+            if(YellowHandle == null)
+            {
+                YellowHandle = new TCPConnectionHandle(IPAddress.Loopback, StrategyConfig.YellowStrategyPort);
                 YellowHandle.Connect(8, StrategyConfig.ConnectTimeout);
+            }
+            else if (!YellowHandle.Established)
+            {
+                YellowHandle.Reconnect(8, StrategyConfig.ConnectTimeout);
             }
         }
         else
         {
-            if (BlueHandle == null || !BlueHandle.Established)
+            if (BlueHandle == null)
             {
                 BlueHandle = new TCPConnectionHandle(IPAddress.Loopback, StrategyConfig.BlueStrategyPort);
                 BlueHandle.Connect(3, StrategyConfig.ConnectTimeout);
             }
-            if (YellowHandle == null || !YellowHandle.Established)
+            else if (!BlueHandle.Established)
+            {
+                BlueHandle.Reconnect(3, StrategyConfig.ConnectTimeout);
+            }
+
+            if(YellowHandle == null)
             {
                 YellowHandle = new TCPConnectionHandle(IPAddress.Loopback, StrategyConfig.YellowStrategyPort);
                 YellowHandle.Connect(3, StrategyConfig.ConnectTimeout);
+            }
+            else if (!YellowHandle.Established)
+            {
+                YellowHandle.Reconnect(3, StrategyConfig.ConnectTimeout);
             }
         }
     }
@@ -153,6 +171,7 @@ public class StrategyServer : MonoBehaviour
                 Logger.MainLogger.LogError(info);
                 Debug.Log(info);
                 CreateServer(desc, Utils.FixCmdPath(logfilepath), port, autoreboot).Start();
+                EstablishConnection();
             }
         });
         return p;
@@ -242,6 +261,8 @@ public abstract class ConnectionHandle
 
     abstract public bool Connect(int retry, int timeout);
 
+    abstract public void Reconnect(int retry, int timeout);
+
     protected virtual bool Handshake(int timeout)
     {
         Conn.ReceiveTimeout = timeout;
@@ -276,8 +297,6 @@ internal class UDPConnectionHandle : ConnectionHandle
         ServerAddr = address;
         ServerPort = port;
         ServerEndPoint = new IPEndPoint(IPAddress.Parse(address), port);
-
-        Conn = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
     }
 
     public UDPConnectionHandle(IPAddress address, int port)
@@ -285,12 +304,11 @@ internal class UDPConnectionHandle : ConnectionHandle
         ServerAddr = address.ToString();
         ServerPort = port;
         ServerEndPoint = new IPEndPoint(address, port);
-
-        Conn = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
     }
 
     public override bool Connect(int retry, int timeout)
     {
+        Conn = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
         bool succeed = false;
 
         while (!succeed && retry-- > 0)
@@ -309,6 +327,12 @@ internal class UDPConnectionHandle : ConnectionHandle
         Conn.SendTimeout = 5000;
 
         return succeed;
+    }
+
+    public override void Reconnect(int retry, int timeout)
+    {
+        Conn.Close();
+        Connect(retry, timeout);
     }
 
     public override void SendMessage(Message msg)
@@ -340,12 +364,11 @@ internal class TCPConnectionHandle : ConnectionHandle
         ServerAddr = address.ToString();
         ServerPort = port;
         ServerEndPoint = new IPEndPoint(address, port);
-
-        Conn = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
     }
 
     public override bool Connect(int retry, int timeout)
     {
+        Conn = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         bool succeed = false;
 
         while (!succeed && retry-- > 0)
@@ -368,6 +391,12 @@ internal class TCPConnectionHandle : ConnectionHandle
         Conn.SendTimeout = 5000;
 
         return succeed;
+    }
+
+    public override void Reconnect(int retry, int timeout)
+    {
+        Conn.Close();
+        Connect(retry, timeout);
     }
 
     public override Message RecvMessage()
