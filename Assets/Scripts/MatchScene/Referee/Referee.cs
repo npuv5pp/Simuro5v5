@@ -48,7 +48,6 @@ public class Referee
         this.yellowRobots = matchInfo.YellowRobots;
         this.goalieBlueId = FindBlueGoalie();
         this.goalieYellowId = FindYellowGoalie();
-        this.standoffTime = 0;
 
         JudgeResult judgeResult = null;
 

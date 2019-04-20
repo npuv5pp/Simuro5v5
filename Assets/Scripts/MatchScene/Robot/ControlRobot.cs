@@ -142,7 +142,7 @@ public class ControlRobot : MonoBehaviour
     void DisableRigidBodyAndCollider()
     {
         // Collider.enabled = false;
-        Destroy(rb);
+        DestroyImmediate(rb);
     }
 
     /// <summary>
