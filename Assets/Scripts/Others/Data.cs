@@ -331,13 +331,6 @@ namespace Simuro5v5
     {
         public float x;
         public float y;
-        public float rotation
-        {
-            get
-            {
-                return Mathf.Atan2(y, x) * Mathf.Rad2Deg;
-            }
-        }// 根据x,y坐标计算的相对原点的方向
 
         public static Vector2D Zero => new Vector2D();
 
