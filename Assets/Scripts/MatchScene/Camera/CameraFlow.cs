@@ -5,7 +5,9 @@ using UnityEngine;
 public enum CameraState
 {
     OverLooking,
-    LocateObject
+    LocateObject,
+    FirstPersonForward,
+    FirstPersonReverse
 }
 
 public class CameraFlow : MonoBehaviour
@@ -15,7 +17,7 @@ public class CameraFlow : MonoBehaviour
     private Vector3 InitialPosition;
     private Quaternion InitialRotation;
     private Vector3 velocity = Vector3.zero;
-    private Camera camera;
+    private Camera cam;
     private float angle;
     private Vector3 offset = new Vector3(0, 50, 50);
 
@@ -26,57 +28,93 @@ public class CameraFlow : MonoBehaviour
         InitialPosition = transform.position;
         InitialRotation = transform.rotation;
         angle = 0;
-        camera = GetComponent<Camera>();
+        cam = GetComponent<Camera>();
         //transform.rotation = Quaternion.Euler(60,transform.rotation.y,transform.rotation.z);
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(CameraState == CameraState.OverLooking)
+        switch (CameraState)
         {
-            MousePickTarget();
+            case CameraState.OverLooking:
+                OverLooking();
+                break;
+
+            case CameraState.LocateObject:
+                transform.position = Vector3.SmoothDamp(transform.position, target.position + offset, ref velocity, 0.3f);
+                Scale();
+                Rotate();
+                transform.LookAt(target);
+                break;
+
+            case CameraState.FirstPersonForward:
+                FirstPersonForward();
+                break;
+
+            case CameraState.FirstPersonReverse:
+                FirstPersonReverse();
+                break;
+
+
         }
 
-        if (CameraState == CameraState.LocateObject)
-        {
-            MousePickTarget();
-            Scale();
-            Rotate();
-            transform.LookAt(target);
-            WaitOverLooking();
-
-        }
-    }
-
-    private void WaitOverLooking()
-    {
-        if(Input.GetKeyDown(KeyCode.X))
-        {
-            transform.position = InitialPosition;
-            transform.position = Vector3.SmoothDamp(transform.position, InitialPosition, ref velocity, 0.3f);
-
-            transform.rotation = InitialRotation;
-            CameraState = CameraState.OverLooking;
-
-        }
-    }
-
-    private void MousePickTarget()
-    {
         if (Input.GetMouseButtonUp(0))
         {
-            Ray ray = camera.ScreenPointToRay(Input.mousePosition);
+            Ray ray = cam.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
 
             if (Physics.Raycast(ray, out hit) && FindHost(hit))
             {
                 target = hit.transform.transform;
                 CameraState = CameraState.LocateObject;
-                transform.position = Vector3.SmoothDamp(transform.position, target.position + offset, ref velocity, 0.3f);
+
             }
 
         }
+
+        if (Input.GetKeyDown(KeyCode.X))
+        {
+            CameraState = CameraState.OverLooking;
+        }
+
+        if (Input.GetKeyDown(KeyCode.K) && (CameraState == CameraState.FirstPersonReverse || CameraState == CameraState.LocateObject))
+        {
+            if(CameraState == CameraState.FirstPersonForward)
+            {
+                CameraState = CameraState.LocateObject;
+            }
+            else
+            {
+                CameraState = CameraState.FirstPersonForward;
+            }
+        }
+
+        if (Input.GetKeyDown(KeyCode.L) && (CameraState == CameraState.FirstPersonForward || CameraState == CameraState.LocateObject))
+        {
+            if (CameraState == CameraState.FirstPersonReverse)
+            {
+                CameraState = CameraState.LocateObject;
+            }
+            else
+            {
+                CameraState = CameraState.FirstPersonReverse;
+            }
+        }
+
+    }
+
+    public void OverLooking()
+    {
+        transform.position = InitialPosition;
+        transform.rotation = InitialRotation;
+    }
+
+    public void MousePickTarget()
+    {
+
+        transform.position = Vector3.SmoothDamp(transform.position, target.position + offset, ref velocity, 0.3f);
+
     }
 
     private bool FindHost(RaycastHit hit)
@@ -88,13 +126,41 @@ public class CameraFlow : MonoBehaviour
         return false;
 
     }
+
+    public void FirstPersonForward()
+    {
+        transform.position = target.position;
+        var rot = new Quaternion();
+        rot.eulerAngles = new Vector3
+        {
+            x = target.rotation.eulerAngles.x + 90,
+            y = target.rotation.eulerAngles.y,
+            z = target.rotation.eulerAngles.z,
+        };
+        transform.rotation = rot;
+    }
+
+    public void FirstPersonReverse()
+    {
+        transform.position = target.position;
+        var rot = new Quaternion();
+        rot.eulerAngles = new Vector3
+        {
+            x = target.rotation.eulerAngles.x - 90,
+            y = target.rotation.eulerAngles.y,
+            z = target.rotation.eulerAngles.z + 180,
+        };
+        transform.rotation = rot;
+    }
+
     //缩放
     private void Scale()
     {
+
         float dis = offset.magnitude;
-        dis += Input.GetAxis("Mouse ScrollWheel") * 10;
+        dis += Input.GetAxis("Mouse ScrollWheel") * -10;
         offset = offset.normalized * dis;
-        transform.position = Vector3.SmoothDamp(transform.position, target.position + offset, ref velocity, 0.3f);
+
     }
 
     private void Rotate()
