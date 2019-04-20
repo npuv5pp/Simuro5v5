@@ -97,6 +97,8 @@ public class GUI_Play : MonoBehaviour
     public void AnimOutGameAndRemoveStrategy()
     {
         AnimOutGame();
+        recorder.Stop();
+        recorder.Clear();
         playMain.RemoveStrategy();
         playMain.StopMatch();
     }
@@ -128,7 +130,12 @@ public class GUI_Play : MonoBehaviour
 
     public void PlayMainStartMatch()
     {
-        recorder.Begin();
+        if (recorder.IsRecording)
+        {
+            recorder.Stop();
+            recorder.Clear();
+        }
+        recorder.Start();
         playMain.StartMatch();
     }
 

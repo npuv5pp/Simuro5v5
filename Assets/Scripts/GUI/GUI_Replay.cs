@@ -47,8 +47,8 @@ public class GUI_Replay : MonoBehaviour
             Recorder = new DataRecorder();
             for (int i = 0; i < 100; i++)
             {
-                Recorder.Add(new DataRecorder.StateRecodeData(DataRecorder.DataType.InPlaying, new MatchInfo()));
-                Recorder.Add(new DataRecorder.StateRecodeData(DataRecorder.DataType.InPlaying, MatchInfo.NewDefaultPreset()));
+                Recorder.Add(new DataRecorder.StateRecordData(DataRecorder.DataType.InPlaying, new MatchInfo()));
+                Recorder.Add(new DataRecorder.StateRecordData(DataRecorder.DataType.InPlaying, MatchInfo.NewDefaultPreset()));
             }
         }
 
@@ -123,9 +123,9 @@ public class GUI_Replay : MonoBehaviour
     /// 渲染一拍的数据到场景中，包括：机器人和球的坐标，数据板
     /// </summary>
     /// <param name="matchInfo">要渲染的场景信息</param>
-    void Render(DataRecorder.BaseRecodeData d)
+    void Render(DataRecorder.BaseRecordData d)
     {
-        if (!(d is DataRecorder.StateRecodeData data))
+        if (!(d is DataRecorder.StateRecordData data))
         {
             return;
         }
