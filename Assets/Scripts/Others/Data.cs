@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using UnityEngine;
+﻿using UnityEngine;
 using Simuro5v5.Config;
 using Simuro5v5.Strategy;
 using System.Collections.Generic;
@@ -46,7 +45,8 @@ namespace Simuro5v5
         public Robot[] YellowRobots { get; set; }
         public Ball Ball;
 
-        public int PlayTime;
+        public int TickMatch;
+        public int TickRound;
 
         public GameState GameState;
         public Side WhosBall;
@@ -78,7 +78,7 @@ namespace Simuro5v5
             Ball = another.Ball;
             GameState = another.GameState;
             WhosBall = another.WhosBall;
-            PlayTime = another.PlayTime;
+            TickMatch = another.TickMatch;
             Score = another.Score;
             ControlState = another.ControlState;
             Referee = another.Referee;
@@ -93,20 +93,20 @@ namespace Simuro5v5
             info.Ball.angularVelocity = 0;
             info.Ball.linearVelocity = Vector2D.Zero;
             //x, y, rotation
-            var yellowData = new double[,]
-            { { -102.5, 0, 90 }, { -81.2, 48, 0 }, { -81.2, -48, 0 }, { -29.8, 48, 0 }, { -29.8, -48, 0 } };
-            var blueData = new double[,]
-            { { 102.5, 0, -90 }, { 81.2, -48, 180 }, { 81.2, 48, 180 }, { 29.8, -48, 180 }, { 29.8, 48, 180 } };
-            Robot InitRobot(Robot rb, double[,] data, int elem)
+            var yellowData = new float[,]
+            { { -102.5f, 0, 90 }, { -81.2f, 48, 0 }, { -81.2f, -48, 0 }, { -29.8f, 48, 0 }, { -29.8f, -48, 0 } };
+            var blueData = new float[,]
+            { { 102.5f, 0, -90 }, { 81.2f, -48, 180 }, { 81.2f, 48, 180 }, { 29.8f, -48, 180 }, { 29.8f, 48, 180 } };
+            Robot InitRobot(Robot rb, float[,] data, int elem)
             {
-                rb.pos.x = (float)data[elem, 0];
-                rb.pos.y = (float)data[elem, 1];
+                rb.pos.x = data[elem, 0];
+                rb.pos.y = data[elem, 1];
                 rb.rotation = data[elem, 2];
-                rb.velocityLeft = rb.velocityRight = 0;
+                rb.wheel.left = rb.wheel.right = 0;
                 rb.linearVelocity = Vector2D.Zero;
                 return rb;
             }
-            Robot[] InitMe(IEnumerable<Robot> rbs, double[,] data)
+            Robot[] InitMe(IEnumerable<Robot> rbs, float[,] data)
             {
                 return rbs.Select((rb, i) => InitRobot(rb, data, i)).ToArray();
             }
@@ -120,7 +120,7 @@ namespace Simuro5v5
             BlueRobots = (Robot[])matchInfo.BlueRobots.Clone();
             YellowRobots = (Robot[])matchInfo.YellowRobots.Clone();
             Ball = matchInfo.Ball;
-            PlayTime = matchInfo.PlayTime;
+            TickMatch = matchInfo.TickMatch;
             GameState = matchInfo.GameState;
             WhosBall = matchInfo.WhosBall;
             Score = matchInfo.Score;
@@ -220,18 +220,12 @@ namespace Simuro5v5
         public int YellowScore;
     }
 
-    [JsonObject(MemberSerialization.OptIn)]
     public class SideInfo
     {
-        [JsonProperty("home")]
         public Robot[] home = new Robot[Const.RobotsPerTeam];
-        [JsonProperty("opp")]
         public OpponentRobot[] opp = new OpponentRobot[Const.RobotsPerTeam];
-        [JsonProperty("currentBall")]
         public Ball currentBall;
-        [JsonProperty("gameState")]
         public int gameState;
-        [JsonProperty("whosBall")]
         public int whosBall;
 
         public SideInfo() { }
@@ -270,12 +264,9 @@ namespace Simuro5v5
         }
     }
 
-    [JsonObject(MemberSerialization.OptIn)]
     public class PlacementInfo
     {
-        [JsonProperty("robot")]
         public Robot[] Robots = new Robot[Const.RobotsPerTeam];
-        [JsonProperty("ball")]
         public Ball Ball = new Ball();
 
         public void Normalize()
@@ -317,10 +308,8 @@ namespace Simuro5v5
     }
 
     [Serializable]
-    [JsonObject(MemberSerialization.OptIn)]
     public class WheelInfo
     {
-        [JsonProperty("wheels")]
         public Wheel[] Wheels = new Wheel[Const.RobotsPerTeam];
 
         public WheelInfo() { }
@@ -336,12 +325,9 @@ namespace Simuro5v5
         }
     }
 
-    [JsonObject(MemberSerialization.OptIn)]
     public struct Vector2D
     {
-        [JsonProperty("x")]
         public float x;
-        [JsonProperty("y")]
         public float y;
         public float rotation
         {
@@ -377,13 +363,10 @@ namespace Simuro5v5
     }
 
     [Serializable]
-    [JsonObject(MemberSerialization.OptIn)]
     public struct Wheel
     {
-        [JsonProperty("velocityLeft")]
-        public double left;
-        [JsonProperty("velocityRight")]
-        public double right;
+        public float left;
+        public float right;
 
         public void Normalize()
         {
@@ -392,37 +375,25 @@ namespace Simuro5v5
         }
     }
 
-    [JsonObject(MemberSerialization.OptIn)]
     public struct Robot
     {
         public float mass;
-        [JsonProperty("pos")]
         public Vector2D pos;
-        [JsonProperty("rotation")]
-        public double rotation;
-        [JsonProperty("velocityLeft")]
-        public double velocityLeft;
-        [JsonProperty("velocityRight")]
-        public double velocityRight;
+        public float rotation;
+        public Wheel wheel;
         public Vector2D linearVelocity;
         public float angularVelocity;
 
         public void Normalize(float right, float left, float top, float bottom)
         {
             pos.ClampToRect(right, left, top, bottom);
-            var wv = new Wheel { left = velocityLeft, right = velocityRight };
-            wv.Normalize();
-            velocityLeft = wv.left;
-            velocityRight = wv.right;
+            wheel.Normalize();
         }
 
         public void Normalize()
         {
             pos.ClampToField();
-            var wv = new Wheel { left = velocityLeft, right = velocityRight };
-            wv.Normalize();
-            velocityLeft = wv.left;
-            velocityRight = wv.right;
+            wheel.Normalize();
         }
 
         public Vector3 GetLinearVelocityVector3() { return linearVelocity.GetUnityVector3(); }
@@ -440,16 +411,12 @@ namespace Simuro5v5
         }
     }
 
-    [JsonObject(MemberSerialization.OptIn)]
     public struct OpponentRobot
     {
-        [JsonProperty("pos")]
         public Vector2D pos;
-        [JsonProperty("rotation")]
-        public double rotation;
+        public float rotation;
     }
 
-    [JsonObject(MemberSerialization.OptIn)]
     public struct Ball
     {
         public enum WhichDoor
@@ -460,7 +427,6 @@ namespace Simuro5v5
         }
 
         public float mass;
-        [JsonProperty("pos")]
         public Vector2D pos;
         public Vector2D linearVelocity;
         public float angularVelocity;
@@ -501,10 +467,8 @@ namespace Simuro5v5
         public Vector3 GetAngularVelocityVector3() { return new Vector3 { y = angularVelocity }; }
     }
 
-    [JsonObject(MemberSerialization.OptIn)]
     public class TeamInfo
     {
-        [JsonProperty("name")]
         public string Name { get; set; }
     }
 }

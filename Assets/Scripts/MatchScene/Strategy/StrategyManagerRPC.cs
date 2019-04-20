@@ -160,8 +160,11 @@ namespace Simuro5v5.Strategy
             {
                 pos = proto.Position.ToNative(),
                 rotation = proto.Rotation,
-                velocityLeft = proto.Wheel.LeftSpeed,
-                velocityRight = proto.Wheel.RightSpeed
+                wheel = new Wheel
+                {
+                    left = proto.Wheel.LeftSpeed,
+                    right = proto.Wheel.RightSpeed
+                }
             };
         }
 
@@ -188,11 +191,11 @@ namespace Simuro5v5.Strategy
             return new V5RPC.Proto.Robot
             {
                 Position = native.pos.ToProto(),
-                Rotation = (float)native.rotation,
+                Rotation = native.rotation,
                 Wheel = new V5RPC.Proto.Wheel
                 {
-                    LeftSpeed = (float)native.velocityLeft,
-                    RightSpeed = (float)native.velocityRight
+                    LeftSpeed = native.wheel.left,
+                    RightSpeed = native.wheel.right
                 }
             };
         }
@@ -202,7 +205,7 @@ namespace Simuro5v5.Strategy
             return new V5RPC.Proto.Robot
             {
                 Position = native.pos.ToProto(),
-                Rotation = (float)native.rotation,
+                Rotation = native.rotation,
                 Wheel = new V5RPC.Proto.Wheel()
             };
         }

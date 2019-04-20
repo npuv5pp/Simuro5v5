@@ -82,7 +82,7 @@ public class ControlRobot : MonoBehaviour
 
     public void SetWheelVelocity(Wheel ws)
     {
-        SetWheelVelocity((float)ws.left, (float)ws.right);
+        SetWheelVelocity(ws.left, ws.right);
     }
 
     public void SetWheelVelocity(float left, float right)
@@ -109,7 +109,7 @@ public class ControlRobot : MonoBehaviour
         rot.eulerAngles = new Vector3
         {
             x = -90,
-            y = ((float)robot.rotation).FormatOld().FormatOld2Unity(),
+            y = robot.rotation.FormatOld().FormatOld2Unity(),
             z = 0,
         };
         transform.rotation = rot;
@@ -123,7 +123,7 @@ public class ControlRobot : MonoBehaviour
     {
         // 设置位置信息
         SetPlacement(robot);
-        SetWheelVelocity((float)robot.velocityLeft, (float)robot.velocityRight);
+        SetWheelVelocity(robot.wheel.left, robot.wheel.right);
         if (physicsEnabled)
         {
             // 设置刚体的线速度和角速度

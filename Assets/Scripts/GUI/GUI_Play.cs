@@ -263,7 +263,7 @@ public class GUI_Play : MonoBehaviour
 
     void UpdateTimeText()
     {
-        SetTimeText(MatchInfo.PlayTime);
+        SetTimeText(MatchInfo.TickMatch);
     }
 
     void UpdateScoreText()

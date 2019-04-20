@@ -115,7 +115,7 @@ public class PlayMain : MonoBehaviour
                     PauseForTime(3, delegate ()
                     {
                         AutoPlacement();
-                        GlobalMatchInfo.PlayTime++;
+                        GlobalMatchInfo.TickMatch++;
                         InPlacement = false;
                         autoPlaced = false;
                         StartRound();
@@ -174,7 +174,8 @@ public class PlayMain : MonoBehaviour
             else
             {
                 UpdateWheelsToScene();
-                GlobalMatchInfo.PlayTime++;
+                GlobalMatchInfo.TickMatch++;
+                GlobalMatchInfo.TickRound++;
             }
         }
         catch (Exception)
@@ -196,7 +197,8 @@ public class PlayMain : MonoBehaviour
         ObjectManager.SetToDefault();
         ObjectManager.SetStill();
         GlobalMatchInfo.Score = new MatchScore();
-        GlobalMatchInfo.PlayTime = 0;
+        GlobalMatchInfo.TickMatch = 1;
+        GlobalMatchInfo.TickRound = 1;
         GlobalMatchInfo.Referee = new Referee();
 
         StrategyManager.BlueStrategy.OnMatchStart();
@@ -221,6 +223,7 @@ public class PlayMain : MonoBehaviour
         if (StartedMatch)
         {
             InRound = true;
+            GlobalMatchInfo.TickRound = 1;
             PauseRound();
 
             StrategyManager.BlueStrategy.OnRoundStart();

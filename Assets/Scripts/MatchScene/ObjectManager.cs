@@ -118,8 +118,8 @@ namespace Simuro5v5
             {
                 if (OutputMatchInfo != null)
                 {
-                    OutputMatchInfo.BlueRobots[i].velocityLeft = ws.Wheels[i].left;
-                    OutputMatchInfo.BlueRobots[i].velocityRight = ws.Wheels[i].right;
+                    OutputMatchInfo.BlueRobots[i].wheel.left = ws.Wheels[i].left;
+                    OutputMatchInfo.BlueRobots[i].wheel.right = ws.Wheels[i].right;
                 }
                 blueComponent[i].SetWheelVelocity(ws.Wheels[i]);
             }
@@ -131,8 +131,8 @@ namespace Simuro5v5
             {
                 if (OutputMatchInfo != null)
                 {
-                    OutputMatchInfo.YellowRobots[i].velocityLeft = ws.Wheels[i].left;
-                    OutputMatchInfo.YellowRobots[i].velocityRight = ws.Wheels[i].right;
+                    OutputMatchInfo.YellowRobots[i].wheel.left = ws.Wheels[i].left;
+                    OutputMatchInfo.YellowRobots[i].wheel.right = ws.Wheels[i].right;
                 }
                 yellowComponent[i].SetWheelVelocity(ws.Wheels[i]);
             }
