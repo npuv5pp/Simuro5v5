@@ -14,8 +14,8 @@ namespace Simuro5v5.Strategy
         public TeamInfo BlueTeamInfo { get; set; }
         public TeamInfo YellowTeamInfo { get; set; }
 
-        public bool IsBlueReady => BlueStrategy !=null;
-        public bool IsYellowReady => YellowStrategy !=null;
+        public bool IsBlueReady => BlueStrategy != null;
+        public bool IsYellowReady => YellowStrategy != null;
 
         public StrategyManagerRPC() { }
 
@@ -63,7 +63,10 @@ namespace Simuro5v5.Strategy
 
         public RPCStrategy(int server_port)
         {
-            client = new StrategyClient(new System.Net.IPEndPoint(System.Net.IPAddress.Loopback, server_port));
+            client = new StrategyClient(new System.Net.IPEndPoint(System.Net.IPAddress.Loopback, server_port))
+            {
+                Timeout = Config.StrategyConfig.ConnectTimeout,
+            };
         }
 
         public TeamInfo GetTeamInfo()

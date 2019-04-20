@@ -115,6 +115,11 @@ public class GUI_Play : MonoBehaviour
             Debug.LogError(e.Message);
             AnimOutGame();
         }
+        catch (System.TimeoutException e)
+        {
+            Debug.LogError(e.Message);
+            AnimOutGame();
+        }
     }
 
     public void OpenMenuStrategy()
