@@ -86,8 +86,16 @@ public class GUI_Replay : MonoBehaviour
         }
     }
 
+    int tick = 0;
+
     void FixedUpdate()
     {
+        tick++;
+        if (tick % 2 == 0)
+        {
+            return;
+        }
+
         if (!Paused)
         {
             if (SliderPostion == Recorder.DataLength - 1)
@@ -128,7 +136,7 @@ public class GUI_Replay : MonoBehaviour
                     if (data.matchInfo != null)
                     {
                         ObjectManager.RevertScene(data.matchInfo);
-                        DataBoard.Render(data.matchInfo);
+                        //DataBoard.Render(data.matchInfo);
                     }
                 }
                 break;
