@@ -49,7 +49,7 @@ public class PlayMain : MonoBehaviour
     bool TimedPausing { get; set; }
     readonly object timedPausingLock = new object();
 
-    bool autoPlacemented = false;
+    bool autoPlaced = false;
 
     // 进入场景之后
     void OnEnable()
@@ -109,16 +109,16 @@ public class PlayMain : MonoBehaviour
             {
                 // 回合结束
                 // 自动摆位
-                if (!autoPlacemented)
+                if (!autoPlaced)
                 {
                     // 摆位时状态机不会停止运行，在这里确保不会运行两次摆位函数
-                    autoPlacemented = true;
+                    autoPlaced = true;
                     PauseForTime(3, delegate ()
                     {
                         AutoPlacement();
                         GlobalMatchInfo.PlayTime++;
                         InPlacement = false;
-                        autoPlacemented = false;
+                        autoPlaced = false;
                         StartRound();
                     });
                 }
