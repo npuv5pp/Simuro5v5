@@ -28,7 +28,7 @@ namespace Simuro5v5
         /// <summary>
         /// 已记录的数据长度
         /// </summary>
-        public int DataLength { get { return Data.Count; } }
+        public int DataLength => Data.Count;
 
         public DataRecorder() { }
 

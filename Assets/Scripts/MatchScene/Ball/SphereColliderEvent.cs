@@ -6,16 +6,6 @@ public class SphereColliderEvent : MonoBehaviour {
 
     public ArrayList TouchObject = new ArrayList();
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
-
     // 碰撞开始
     void OnCollisionEnter(Collision collision)
     {
@@ -26,11 +16,5 @@ public class SphereColliderEvent : MonoBehaviour {
     void OnCollisionExit(Collision collision)
     {
         TouchObject.Remove(collision.gameObject);
-    }
-
-    // 碰撞持续中
-    void OnCollisionStay(Collision collision)
-    {
-        
     }
 }
