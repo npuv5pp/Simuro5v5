@@ -20,7 +20,7 @@ public class JudgeResult
     public string ToRichText()
     {
 
-        var rv = $"Foul: {ResultType}\t";
+        var rv = $"Foul: {ResultType}      ";
         if (Actor == Side.Blue)
         {
             rv += $"<color=#{Const.Style.SideBlue.ToHex()}>{Actor}<color=#F20C00> team is actor.\nReason: <color=\"green\">{Reason}";
