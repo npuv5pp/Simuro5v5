@@ -115,17 +115,6 @@ namespace Simuro5v5
             return info;
         }
 
-        private static void UpdateFromRigidbody(ref Robot robot, in Rigidbody rb)
-        {
-            robot.mass = rb.mass;
-            robot.pos.x = rb.position.x;
-            robot.pos.y = rb.position.z;
-            robot.rotation = rb.rotation.eulerAngles.y.FormatUnity2Old().FormatOld();
-            robot.linearVelocity.x = rb.velocity.x;
-            robot.linearVelocity.y = rb.velocity.z;
-            robot.angularVelocity = rb.angularVelocity.y;
-        }
-
         public void UpdateFrom(MatchInfo matchInfo)
         {
             BlueRobots = (Robot[])matchInfo.BlueRobots.Clone();
@@ -144,8 +133,8 @@ namespace Simuro5v5
 
             for (int i = 0; i < Const.RobotsPerTeam; i++)
             {
-                UpdateFromRigidbody(ref BlueRobots[i], blue[i].GetComponent<Rigidbody>());
-                UpdateFromRigidbody(ref YellowRobots[i], yellow[i].GetComponent<Rigidbody>());
+                BlueRobots[i].UpdateFromRigidbody(blue[i].GetComponent<Rigidbody>());
+                YellowRobots[i].UpdateFromRigidbody(yellow[i].GetComponent<Rigidbody>());
             }
             Rigidbody ballTemp = ball.GetComponent<Rigidbody>();
             Ball newBall = new Ball
@@ -438,6 +427,17 @@ namespace Simuro5v5
 
         public Vector3 GetLinearVelocityVector3() { return linearVelocity.GetUnityVector3(); }
         public Vector3 GetAngularVelocityVector3() { return new Vector3 { y = angularVelocity }; }
+
+        public void UpdateFromRigidbody(Rigidbody rb)
+        {
+            this.mass = rb.mass;
+            this.pos.x = rb.position.x;
+            this.pos.y = rb.position.z;
+            this.rotation = rb.rotation.eulerAngles.y.FormatUnity2Old().FormatOld();
+            this.linearVelocity.x = rb.velocity.x;
+            this.linearVelocity.y = rb.velocity.z;
+            this.angularVelocity = rb.angularVelocity.y;
+        }
     }
 
     [JsonObject(MemberSerialization.OptIn)]
