@@ -219,6 +219,8 @@ namespace Simuro5v5.Strategy
                 field.OpponentRobots.Add(native.opp[i].ToProto());
             }
             field.Ball = native.currentBall.ToProto();
+            field.TickTotal = native.TickMatch;
+            field.TickRound = native.TickRound;
             return field;
         }
     }

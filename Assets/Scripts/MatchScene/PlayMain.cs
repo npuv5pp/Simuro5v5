@@ -250,8 +250,6 @@ public class PlayMain : MonoBehaviour
             PausedRound = true;
             ObjectManager.Pause();
 
-            StrategyManager.BlueStrategy.OnRoundStop();
-            StrategyManager.YellowStrategy.OnRoundStop();
             Event.Send(Event.EventType0.RoundPause);
         }
     }
@@ -294,6 +292,8 @@ public class PlayMain : MonoBehaviour
     {
         PauseRound();
         InRound = false;
+        StrategyManager.BlueStrategy.OnRoundStop();
+        StrategyManager.YellowStrategy.OnRoundStop();
         ObjectManager.Pause();
         Event.Send(Event.EventType0.RoundStop);
     }

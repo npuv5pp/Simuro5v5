@@ -180,6 +180,8 @@ namespace Simuro5v5
             si.opp = (from rb in opp
                       select new OpponentRobot { pos = rb.pos, rotation = rb.rotation }).ToArray();
             if (side == Side.Yellow) si.ConvertToOtherSide();
+            si.TickMatch = TickMatch;
+            si.TickRound = TickRound;
             return si;
         }
     }
@@ -225,6 +227,8 @@ namespace Simuro5v5
         public Robot[] home = new Robot[Const.RobotsPerTeam];
         public OpponentRobot[] opp = new OpponentRobot[Const.RobotsPerTeam];
         public Ball currentBall;
+        public int TickMatch;
+        public int TickRound;
         public int gameState;
         public int whosBall;
 
