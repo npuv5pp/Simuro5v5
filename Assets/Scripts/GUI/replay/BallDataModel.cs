@@ -14,7 +14,6 @@ public class BallDataModel : MonoBehaviour
     {
         x.text = Ball.pos.x.ToString();
         y.text = Ball.pos.y.ToString();
-        rotation.text = Ball.pos.rotation.ToString();
     }
 
     public void RenderData(Ball ball)

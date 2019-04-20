@@ -191,5 +191,6 @@ public class ControlRobot : MonoBehaviour
         Drag = Const.Robot.DragFactor;
         AngularDrag = Const.Robot.AngularDragFactor;
         DoubleZeroDrag = Const.Robot.DoubleZeroDragFactor;
+        DoubleZeroAngularDrag = Const.Robot.DoubleZeroAngularDragFactor;
     }
 }

@@ -323,8 +323,6 @@ namespace Simuro5v5
             for (int i = 0; i < Const.RobotsPerTeam; i++)
             {
                 Wheels[i].Normalize();
-                //w.left *= Const.inch2cm;
-                //w.right *= Const.inch2cm;
             }
         }
     }
