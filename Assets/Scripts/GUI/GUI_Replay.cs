@@ -28,28 +28,17 @@ public class GUI_Replay : MonoBehaviour
 
     bool Paused;
 
-    private int SliderPostion
+    private int SliderPosition
     {
-        get
-        {
-            return (int)Slider.value;
-        }
-        set
-        {
-            Slider.value = value;
-        }
+        get => (int)Slider.value;
+        set => Slider.value = value;
     }
 
     void Start()
     {
         if (Recorder == null || Recorder.DataLength == 0)
         {
-            Recorder = new DataRecorder();
-            for (int i = 0; i < 100; i++)
-            {
-                Recorder.Add(new DataRecorder.StateRecordData(DataRecorder.DataType.InPlaying, new MatchInfo()));
-                Recorder.Add(new DataRecorder.StateRecordData(DataRecorder.DataType.InPlaying, MatchInfo.NewDefaultPreset()));
-            }
+            Recorder = DataRecorder.PlaceHolder();
         }
 
         ObjectManager = new ObjectManager();
@@ -58,7 +47,7 @@ public class GUI_Replay : MonoBehaviour
         ObjectManager.Resume();
         Slider.minValue = 0;
         Slider.maxValue = Recorder.DataLength == 0 ? 0 : Recorder.DataLength - 1;
-        Render(Recorder.Get(0));
+        Render(Recorder.IndexOf(0));
 
         Paused = true;
     }
@@ -98,7 +87,7 @@ public class GUI_Replay : MonoBehaviour
 
         if (!Paused)
         {
-            if (SliderPostion == Recorder.DataLength - 1)
+            if (SliderPosition == Recorder.DataLength - 1)
             {
                 Paused = true;
             }
@@ -123,9 +112,9 @@ public class GUI_Replay : MonoBehaviour
     /// 渲染一拍的数据到场景中，包括：机器人和球的坐标，数据板
     /// </summary>
     /// <param name="matchInfo">要渲染的场景信息</param>
-    void Render(DataRecorder.BaseRecordData d)
+    void Render(DataRecorder.RecordData d)
     {
-        if (!(d is DataRecorder.StateRecordData data))
+        if (!(d is DataRecorder.RecordData data))
         {
             return;
         }
@@ -162,9 +151,9 @@ public class GUI_Replay : MonoBehaviour
     /// </summary>
     void Next()
     {
-        if (SliderPostion < Recorder.DataLength - 1)
+        if (SliderPosition < Recorder.DataLength - 1)
         {
-            SliderPostion++;
+            SliderPosition++;
         }
     }
 
@@ -174,9 +163,9 @@ public class GUI_Replay : MonoBehaviour
     /// </summary>
     void Previous()
     {
-        if (SliderPostion > 0)
+        if (SliderPosition > 0)
         {
-            SliderPostion--;
+            SliderPosition--;
         }
     }
 
@@ -195,7 +184,7 @@ public class GUI_Replay : MonoBehaviour
     /// </summary>
     public void OnSliderValueChanged()
     {
-        Render(Recorder.Get(SliderPostion));
+        Render(Recorder.IndexOf(SliderPosition));
     }
 
     /// <summary>
@@ -213,7 +202,7 @@ public class GUI_Replay : MonoBehaviour
     public void OnSliderScrolled(BaseEventData _data)
     {
         var data = _data as PointerEventData;
-        SliderPostion += (int)data.scrollDelta.y;
+        SliderPosition += (int)data.scrollDelta.y;
     }
 
     /// <summary>

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using UnityEngine;
+using UnityEngine.Profiling;
 
 namespace Simuro5v5
 {
@@ -20,11 +22,33 @@ namespace Simuro5v5
             InPlaying,
         }
 
-        public string Name;
-        private DateTime beginTime;
-        public bool IsRecording { get; set; }
+        /// <summary>
+        /// 基本数据类型
+        /// </summary>
+        public class RecordData
+        {
+            public readonly MatchInfo matchInfo;
+            public readonly DataType type;
 
-        private readonly List<BaseRecordData> data = new List<BaseRecordData>();
+            public RecordData(DataType type)
+            {
+                this.type = type;
+            }
+
+            public RecordData(DataType type, MatchInfo match)
+            {
+                this.type = type;
+                matchInfo = match;
+            }
+        }
+
+        public string Name => $"{beginTime.Year}/{beginTime.Month}/{beginTime.Day} {beginTime.Hour}:{beginTime.Minute}";
+
+        public bool IsRecording { get; private set; }
+
+        private DateTime beginTime;
+
+        private readonly List<RecordData> data = new List<RecordData>();
 
         /// <summary>
         /// 已记录的数据长度
@@ -38,7 +62,6 @@ namespace Simuro5v5
         {
             IsRecording = true;
             beginTime = DateTime.Now;
-            Name = $"{beginTime.Year}/{beginTime.Month}/{beginTime.Day} {beginTime.Hour}:{beginTime.Minute}";
             Event.Register(Event.EventType1.MatchInfoUpdate, RecordMatchInfo);
             Event.Register(Event.EventType0.MatchStart, RecordNewMatch);
             Event.Register(Event.EventType0.RoundStart, RecordNewRound);
@@ -65,7 +88,7 @@ namespace Simuro5v5
         {
             if (obj is MatchInfo matchInfo)
             {
-                data.Add(new StateRecordData(DataType.InPlaying, new MatchInfo(matchInfo)));
+                data.Add(new RecordData(DataType.InPlaying, new MatchInfo(matchInfo)));
             }
             else
             {
@@ -90,17 +113,19 @@ namespace Simuro5v5
 
         private void RecordState(DataType type)
         {
-            data.Add(new StateRecordData(type));
+            data.Add(new RecordData(type));
         }
 
-        public void Add(BaseRecordData recodeData)
+        public static DataRecorder PlaceHolder()
         {
-            if (Name == null)
+            var recorder = new DataRecorder()
             {
-                beginTime = DateTime.Now;
-                Name = $"{beginTime.Year}/{beginTime.Month}/{beginTime.Day} {beginTime.Hour}:{beginTime.Minute}";
-            }
-            this.data.Add(recodeData);
+                beginTime = DateTime.Now,
+            };
+            recorder.data.Add(new RecordData(DataType.InPlaying, new MatchInfo()));
+            recorder.data.Add(new RecordData(DataType.InPlaying, MatchInfo.NewDefaultPreset()));
+
+            return recorder;
         }
 
         /// <summary>
@@ -115,7 +140,7 @@ namespace Simuro5v5
         /// 获取最后一拍的数据
         /// </summary>
         /// <returns></returns>
-        public BaseRecordData GetLastInfo()
+        public RecordData GetLastInfo()
         {
             return data.Count == 0 ? null : data[data.Count - 1];
         }
@@ -125,37 +150,14 @@ namespace Simuro5v5
         /// </summary>
         /// <param name="i">下标</param>
         /// <returns>第i个MatchInfo数据</returns>
-        public BaseRecordData Get(int i)
+        public RecordData IndexOf(int i)
         {
-            if (i >= DataLength)
-            {
-                return null;
-            }
             return data[i];
         }
 
-        /// <summary>
-        /// 基本数据类型
-        /// </summary>
-        public abstract class BaseRecordData
+        public string Serialize()
         {
-            public DataType type;
-        }
-
-        public class StateRecordData : BaseRecordData
-        {
-            public MatchInfo matchInfo;
-
-            public StateRecordData(DataType type)
-            {
-                base.type = type;
-            }
-
-            public StateRecordData(DataType type, MatchInfo match)
-            {
-                base.type = DataType.InPlaying;
-                matchInfo = match;
-            }
+            return JsonConvert.SerializeObject(this);
         }
     }
 }
