@@ -14,3 +14,6 @@ Then open Simuro5v5.exe. Here the right mouse button can open or close the menu,
 In the game scene, you can right-click the menu. At any time, you can click on the Replay button to enter the playback scene, from here you can see your most recent game playback.
 
 You can control the progress through the keyboard or mouse. The up and down direction keys of the keyboard can adjust the playback speed, the left and right direction keys control the progress, and the space bar pauses or continues. You can also control it with your mouse. Click the button to control the playback process, or use the mouse wheel to slide the bottom of the screen to control the playback progress. The mouse wheel slides on the rate drop-down box on the right to adjust the rate.
+
+## Credits
+(C) NWPU V5++ Team. ALL RIGHTS RESERVED.
