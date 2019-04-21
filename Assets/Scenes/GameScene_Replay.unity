@@ -2246,7 +2246,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 842766250}
-  - component: {fileID: 842766249}
   m_Layer: 0
   m_Name: Cameras
   m_TagString: Untagged
@@ -2254,19 +2253,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &842766249
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 114090745385373586, guid: ad7727942a3813d4e9e3b1b07738d200,
-    type: 3}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 842766248}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7cf2f78523a6b38488550f61d1be5b3c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!4 &842766250
 Transform:
   m_ObjectHideFlags: 0
