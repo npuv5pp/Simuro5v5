@@ -157,7 +157,7 @@ namespace Simuro5v5
 
         public string Serialize()
         {
-            return JsonConvert.SerializeObject(this);
+            return JsonConvert.SerializeObject(data);
         }
     }
 }
