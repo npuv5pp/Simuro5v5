@@ -19,7 +19,7 @@ public class CameraFlow : MonoBehaviour
     private Vector3 velocity = Vector3.zero;
     private Camera cam;
     private float angle;
-    private Vector3 offset = new Vector3(0, 50, 50);
+    private Vector3 offset = new Vector3(-50, 50, 0);
     private float MinLocateMin = 8;
 
     // Start is called before the first frame update
@@ -278,9 +278,15 @@ public class CameraFlow : MonoBehaviour
 
     public void ChangeLocateObject()
     {
+        if(CameraState == CameraState.LocateObject)
+        {
+            CameraState = CameraState.OverLooking;
+        }
+        else 
+        {
+            CameraState = CameraState.LocateObject;
+        }
 
-
-        CameraState = CameraState.LocateObject;
         //angle = 0;
 
     }
