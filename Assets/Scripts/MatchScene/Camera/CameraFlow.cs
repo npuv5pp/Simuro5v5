@@ -20,10 +20,12 @@ public class CameraFlow : MonoBehaviour
     private Camera cam;
     private float angle;
     private Vector3 offset = new Vector3(0, 50, 50);
+    private float MinLocateMin = 8;
 
     // Start is called before the first frame update
     void Start()
     {
+        target = GameObject.Find("Ball").transform;
         CameraState = CameraState.OverLooking;
         InitialPosition = transform.position;
         InitialRotation = transform.rotation;
@@ -68,37 +70,28 @@ public class CameraFlow : MonoBehaviour
             {
                 target = hit.transform.transform;
                 CameraState = CameraState.LocateObject;
+                //angle = 0;
 
             }
 
         }
 
-        if(FindHostByKey())
+        if (FindHostByKey())
         {
-            if(CameraState == CameraState.OverLooking)
-            {
-                CameraState = CameraState.LocateObject;
-            }
+            ChangeLocateObject();
         }
 
         if (Input.GetKeyDown(KeyCode.X))
         {
-            CameraState = CameraState.OverLooking;
+            ChangeOverLooking();
         }
 
-        if (Input.GetKeyDown(KeyCode.K) && (CameraState == CameraState.FirstPersonReverse || CameraState == CameraState.LocateObject || CameraState == CameraState.FirstPersonForward))
+        if (Input.GetKeyDown(KeyCode.K))
         {
-            if (CameraState == CameraState.FirstPersonForward)
-            {
-                CameraState = CameraState.LocateObject;
-            }
-            else
-            {
-                CameraState = CameraState.FirstPersonForward;
-            }
+            ChangeFPForward();
         }
 
-        if (Input.GetKeyDown(KeyCode.L) && (CameraState == CameraState.FirstPersonForward || CameraState == CameraState.LocateObject || CameraState == CameraState.FirstPersonReverse))
+        if (Input.GetKeyDown(KeyCode.L))
         {
             if (CameraState == CameraState.FirstPersonReverse)
             {
@@ -114,7 +107,7 @@ public class CameraFlow : MonoBehaviour
 
     private bool FindHostByKey()
     {
-        if(Input.GetKeyDown(KeyCode.Alpha1))
+        if (Input.GetKeyDown(KeyCode.Alpha1))
         {
             target = GameObject.Find("Blue0").transform;
             return true;
@@ -173,13 +166,14 @@ public class CameraFlow : MonoBehaviour
 
     }
 
-    public void OverLooking()
+    private void OverLooking()
     {
-        transform.position = InitialPosition;
+        transform.position = Vector3.SmoothDamp(transform.position, InitialPosition, ref velocity, 0.3f);
+        //transform.position = InitialPosition;
         transform.rotation = InitialRotation;
     }
 
-    public void MousePickTarget()
+    private void MousePickTarget()
     {
 
         transform.position = Vector3.SmoothDamp(transform.position, target.position + offset, ref velocity, 0.3f);
@@ -196,30 +190,55 @@ public class CameraFlow : MonoBehaviour
 
     }
 
-    public void FirstPersonForward()
+    private void FirstPersonForward()
     {
-        transform.position = target.position;
-        var rot = new Quaternion();
-        rot.eulerAngles = new Vector3
+        if (target.transform.tag == "Robot")
         {
-            x = target.rotation.eulerAngles.x + 90,
-            y = target.rotation.eulerAngles.y,
-            z = target.rotation.eulerAngles.z,
-        };
-        transform.rotation = rot;
+            transform.position = target.position;
+            var rot = new Quaternion();
+            rot.eulerAngles = new Vector3
+            {
+                x = target.rotation.eulerAngles.x + 90,
+                y = target.rotation.eulerAngles.y,
+                z = target.rotation.eulerAngles.z,
+            };
+            transform.rotation = rot;
+        }
+        else if (target.transform.tag == "Ball")
+        {
+            transform.position = target.position;
+            transform.rotation = target.rotation;
+        }
     }
 
-    public void FirstPersonReverse()
+    private void FirstPersonReverse()
     {
-        transform.position = target.position;
-        var rot = new Quaternion();
-        rot.eulerAngles = new Vector3
+        if (target.transform.tag == "Robot")
         {
-            x = target.rotation.eulerAngles.x - 90,
-            y = target.rotation.eulerAngles.y,
-            z = target.rotation.eulerAngles.z + 180,
-        };
-        transform.rotation = rot;
+            transform.position = target.position;
+            var rot = new Quaternion();
+            rot.eulerAngles = new Vector3
+            {
+                x = target.rotation.eulerAngles.x - 90,
+                y = target.rotation.eulerAngles.y,
+                z = target.rotation.eulerAngles.z + 180,
+            };
+            transform.rotation = rot;
+        }
+        else if (target.transform.tag == "Ball")
+        {
+            transform.position = target.position;
+            var rot = new Quaternion();
+            rot.eulerAngles = new Vector3
+            {
+                x = target.rotation.eulerAngles.x,
+                y = target.rotation.eulerAngles.y + 180,
+                z = target.rotation.eulerAngles.z,
+            };
+            transform.rotation = rot;
+           // transform.position = target.position;
+           // transform.rotation = target.rotation;
+        }
     }
 
     //缩放
@@ -227,8 +246,12 @@ public class CameraFlow : MonoBehaviour
     {
 
         float dis = offset.magnitude;
-        dis += Input.GetAxis("Mouse ScrollWheel") * -10;
-        offset = offset.normalized * dis;
+        dis += Input.GetAxis("Mouse ScrollWheel") * -50;
+
+        if ((target.position + offset.normalized * dis).y > MinLocateMin)
+        {
+            offset = offset.normalized * dis;
+        }
 
     }
 
@@ -240,10 +263,49 @@ public class CameraFlow : MonoBehaviour
             float y = offset.y;
             float x = Mathf.Cos(angle) * y;
             float z = Mathf.Sin(angle) * y;
-            offset.x = x;
-            offset.z = z;
+            offset.x = -x;
+            offset.z = -z;
             transform.position = target.position + offset;
 
+        }
+    }
+
+
+    public void ChangeOverLooking()
+    {
+        CameraState = CameraState.OverLooking;
+    }
+
+    public void ChangeLocateObject()
+    {
+
+
+        CameraState = CameraState.LocateObject;
+        //angle = 0;
+
+    }
+
+    public void ChangeFPForward()
+    {
+        if (CameraState == CameraState.LocateObject || CameraState == CameraState.FirstPersonReverse)
+        {
+            CameraState = CameraState.FirstPersonForward;
+        }
+        else if (CameraState == CameraState.FirstPersonForward)
+        {
+            CameraState = CameraState.LocateObject;
+        }
+    }
+
+    public void ChangeFPReverse()
+    {
+        if (CameraState == CameraState.LocateObject || CameraState == CameraState.FirstPersonForward)
+        {
+            CameraState = CameraState.FirstPersonReverse;
+        }
+        else if (CameraState == CameraState.FirstPersonReverse)
+        {
+            CameraState = CameraState.LocateObject;
         }
     }
 }
