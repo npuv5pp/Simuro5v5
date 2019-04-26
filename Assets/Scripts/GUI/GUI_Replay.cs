@@ -4,11 +4,15 @@
  * 2.回放菜单：包括回到比赛、返回播放、退出
 ********************************************************************************/
 
+using System;
+using System.Globalization;
+using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using TMPro;
 using Simuro5v5;
+using UnityEditor;
 using UnityEngine.EventSystems;
 
 public class GUI_Replay : MonoBehaviour
@@ -36,17 +40,23 @@ public class GUI_Replay : MonoBehaviour
 
     void Start()
     {
+        ObjectManager = new ObjectManager();
+        ShowRecord();
+    }
+
+    private void ShowRecord()
+    {
         if (Recorder == null || Recorder.DataLength == 0)
         {
             Recorder = DataRecorder.PlaceHolder();
         }
 
-        ObjectManager = new ObjectManager();
         ObjectManager.RebindObject(Entity);
         ObjectManager.DisablePhysics();
         ObjectManager.Resume();
         Slider.minValue = 0;
         Slider.maxValue = Recorder.DataLength == 0 ? 0 : Recorder.DataLength - 1;
+        Slider.value = 0;
         Render(Recorder.IndexOf(0));
 
         Paused = true;
@@ -262,5 +272,41 @@ public class GUI_Replay : MonoBehaviour
     {
         var data = _data as PointerEventData;
         SpeedDropdown.value -= (int)data.scrollDelta.y;
+    }
+
+    public void ExportDataRecord()
+    {
+        string path = EditorUtility.SaveFilePanel(
+            "Export Data Record",
+            "",
+            $"match-{DateTime.Now:yyyy-mm-dd hhmmss}.json",
+            "json");
+        
+        // if save file panel cancelled
+        if (string.IsNullOrEmpty(path))
+        {
+            return;
+        }
+
+        string json = Recorder.Serialize();
+        File.WriteAllText(path, json);
+    }
+
+    public void ImportDataRecord()
+    {
+        string path = EditorUtility.OpenFilePanel(
+            "Import Data Record",
+            "",
+            "json");
+
+        // if open file panel cancelled
+        if (string.IsNullOrEmpty(path))
+        {
+            return;
+        }
+
+        string json = File.ReadAllText(path);
+        Recorder = new DataRecorder(json);
+        ShowRecord();
     }
 }

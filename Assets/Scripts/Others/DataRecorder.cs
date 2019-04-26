@@ -38,10 +38,11 @@ namespace Simuro5v5
                 this.type = type;
             }
 
-            public RecordData(DataType type, MatchInfo match)
+            [JsonConstructor]
+            public RecordData(DataType type, MatchInfo matchInfo)
             {
                 this.type = type;
-                matchInfo = match;
+                this.matchInfo = matchInfo;
             }
         }
 
@@ -57,6 +58,15 @@ namespace Simuro5v5
         /// 已记录的数据长度
         /// </summary>
         public int DataLength => data.Count;
+
+        public DataRecorder()
+        {
+        }
+
+        public DataRecorder(string json)
+        {
+            data = JsonConvert.DeserializeObject<List<RecordData>>(json);
+        }
 
         /// <summary>
         /// 开始记录
@@ -158,6 +168,9 @@ namespace Simuro5v5
             return data[i];
         }
 
+        /// <summary>
+        /// 将历史记录序列化为 Json 格式
+        /// </summary>
         public string Serialize()
         {
             return JsonConvert.SerializeObject(data, Formatting.Indented);
