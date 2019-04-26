@@ -17,6 +17,9 @@ public class Referee
 
     private int goalieBlueId;
     private int goalieYellowId;
+    /// <summary>
+    /// 停滞时间
+    /// </summary>
     private int standoffTime;
 
     private readonly Square yellowGoalState;
