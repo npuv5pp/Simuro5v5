@@ -14,5 +14,5 @@ $outputPath = '.\Assets\BinDeps\V5RPC\'
 New-Item -Path $outputPath -ItemType Directory -ErrorAction Ignore | Out-Null
 $outputPath = Resolve-Path $outputPath -ErrorAction Stop
 $escapedPath = '"' + ($outputPath -replace '\\', '/') + '"'
-&$msbuild '/t:Restore;Build' "/p:Configuration=Release;OutputPath=$escapedPath;CopyLocalLockFileAssemblies=True" $sln
+&$msbuild '/t:Restore;Build' "/p:Configuration=Release;OutputPath=$escapedPath" $sln
 Get-ChildItem -Path $outputPath | Where-Object { $_.Extension -in '.pdb', '.json' } | Remove-Item
