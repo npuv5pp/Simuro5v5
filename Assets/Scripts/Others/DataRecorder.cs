@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using UnityEngine;
 using UnityEngine.Profiling;
 
@@ -28,6 +30,7 @@ namespace Simuro5v5
         public class RecordData
         {
             public readonly MatchInfo matchInfo;
+            [JsonConverter(typeof(StringEnumConverter))]
             public readonly DataType type;
 
             public RecordData(DataType type)
@@ -157,7 +160,7 @@ namespace Simuro5v5
 
         public string Serialize()
         {
-            return JsonConvert.SerializeObject(data);
+            return JsonConvert.SerializeObject(data, Formatting.Indented);
         }
     }
 }

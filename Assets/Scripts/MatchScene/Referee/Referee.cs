@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Text;
 using Assets.Scripts.MatchScene.Referee;
+using Newtonsoft.Json;
 using Simuro5v5;
 using UnityEngine;
 using Event = Simuro5v5.EventSystem.Event;
@@ -20,6 +21,7 @@ public class Referee
     /// <summary>
     /// 停滞时间
     /// </summary>
+    [JsonProperty]
     private int standoffTime;
 
     private readonly Square yellowGoalState;
