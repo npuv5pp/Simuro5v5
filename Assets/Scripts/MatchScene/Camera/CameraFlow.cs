@@ -22,7 +22,6 @@ public class CameraFlow : MonoBehaviour
     private Vector3 offset = new Vector3(-50, 50, 0);
     private float MinLocateMin = 8;
 
-    // Start is called before the first frame update
     void Start()
     {
         target = GameObject.Find("Ball").transform;
@@ -34,7 +33,6 @@ public class CameraFlow : MonoBehaviour
         //transform.rotation = Quaternion.Euler(60,transform.rotation.y,transform.rotation.z);
     }
 
-    // Update is called once per frame
     void Update()
     {
         switch (CameraState)
@@ -44,7 +42,7 @@ public class CameraFlow : MonoBehaviour
                 break;
 
             case CameraState.LocateObject:
-                transform.position = Vector3.SmoothDamp(transform.position, target.position + offset, ref velocity, 0.3f);
+                transform.position = Vector3.SmoothDamp(transform.position, target.position + offset, ref velocity, 0.3f * Time.timeScale);
                 Scale();
                 Rotate();
                 transform.LookAt(target);
@@ -57,8 +55,6 @@ public class CameraFlow : MonoBehaviour
             case CameraState.FirstPersonReverse:
                 FirstPersonReverse();
                 break;
-
-
         }
 
         if (Input.GetMouseButtonUp(0))
@@ -71,9 +67,7 @@ public class CameraFlow : MonoBehaviour
                 target = hit.transform.transform;
                 CameraState = CameraState.LocateObject;
                 //angle = 0;
-
             }
-
         }
 
         if (FindHostByKey())
@@ -163,21 +157,18 @@ public class CameraFlow : MonoBehaviour
             return true;
         }
         return false;
-
     }
 
     private void OverLooking()
     {
-        transform.position = Vector3.SmoothDamp(transform.position, InitialPosition, ref velocity, 0.3f);
+        transform.position = Vector3.SmoothDamp(transform.position, InitialPosition, ref velocity, 0.3f *Time.timeScale);
         //transform.position = InitialPosition;
         transform.rotation = InitialRotation;
     }
 
     private void MousePickTarget()
     {
-
-        transform.position = Vector3.SmoothDamp(transform.position, target.position + offset, ref velocity, 0.3f);
-
+        transform.position = Vector3.SmoothDamp(transform.position, target.position + offset, ref velocity, 0.3f * Time.timeScale);
     }
 
     private bool FindHostByMouse(RaycastHit hit)
@@ -187,7 +178,6 @@ public class CameraFlow : MonoBehaviour
             return true;
         }
         return false;
-
     }
 
     private void FirstPersonForward()
@@ -252,7 +242,6 @@ public class CameraFlow : MonoBehaviour
         {
             offset = offset.normalized * dis;
         }
-
     }
 
     private void Rotate()
@@ -270,7 +259,6 @@ public class CameraFlow : MonoBehaviour
         }
     }
 
-
     public void ChangeOverLooking()
     {
         CameraState = CameraState.OverLooking;
@@ -286,9 +274,7 @@ public class CameraFlow : MonoBehaviour
         {
             CameraState = CameraState.LocateObject;
         }
-
         //angle = 0;
-
     }
 
     public void ChangeFPForward()
