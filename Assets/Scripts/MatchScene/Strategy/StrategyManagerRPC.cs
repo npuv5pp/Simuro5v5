@@ -1,4 +1,5 @@
 using System;
+using System.Net;
 using V5RPC;
 
 namespace Simuro5v5.Strategy
@@ -19,15 +20,52 @@ namespace Simuro5v5.Strategy
 
         public StrategyManagerRPC() { }
 
-        public void ConnectBlue(int server_port)
+        IPEndPoint ParseEndPoint(string endpoint)
         {
-            BlueStrategy = new RPCStrategy(Config.StrategyConfig.BlueStrategyPort);
+            string addr;
+            int port;
+
+            try
+            {
+                if (endpoint.Contains(":"))
+                {
+                    var ep = endpoint.Split(':');
+                    addr = ep[0];
+                    port = int.Parse(ep[1]);
+                }
+                else
+                {
+                    addr = endpoint;
+                    port = 0;
+                }
+
+                return new IPEndPoint(IPAddress.Parse(addr), port);
+            }
+            catch (Exception)
+            {
+                throw new FormatException("Error endpoint: " + endpoint);
+            }
+        }
+
+        public void ConnectBlue(string endpoint)
+        {
+            var ep = ParseEndPoint(endpoint);
+            if (ep.Port == 0)
+            {
+                ep.Port = Config.StrategyConfig.BlueStrategyPort;
+            }
+            BlueStrategy = new RPCStrategy(ep);
             BlueTeamInfo = BlueStrategy.GetTeamInfo();
         }
 
-        public void ConnectYellow(int server_port)
+        public void ConnectYellow(string endpoint)
         {
-            YellowStrategy = new RPCStrategy(Config.StrategyConfig.YellowStrategyPort);
+            var ep = ParseEndPoint(endpoint);
+            if (ep.Port == 0)
+            {
+                ep.Port = Config.StrategyConfig.YellowStrategyPort;
+            }
+            YellowStrategy = new RPCStrategy(ep);
             YellowTeamInfo = YellowStrategy.GetTeamInfo();
         }
 
@@ -61,9 +99,9 @@ namespace Simuro5v5.Strategy
     {
         StrategyClient client;
 
-        public RPCStrategy(int server_port)
+        public RPCStrategy(IPEndPoint endpoint)
         {
-            client = new StrategyClient(new System.Net.IPEndPoint(System.Net.IPAddress.Loopback, server_port))
+            client = new StrategyClient(endpoint)
             {
                 Timeout = Config.StrategyConfig.ConnectTimeout,
             };

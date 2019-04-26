@@ -307,10 +307,10 @@ public class PlayMain : MonoBehaviour
         }
     }
 
-    public void LoadStrategy()
+    public void LoadStrategy(string blue_endpoint, string yellow_endpoint)
     {
-        StrategyManager.ConnectBlue(StrategyConfig.BlueStrategyPort);
-        StrategyManager.ConnectYellow(StrategyConfig.YellowStrategyPort);
+        StrategyManager.ConnectBlue(blue_endpoint);
+        StrategyManager.ConnectYellow(yellow_endpoint);
     }
 
     public void RemoveStrategy()

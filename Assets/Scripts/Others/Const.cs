@@ -29,7 +29,7 @@ namespace Simuro5v5
             public readonly static float DragFactor = 50;
             public readonly static float DoubleZeroDragFactor = DragFactor * 8;
             public readonly static float AngularDragFactor = 1300;
-            public readonly static float DoubleZeroAngularDragFactor = AngularDragFactor * 8;
+            public readonly static float DoubleZeroAngularDragFactor = AngularDragFactor * 1;
             public readonly static float Mass = 10;
 
             public readonly static float RL = 7.8670658f;                   // 机器人边长         // 有舍入误差
