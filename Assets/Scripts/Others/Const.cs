@@ -24,13 +24,17 @@ namespace Simuro5v5
 
         public static class Robot
         {
+            public readonly static float Mass = 10;
+
+            // linear
             public readonly static float ForwardForceFactor = 47.5f;
-            public readonly static float TorqueFactor = 300;
             public readonly static float DragFactor = 50;
             public readonly static float DoubleZeroDragFactor = DragFactor * 8;
+
+            // angular
+            public readonly static float TorqueFactor = 300;
             public readonly static float AngularDragFactor = 1300;
             public readonly static float DoubleZeroAngularDragFactor = AngularDragFactor * 1;
-            public readonly static float Mass = 10;
 
             public readonly static float RL = 7.8670658f;                   // 机器人边长         // 有舍入误差
             public readonly static float HRL = 3.9335329f;                  // 机器人半边长       // 有舍入误差
@@ -56,7 +60,7 @@ namespace Simuro5v5
 
         public static class Ball
         {
-            public readonly static float mass = 3;
+            public readonly static float mass = 2;
 
             public readonly static float BL = 5.043424f;                    // 球的直径
             public readonly static float HBL = 2.521712f;                   // 球的半径

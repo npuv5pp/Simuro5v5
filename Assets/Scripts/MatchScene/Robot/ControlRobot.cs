@@ -67,7 +67,6 @@ public class ControlRobot : MonoBehaviour
         rb.AddForce(forward_force + forward_drag);
 
         torque = Vector3.up * (LeftVelocity - RightVelocity) * TorqueFactor;
-        angular_drag = rb.angularVelocity * -AngularDrag;
         if (LeftVelocity == 0 && RightVelocity == 0)
         {
             // 双减速
