@@ -15,8 +15,11 @@ namespace Simuro5v5.Strategy
         public TeamInfo BlueTeamInfo { get; set; }
         public TeamInfo YellowTeamInfo { get; set; }
 
-        public bool IsBlueReady => BlueStrategy != null;
-        public bool IsYellowReady => YellowStrategy != null;
+        //public bool IsBlueReady => BlueStrategy != null;
+        //public bool IsYellowReady => YellowStrategy != null;
+
+        public bool IsBlueReady;
+        public bool IsYellowReady;
 
         public StrategyManagerRPC() { }
 
@@ -56,6 +59,7 @@ namespace Simuro5v5.Strategy
             }
             BlueStrategy = new RPCStrategy(ep);
             BlueTeamInfo = BlueStrategy.GetTeamInfo();
+            IsBlueReady = true;
         }
 
         public void ConnectYellow(string endpoint)
@@ -67,18 +71,21 @@ namespace Simuro5v5.Strategy
             }
             YellowStrategy = new RPCStrategy(ep);
             YellowTeamInfo = YellowStrategy.GetTeamInfo();
+            IsYellowReady = true;
         }
 
         public void CloseBlue()
         {
             BlueStrategy.Close();
             BlueStrategy = null;
+            IsBlueReady = false;
         }
 
         public void CloseYellow()
         {
             YellowStrategy.Close();
             YellowStrategy = null;
+            IsYellowReady = true;
         }
     }
 

@@ -13,6 +13,7 @@ using Simuro5v5.Config;
 using TMPro;
 using Event = Simuro5v5.EventSystem.Event;
 using static Simuro5v5.Strategy.NetStrategy;
+using System;
 
 public class GUI_Play : MonoBehaviour
 {
@@ -103,43 +104,69 @@ public class GUI_Play : MonoBehaviour
         AnimOutGame();
         recorder.Stop();
         recorder.Clear();
-        playMain.StopMatch();
-        playMain.RemoveStrategy();
+
+        try
+        {
+            playMain.StopMatch();
+            playMain.RemoveStrategy();
+        }
+        catch (Exception e)
+        {
+            Debug.LogError(e.Message);
+            Win32Dialog.ShowMessageBox("卸载超时，强制卸载", "Remove Failed");
+        }
     }
 
     public void AnimInGameAndLoadStrategy()
     {
         AnimInGame();
         string blue_ep, yellow_ep;
+        if (blueInputField.text.Trim() == "")
+            blue_ep = "127.0.0.1";
+        else
+            blue_ep = blueInputField.text;
+
+        if (yellowInputField.text.Trim() == "")
+            yellow_ep = "127.0.0.1";
+        else
+            yellow_ep = yellowInputField.text;
+
         try
         {
-            if (blueInputField.text.Trim() == "")
-            {
-                blue_ep = "127.0.0.1";
-            }
-            else
-            {
-                blue_ep = blueInputField.text;
-            }
-            if (yellowInputField.text.Trim() == "")
-            {
-                yellow_ep = "127.0.0.1";
-            }
-            else
-            {
-                yellow_ep = yellowInputField.text;
-            }
-            playMain.LoadStrategy(blue_ep, yellow_ep);
+            playMain.LoadStrategy(Side.Blue, blue_ep);
         }
-        catch (System.TimeoutException e)
+        catch (TimeoutException e)
         {
             Debug.LogError(e.Message);
+            Win32Dialog.ShowMessageBox("蓝方策略连接超时", "Timeout");
             AnimOutGame();
+            return;
         }
-        catch (System.Exception e)
+        catch (Exception e)
         {
             Debug.LogError(e.Message);
+            Win32Dialog.ShowMessageBox("蓝方策略连接失败", "Failed");
             AnimOutGame();
+            return;
+        }
+
+        try
+        {
+            playMain.LoadStrategy(Side.Yellow, yellow_ep);
+        }
+        catch (TimeoutException e)
+        {
+            Debug.LogError(e.Message);
+            Win32Dialog.ShowMessageBox("黄方策略连接超时", "Timeout");
+            AnimOutGame();
+            return;
+        }
+        catch (Exception e)
+        {
+            Debug.LogError(e.Message);
+            Win32Dialog.ShowMessageBox("黄方策略连接失败", "Failed");
+            AnimOutGame();
+            return;
         }
     }
 

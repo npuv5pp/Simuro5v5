@@ -112,6 +112,7 @@ public class PlayMain : MonoBehaviour
                 {
                     // 摆位时状态机不会停止运行，在这里确保不会运行两次摆位函数
                     autoPlaced = true;
+                    InRound = false;
                     PauseForTime(3, delegate ()
                     {
                         AutoPlacement();
@@ -307,10 +308,36 @@ public class PlayMain : MonoBehaviour
         }
     }
 
+    public void LoadStrategy(Side side, string endpoint)
+    {
+        switch (side)
+        {
+            case Side.Blue:
+                StrategyManager.ConnectBlue(endpoint);
+                break;
+            case Side.Yellow:
+                StrategyManager.ConnectYellow(endpoint);
+                break;
+        }
+    }
+
     public void LoadStrategy(string blue_endpoint, string yellow_endpoint)
     {
         StrategyManager.ConnectBlue(blue_endpoint);
         StrategyManager.ConnectYellow(yellow_endpoint);
+    }
+
+    public void RemoveStrategy(Side side)
+    {
+        switch (side)
+        {
+            case Side.Blue:
+                StrategyManager.CloseBlue();
+                break;
+            case Side.Yellow:
+                StrategyManager.CloseYellow();
+                break;
+        }
     }
 
     public void RemoveStrategy()
