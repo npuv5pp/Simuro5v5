@@ -1,6 +1,3 @@
-[submodule "StrategyServer"]
-	path = StrategyServer
-	url = https://github.com/npuv5pp/StrategyServer.git
 [submodule "V5RPC"]
 	path = V5RPC
 	url = https://github.com/npuv5pp/V5RPC
