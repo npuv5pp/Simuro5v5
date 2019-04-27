@@ -79,6 +79,7 @@ namespace Simuro5v5
             GameState = another.GameState;
             WhosBall = another.WhosBall;
             TickMatch = another.TickMatch;
+            TickRound = another.TickRound;
             Score = another.Score;
             ControlState = another.ControlState;
             Referee = another.Referee;

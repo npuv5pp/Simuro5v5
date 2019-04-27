@@ -158,11 +158,12 @@ public class PlayMain : MonoBehaviour
 
         try
         {
-            // 广播信息
-            Event.Send(Event.EventType1.MatchInfoUpdate, GlobalMatchInfo);
-
             // 裁判判断
             JudgeResult judgeResult = GlobalMatchInfo.Referee.Judge(GlobalMatchInfo);
+
+
+            // 广播信息
+            Event.Send(Event.EventType1.MatchInfoUpdate, GlobalMatchInfo);
             if (judgeResult.ResultType != ResultType.NormalMatch)
             {
                 InRound = false;
