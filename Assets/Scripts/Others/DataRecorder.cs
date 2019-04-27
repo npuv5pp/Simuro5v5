@@ -173,7 +173,7 @@ namespace Simuro5v5
         /// </summary>
         public string Serialize()
         {
-            return JsonConvert.SerializeObject(data, Formatting.Indented);
+            return JsonConvert.SerializeObject(data);
         }
     }
 }

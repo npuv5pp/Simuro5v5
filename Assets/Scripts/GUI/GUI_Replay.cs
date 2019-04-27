@@ -7,6 +7,7 @@
 using System;
 using System.Globalization;
 using System.IO;
+using SFB;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
@@ -121,7 +122,6 @@ public class GUI_Replay : MonoBehaviour
     /// <summary>
     /// 渲染一拍的数据到场景中，包括：机器人和球的坐标，数据板
     /// </summary>
-    /// <param name="matchInfo">要渲染的场景信息</param>
     void Render(DataRecorder.RecordData d)
     {
         if (!(d is DataRecorder.RecordData data))
@@ -276,7 +276,7 @@ public class GUI_Replay : MonoBehaviour
 
     public void ExportDataRecord()
     {
-        string path = EditorUtility.SaveFilePanel(
+        string path = StandaloneFileBrowser.SaveFilePanel(
             "Export Data Record",
             "",
             $"match-{DateTime.Now:yyyy-mm-dd hhmmss}.json",
@@ -294,18 +294,19 @@ public class GUI_Replay : MonoBehaviour
 
     public void ImportDataRecord()
     {
-        string path = EditorUtility.OpenFilePanel(
+        string[] path = StandaloneFileBrowser.OpenFilePanel(
             "Import Data Record",
             "",
-            "json");
+            "json",
+            false);
 
         // if open file panel cancelled
-        if (string.IsNullOrEmpty(path))
+        if (path.Length == 0)
         {
             return;
         }
 
-        string json = File.ReadAllText(path);
+        string json = File.ReadAllText(path[0]);
         Recorder = new DataRecorder(json);
         ShowRecord();
     }
