@@ -170,7 +170,7 @@ public class PlayMain : MonoBehaviour
                 GlobalMatchInfo.Referee = new Referee();
 
                 Event.Send(Event.EventType1.RefereeLogUpdate, judgeResult.ToRichText());
-                Event.Send(Event.EventType0.AutoPlacement);
+                Event.Send(Event.EventType1.AutoPlacement, GlobalMatchInfo);
             }
             else
             {
@@ -206,7 +206,7 @@ public class PlayMain : MonoBehaviour
         StrategyManager.YellowStrategy.OnMatchStart();
 
         StartedMatch = true;
-        Event.Send(Event.EventType0.MatchStart);
+        Event.Send(Event.EventType1.MatchStart, GlobalMatchInfo);
     }
 
     public void StopMatch()
@@ -216,7 +216,7 @@ public class PlayMain : MonoBehaviour
 
         StrategyManager.BlueStrategy.OnMatchStop();
         StrategyManager.YellowStrategy.OnMatchStop();
-        Event.Send(Event.EventType0.MatchStop);
+        Event.Send(Event.EventType1.MatchStop, GlobalMatchInfo);
     }
 
     public void StartRound()
@@ -229,7 +229,7 @@ public class PlayMain : MonoBehaviour
 
             StrategyManager.BlueStrategy.OnRoundStart();
             StrategyManager.YellowStrategy.OnRoundStart();
-            Event.Send(Event.EventType0.RoundStart);
+            Event.Send(Event.EventType1.RoundStart, GlobalMatchInfo);
         }
     }
 
@@ -251,11 +251,11 @@ public class PlayMain : MonoBehaviour
             PausedRound = true;
             ObjectManager.Pause();
 
-            Event.Send(Event.EventType0.RoundPause);
+            Event.Send(Event.EventType1.RoundPause, GlobalMatchInfo);
         }
     }
 
-    public void PauseForTime(int sec, TimedPauseCallback callback)
+    private void PauseForTime(int sec, TimedPauseCallback callback)
     {
         if (sec > 0)
         {
@@ -285,7 +285,7 @@ public class PlayMain : MonoBehaviour
         {
             PausedRound = false;
             ObjectManager.Resume();
-            Event.Send(Event.EventType0.RoundResume);
+            Event.Send(Event.EventType1.RoundResume, GlobalMatchInfo);
         }
     }
 
@@ -296,7 +296,7 @@ public class PlayMain : MonoBehaviour
         StrategyManager.BlueStrategy.OnRoundStop();
         StrategyManager.YellowStrategy.OnRoundStop();
         ObjectManager.Pause();
-        Event.Send(Event.EventType0.RoundStop);
+        Event.Send(Event.EventType1.RoundStop, GlobalMatchInfo);
     }
 
     public void AutoPlacement()
@@ -321,10 +321,10 @@ public class PlayMain : MonoBehaviour
         }
     }
 
-    public void LoadStrategy(string blue_endpoint, string yellow_endpoint)
+    public void LoadStrategy(string blueEndpoint, string yellowEndpoint)
     {
-        StrategyManager.ConnectBlue(blue_endpoint);
-        StrategyManager.ConnectYellow(yellow_endpoint);
+        StrategyManager.ConnectBlue(blueEndpoint);
+        StrategyManager.ConnectYellow(yellowEndpoint);
     }
 
     public void RemoveStrategy(Side side)

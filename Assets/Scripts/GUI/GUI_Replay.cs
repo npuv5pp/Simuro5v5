@@ -128,22 +128,13 @@ public class GUI_Replay : MonoBehaviour
         {
             return;
         }
-        switch (data.type)
+
+        if (data.matchInfo != null)
         {
-            case DataRecorder.DataType.InPlaying:
-                {
-                    if (data.matchInfo != null)
-                    {
-                        ObjectManager.RevertScene(data.matchInfo);
-                        //DataBoard.Render(data.matchInfo);
-                    }
-                }
-                break;
-            case DataRecorder.DataType.NewMatch:
-            case DataRecorder.DataType.NewRound:
-            case DataRecorder.DataType.AutoPlacement:
-                break;
+            ObjectManager.RevertScene(data.matchInfo);
+            //DataBoard.Render(data.matchInfo);
         }
+
         StateBoard.Render(data.type);
     }
 
@@ -279,7 +270,7 @@ public class GUI_Replay : MonoBehaviour
         string path = StandaloneFileBrowser.SaveFilePanel(
             "Export Data Record",
             "",
-            $"match-{DateTime.Now:yyyy-mm-dd hhmmss}.json",
+            $"match-{DateTime.Now:yyyy-MM-dd_hhmmss}.json",
             "json");
         
         // if save file panel cancelled

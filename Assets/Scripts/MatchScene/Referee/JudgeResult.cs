@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using UnityEngine;
 using UnityEditor;
 using Simuro5v5;
 
@@ -13,7 +15,9 @@ public enum ResultType
 
 public class JudgeResult
 {
+    [JsonConverter(typeof(StringEnumConverter))]
     public ResultType ResultType { get; set; }
+    [JsonConverter(typeof(StringEnumConverter))]
     public Side Actor { get; set; }
     public string Reason { get; set; }
 

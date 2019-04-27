@@ -69,14 +69,6 @@ namespace Simuro5v5.EventSystem
             PlatformStarted,
             PlatformExiting,
 
-            MatchStart,
-            MatchStop,
-            RoundStart,
-            RoundPause,
-            RoundResume,
-            RoundStop,
-            AutoPlacement,
-
             PlaySceneEntered,
             PlaySceneExited,
         }
@@ -90,6 +82,14 @@ namespace Simuro5v5.EventSystem
             MatchInfoUpdate,            // 更新后的赛场信息
             GetGoal,                       // 进球
             RefereeLogUpdate,                  // 更新比赛状态信息
+
+            MatchStart,
+            MatchStop,
+            RoundStart,
+            RoundPause,
+            RoundResume,
+            RoundStop,
+            AutoPlacement,
 
             StrategyBlueLoaded,         // IStrategy策略实例
             StrategyYellowLoaded,       // IStrategy策略实例

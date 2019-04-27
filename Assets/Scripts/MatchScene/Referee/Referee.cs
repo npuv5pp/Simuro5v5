@@ -24,6 +24,9 @@ public class Referee
     [JsonProperty]
     private int standoffTime;
 
+    [JsonProperty]
+    private JudgeResult lastJudge;
+
     private readonly Square yellowGoalState;
     private readonly Square yellowBigState;
     private readonly Square yellowSmallState;
@@ -40,7 +43,6 @@ public class Referee
         blueGoalState = new Square(110, 125, 20, -20);
         blueBigState = new Square(75, 125, 40, -40);
         blueSmallState = new Square(95, 125, 25, -25);
-
     }
 
     ///<summary>
@@ -54,6 +56,13 @@ public class Referee
         this.goalieBlueId = FindBlueGoalie();
         this.goalieYellowId = FindYellowGoalie();
 
+        var result = CollectJudge();
+        lastJudge = result;
+        return result;
+    }
+
+    private JudgeResult CollectJudge()
+    {
         JudgeResult judgeResult = null;
 
         if (JudgePlace(ref judgeResult))
@@ -61,7 +70,7 @@ public class Referee
 
         if (JudgePenalty(ref judgeResult))
             return judgeResult;
-        
+
         if (JudgeGoalie(ref judgeResult))
             return judgeResult;
 

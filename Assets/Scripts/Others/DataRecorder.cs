@@ -76,9 +76,9 @@ namespace Simuro5v5
             IsRecording = true;
             beginTime = DateTime.Now;
             Event.Register(Event.EventType1.MatchInfoUpdate, RecordMatchInfo);
-            Event.Register(Event.EventType0.MatchStart, RecordNewMatch);
-            Event.Register(Event.EventType0.RoundStart, RecordNewRound);
-            Event.Register(Event.EventType0.AutoPlacement, RecordAutoPlacement);
+            Event.Register(Event.EventType1.MatchStart, RecordNewMatch);
+            Event.Register(Event.EventType1.RoundStart, RecordNewRound);
+            Event.Register(Event.EventType1.AutoPlacement, RecordAutoPlacement);
         }
 
         /// <summary>
@@ -88,9 +88,9 @@ namespace Simuro5v5
         {
             IsRecording = false;
             Event.UnRegister(Event.EventType1.MatchInfoUpdate, RecordMatchInfo);
-            Event.UnRegister(Event.EventType0.MatchStart, RecordNewMatch);
-            Event.UnRegister(Event.EventType0.RoundStart, RecordNewRound);
-            Event.UnRegister(Event.EventType0.AutoPlacement, RecordAutoPlacement);
+            Event.UnRegister(Event.EventType1.MatchStart, RecordNewMatch);
+            Event.UnRegister(Event.EventType1.RoundStart, RecordNewRound);
+            Event.UnRegister(Event.EventType1.AutoPlacement, RecordAutoPlacement);
         }
 
         /// <summary>
@@ -99,34 +99,34 @@ namespace Simuro5v5
         /// <param name="obj"></param>
         private void RecordMatchInfo(object obj)
         {
+            RecordState(DataType.InPlaying, obj);
+        }
+
+        private void RecordNewMatch(object obj)
+        {
+            RecordState(DataType.NewMatch, obj);
+        }
+
+        private void RecordNewRound(object obj)
+        {
+            RecordState(DataType.NewRound, obj);
+        }
+
+        private void RecordAutoPlacement(object obj)
+        {
+            RecordState(DataType.AutoPlacement, obj);
+        }
+
+        private void RecordState(DataType type, object obj)
+        {
             if (obj is MatchInfo matchInfo)
             {
-                data.Add(new RecordData(DataType.InPlaying, new MatchInfo(matchInfo)));
+                data.Add(new RecordData(type, new MatchInfo(matchInfo)));
             }
             else
             {
                 data.Add(null);
             }
-        }
-
-        private void RecordNewMatch()
-        {
-            RecordState(DataType.NewMatch);
-        }
-
-        private void RecordNewRound()
-        {
-            RecordState(DataType.NewRound);
-        }
-
-        private void RecordAutoPlacement()
-        {
-            RecordState(DataType.AutoPlacement);
-        }
-
-        private void RecordState(DataType type)
-        {
-            data.Add(new RecordData(type));
         }
 
         public static DataRecorder PlaceHolder()
@@ -173,7 +173,12 @@ namespace Simuro5v5
         /// </summary>
         public string Serialize()
         {
+            
+#if UNITY_EDITOR
+            return JsonConvert.SerializeObject(data, Formatting.Indented);
+#else
             return JsonConvert.SerializeObject(data);
+#endif
         }
     }
 }
