@@ -46,6 +46,12 @@ namespace Simuro5v5
             }
         }
 
+        private class SerializeObject
+        {
+            public DateTime BeginTime { get; set; }
+            public List<RecordData> Data { get; set; }   
+        }
+
         public string Name => $"{beginTime.Year}/{beginTime.Month}/{beginTime.Day} {beginTime.Hour}:{beginTime.Minute}";
 
         public bool IsRecording { get; private set; }
@@ -65,7 +71,9 @@ namespace Simuro5v5
 
         public DataRecorder(string json)
         {
-            data = JsonConvert.DeserializeObject<List<RecordData>>(json);
+            SerializeObject obj = JsonConvert.DeserializeObject<SerializeObject>(json);
+            beginTime = obj.BeginTime;
+            data = obj.Data;
         }
 
         /// <summary>
@@ -173,9 +181,13 @@ namespace Simuro5v5
         /// </summary>
         public string Serialize()
         {
-            
+            var json = new SerializeObject()
+            {
+                BeginTime = beginTime,
+                Data = data,
+            };
 #if UNITY_EDITOR
-            return JsonConvert.SerializeObject(data, Formatting.Indented);
+            return JsonConvert.SerializeObject(json, Formatting.Indented);
 #else
             return JsonConvert.SerializeObject(data);
 #endif
