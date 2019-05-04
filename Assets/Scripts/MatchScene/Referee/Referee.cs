@@ -25,7 +25,7 @@ public class Referee
     private int standoffTime;
 
     [JsonProperty]
-    private JudgeResult lastJudge;
+    public JudgeResult lastJudge;
 
     private readonly Square yellowGoalState;
     private readonly Square yellowBigState;
@@ -63,7 +63,7 @@ public class Referee
 
     private JudgeResult CollectJudge()
     {
-        JudgeResult judgeResult = null;
+        JudgeResult judgeResult = default;
 
         if (JudgePlace(ref judgeResult))
             return judgeResult;

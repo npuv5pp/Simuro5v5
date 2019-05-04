@@ -15,6 +15,7 @@ using TMPro;
 using Simuro5v5;
 using UnityEditor;
 using UnityEngine.EventSystems;
+using Debug = System.Diagnostics.Debug;
 
 public class GUI_Replay : MonoBehaviour
 {
@@ -24,6 +25,7 @@ public class GUI_Replay : MonoBehaviour
     public TMP_Text DataName;
     public TMP_Dropdown SpeedDropdown;
     public StateBoard StateBoard;
+    public JudgeBoard JudgeBoard;
     public Image PauseButtonImage;
     public Sprite PauseButtonPaused;
     public Sprite PauseButtonNonPaused;
@@ -136,6 +138,8 @@ public class GUI_Replay : MonoBehaviour
         }
 
         StateBoard.Render(data.type);
+        Debug.Assert(data.matchInfo != null, "data.matchInfo != null");
+        JudgeBoard.Render(data.matchInfo.Referee.lastJudge);
     }
 
     /// <summary>

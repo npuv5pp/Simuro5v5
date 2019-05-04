@@ -13,7 +13,7 @@ public enum ResultType
     NormalMatch
 }
 
-public class JudgeResult
+public struct JudgeResult
 {
     [JsonConverter(typeof(StringEnumConverter))]
     public ResultType ResultType { get; set; }
