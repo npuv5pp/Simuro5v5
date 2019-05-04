@@ -257,7 +257,10 @@ namespace Simuro5v5.Strategy
         {
             switch (type)
             {
-                case ResultType.FreeKick:
+                case ResultType.FreeKickRightTop:
+                case ResultType.FreeKickLeftBot:
+                case ResultType.FreeKickRightBot:
+                case ResultType.FreeKickLeftTop:
                     return V5RPC.Proto.JudgeResultEvent.Types.ResultType.FreeKick;
                 case ResultType.GoalKick:
                     return V5RPC.Proto.JudgeResultEvent.Types.ResultType.GoalKick;
