@@ -101,60 +101,161 @@ public class CameraFlow : MonoBehaviour
 
     private bool FindHostByKey()
     {
+        Transform newtarget;
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            target = GameObject.Find("Blue0").transform;
-            return true;
+            newtarget = GameObject.Find("Blue0").transform;
+            if (target != newtarget)
+            {
+                target = newtarget;
+                CameraState = CameraState.LocateObject;
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
         if (Input.GetKeyDown(KeyCode.Alpha2))
         {
-            target = GameObject.Find("Blue1").transform;
-            return true;
+            newtarget = GameObject.Find("Blue1").transform;
+            if (target != newtarget)
+            {
+                target = newtarget;
+                CameraState = CameraState.LocateObject;
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+            
         }
         if (Input.GetKeyDown(KeyCode.Alpha3))
         {
-            target = GameObject.Find("Blue2").transform;
-            return true;
+            newtarget = GameObject.Find("Blue2").transform;
+            if (target != newtarget)
+            {
+                target = newtarget;
+                CameraState = CameraState.LocateObject;
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
         if (Input.GetKeyDown(KeyCode.Alpha4))
         {
-            target = GameObject.Find("Blue3").transform;
-            return true;
+            newtarget = GameObject.Find("Blue3").transform;
+            if (target != newtarget)
+            {
+                target = newtarget;
+                CameraState = CameraState.LocateObject;
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
         if (Input.GetKeyDown(KeyCode.Alpha5))
         {
-            target = GameObject.Find("Blue4").transform;
-            return true;
+            newtarget = GameObject.Find("Blue4").transform;
+            if (target != newtarget)
+            {
+                target = newtarget;
+                CameraState = CameraState.LocateObject;
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
         if (Input.GetKeyDown(KeyCode.Alpha6))
         {
-            target = GameObject.Find("Yellow0").transform;
-            return true;
+            newtarget = GameObject.Find("Yellow0").transform;
+            if (target != newtarget)
+            {
+                target = newtarget;
+                CameraState = CameraState.LocateObject;
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
         if (Input.GetKeyDown(KeyCode.Alpha7))
         {
-            target = GameObject.Find("Yellow1").transform;
-            return true;
+            newtarget = GameObject.Find("Yellow1").transform;
+            if (target != newtarget)
+            {
+                target = newtarget;
+                CameraState = CameraState.LocateObject;
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
         if (Input.GetKeyDown(KeyCode.Alpha8))
         {
-            target = GameObject.Find("Yellow2").transform;
-            return true;
+            newtarget = GameObject.Find("Yellow2").transform;
+            if (target != newtarget)
+            {
+                target = newtarget;
+                CameraState = CameraState.LocateObject;
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
         if (Input.GetKeyDown(KeyCode.Alpha9))
         {
-            target = GameObject.Find("Yellow3").transform;
-            return true;
+            newtarget = GameObject.Find("Yellow3").transform;
+            if (target != newtarget)
+            {
+                target = newtarget;
+                CameraState = CameraState.LocateObject;
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
         if (Input.GetKeyDown(KeyCode.Alpha0))
         {
-            target = GameObject.Find("Yellow4").transform;
-            return true;
+            newtarget = GameObject.Find("Yellow4").transform;
+            if (target != newtarget)
+            {
+                target = newtarget;
+                CameraState = CameraState.LocateObject;
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
         if (Input.GetKeyDown(KeyCode.Minus))
         {
-            target = GameObject.Find("Ball").transform;
-            return true;
+            newtarget = GameObject.Find("Ball").transform;
+            if (target != newtarget)
+            {
+                target = newtarget;
+                CameraState = CameraState.LocateObject;
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
         return false;
     }
