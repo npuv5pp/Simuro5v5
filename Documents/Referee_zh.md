@@ -1,4 +1,4 @@
-#裁判文档
+# 裁判文档
 
 这个平台采用了全新的裁决方式，依靠自动裁判进行判决，并在平台下方输出裁决结果。
 
@@ -43,7 +43,7 @@
 
    当黄方正在进攻时，黄方有四个及以上球员在蓝方大禁区内，平台下方输出为 : `Foul: GoalKick , Bule team is actor . Reason : Attacker have four robots in BigState`
 
-###3.PenaltyKick 罚球
+### 3.PenaltyKick 罚球
 
 有两种情况会判为PenaltyKick 罚球 ：
 1. 防守方有两个及以上球员在小禁区内，进攻方执行罚球动作
@@ -54,11 +54,11 @@
 
    当黄方正在进攻时，蓝方有四个及以上球员在己方大禁区内方式时，平台下方输出为 ： `Foul : PenaltyKick , Yellow team is actor . Reason : Defenders have four robots in BigState` 
 
-###4.FreeKick 争球
+### 4.FreeKick 争球
 
 若球在十秒内静止或者球的速度小于5，裁判会判为争球。裁判把场地以中心分为四块区域：分为左上区域，左下区域，右上区域，右下区域，用于争球点的判断。
 当球在左下区域内超过十秒速度都小于5，平台下方输出为 ： `Foul : FreeKick , Blue team is actor . Reason : LeftBot Standoff time longer than 10 seconds in game`
 
-###5.NormalMtack 正常比赛
+### 5.NormalMtack 正常比赛
 
 若在比赛过程中没有出现以上四种犯规情况，比赛会正常进行，直到出现下一次犯规。

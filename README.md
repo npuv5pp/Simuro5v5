@@ -40,7 +40,7 @@ The export strategy playback data can be imported via the Export/Import button o
 # Automatic Referee
 This platform adopts a new ruling method, relies on automatic referee judgment, and outputs the ruling result below the platform.
 
-For specific documents, please refer to [referee documents] (https://github.com/npuv5pp/Simuro5v5/blob/master/Documents/Referee.md)
+For specific documents, please refer to [referee documents](https://github.com/npuv5pp/Simuro5v5/blob/master/Documents/Referee.md)
 
 # Credits
 
