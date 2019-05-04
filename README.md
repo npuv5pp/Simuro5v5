@@ -29,13 +29,27 @@ During the game, you can use the space bar to pause.
 
 ## Replay
 
-In the game scene, you can call the menu at any time by right-clicking. At any time, you can click on the Replay button to enter the playback scene, from here you can see your most recent game playback.
+In the game scene, you can call the menu at any time by right-clicking or by pressing `ESC`. At any time, you can click on the Replay button to enter the playback scene, where you can see your most recent game playback.
 
-You can control the progress through the keyboard or mouse. The up and down direction keys of the keyboard can adjust the playback speed, the left and right direction keys control the progress, and the space bar pauses or continues. You can also control the playback process by mouse control, click the button, or use the mouse wheel to slide the bottom of the screen to control the playback progress. The mouse wheel slides on the rate drop-down box on the right to adjust the rate.
+You can control replay by keyboard:
 
-The playback lens can be controlled with the following four buttons in conjunction with the mouse.
+| Key       | Function                             |
+|-----------|--------------------------------------|
+| `↑` `↓`   | Adjust playback speed                |
+| `←` `→`   | Control progress                     |
+| `空格`    | Pause or continue                    |
+| `1` ~ `5` | Track the blue side robots No. 1~5   |
+| `6` ~ `0` | Track the yellow side robots No. 1~5 |
+| `-`       | Track the ball                       |
+| `K`       | Forward first person perspective     |
+| `L`       | Backward first person perspective    |
+| `X`       | Switch to top view                   |
 
-The export strategy playback data can be imported via the Export/Import button on the right.
+You can also control the playback process by mouse control, click the button, or use the mouse wheel to slide the bottom of the screen to control the playback progress. The mouse wheel slides on the rate drop-down box on the right to adjust the rate.
+
+The playback lens can be controlled with the four buttons on the left in conjunction with the mouse. In tracking mode, use the right mouse button to rotate the camera, and slide the mouse wheel to zoom.
+
+The strategy playback data can be exported and imported via the Export/Import button on the right.
 
 # Automatic Referee
 This platform adopts a new ruling method, relies on automatic referee judgment, and outputs the ruling result below the platform.
