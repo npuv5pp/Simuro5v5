@@ -39,7 +39,7 @@ namespace Simuro5v5
     /// 4. 比分；
     /// 5. 裁判。
     /// </summary>
-    public class MatchInfo
+    public class MatchInfo : ICloneable
     {
         public Robot[] BlueRobots { get; set; }
         public Robot[] YellowRobots { get; set; }
@@ -73,18 +73,21 @@ namespace Simuro5v5
             UpdateFrom(ball, blue, yellow);
         }
 
-        public MatchInfo(MatchInfo another)
+        public object Clone()
         {
-            Ball = another.Ball;
-            GameState = another.GameState;
-            WhosBall = another.WhosBall;
-            TickMatch = another.TickMatch;
-            TickRound = another.TickRound;
-            Score = another.Score;
-            ControlState = another.ControlState;
-            Referee = another.Referee;
-            BlueRobots = (Robot[])another.BlueRobots.Clone();
-            YellowRobots = (Robot[])another.YellowRobots.Clone();
+            return new MatchInfo()
+            {
+                Ball = Ball,
+                GameState = GameState,
+                WhosBall = WhosBall,
+                TickMatch = TickMatch,
+                TickRound = TickRound,
+                Score = Score,
+                ControlState = ControlState,
+                Referee = (Referee)Referee.Clone(),
+                BlueRobots = (Robot[])BlueRobots.Clone(),
+                YellowRobots = (Robot[])YellowRobots.Clone(),
+            };
         }
 
         public static MatchInfo NewDefaultPreset()
@@ -113,6 +116,7 @@ namespace Simuro5v5
             }
             info.YellowRobots = InitMe(info.YellowRobots, yellowData);
             info.BlueRobots = InitMe(info.BlueRobots, blueData);
+
             return info;
         }
 

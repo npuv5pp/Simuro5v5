@@ -129,7 +129,7 @@ namespace Simuro5v5
         {
             if (obj is MatchInfo matchInfo)
             {
-                data.Add(new RecordData(type, new MatchInfo(matchInfo)));
+                data.Add(new RecordData(type, (MatchInfo)matchInfo.Clone()));
             }
             else
             {

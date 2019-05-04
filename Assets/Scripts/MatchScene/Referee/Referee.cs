@@ -7,7 +7,7 @@ using Simuro5v5;
 using UnityEngine;
 using Event = Simuro5v5.EventSystem.Event;
 
-public class Referee
+public class Referee : ICloneable
 {
     //Class
     private GameObject[] BlueObject => PlayMain.ObjectManager.blueObject;
@@ -18,6 +18,7 @@ public class Referee
 
     private int goalieBlueId;
     private int goalieYellowId;
+
     /// <summary>
     /// 停滞时间
     /// </summary>
@@ -27,23 +28,32 @@ public class Referee
     [JsonProperty]
     public JudgeResult lastJudge;
 
-    private readonly Square yellowGoalState;
-    private readonly Square yellowBigState;
-    private readonly Square yellowSmallState;
-    private readonly Square blueGoalState;
-    private readonly Square blueBigState;
-    private readonly Square blueSmallState;
-
     public Referee()
     {
-        yellowGoalState = new Square(-125, -110, 20, -20);
-        yellowBigState = new Square(-125, -75, 40, -40);
-        yellowSmallState = new Square(-125, -95, 25, -25);
-
-        blueGoalState = new Square(110, 125, 20, -20);
-        blueBigState = new Square(75, 125, 40, -40);
-        blueSmallState = new Square(95, 125, 25, -25);
+        standoffTime = 0;
+        lastJudge = new JudgeResult
+        {
+            Actor = Side.None,
+            ResultType = ResultType.NormalMatch,
+            Reason = "",
+        };
     }
+
+    public object Clone()
+    {
+        return new Referee
+        {
+            standoffTime = standoffTime,
+            lastJudge = lastJudge
+        };
+    }
+
+    private static readonly Square yellowGoalState = new Square(-125, -110, 20, -20);
+    private static readonly Square yellowBigState = new Square(-125, -75, 40, -40);
+    private static readonly Square yellowSmallState = new Square(-125, -95, 25, -25);
+    private static readonly Square blueGoalState = new Square(110, 125, 20, -20);
+    private static readonly Square blueBigState = new Square(75, 125, 40, -40);
+    private static readonly Square blueSmallState = new Square(95, 125, 25, -25);
 
     ///<summary>
     ///判断比赛状态，返回JudgeResult类
