@@ -37,6 +37,11 @@ The playback lens can be controlled with the following four buttons in conjuncti
 
 The export strategy playback data can be imported via the Export/Import button on the right.
 
+#Automatic Referee
+This platform adopts a new ruling method, relies on automatic referee judgment, and outputs the ruling result below the platform.
+
+For specific documents, please refer to [referee documents] (https://github.com/npuv5pp/Simuro5v5/Documents/Referee.md)
+
 # Credits
 
 Copyright (C) Northwestern Polytechnical University V5++ team. all rights reserved.

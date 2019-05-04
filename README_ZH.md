@@ -35,5 +35,11 @@
 
 可以通过右边的Export/Import按钮导入导出策略回放数据。
 
+## 自动裁判
+
+这个平台采用了全新的裁决方式，依靠自动裁判进行判决，并在平台下方输出裁决结果。
+
+具体文档参见[裁判文档](https://github.com/npuv5pp/Simuro5v5/Documents/Referee_zh.md)
+
 ## Credits
 版权所有(C) 西北工业大学V5++团队。保留所有权利。
