@@ -29,7 +29,7 @@ During the game, you can use the space bar to pause.
 
 ## Replay
 
-In the game scene, you can call the menu at any time by right-clicking or by pressing `ESC`. At any time, you can click on the Replay button to enter the playback scene, where you can see your most recent game playback.
+In the game scene, you can call the menu at any time by right-clicking or by pressing `ESC`. At any time, you can click the Replay button to enter the playback scene, where you can see your most recent game playback.
 
 You can control replay by keyboard:
 
@@ -37,7 +37,7 @@ You can control replay by keyboard:
 |-----------|--------------------------------------|
 | `↑` `↓`   | Adjust playback speed                |
 | `←` `→`   | Control progress                     |
-| `空格`    | Pause or continue                    |
+| `SEC`     | Pause or continue                    |
 | `1` ~ `5` | Track the blue side robots No. 1~5   |
 | `6` ~ `0` | Track the yellow side robots No. 1~5 |
 | `-`       | Track the ball                       |
