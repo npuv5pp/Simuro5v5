@@ -161,10 +161,14 @@ public class PlayMain : MonoBehaviour
             {
                 InRound = false;
                 InPlacement = true;
-                GlobalMatchInfo.Referee = new Referee();
 
                 Event.Send(Event.EventType1.RefereeLogUpdate, judgeResult.ToRichText());
                 Event.Send(Event.EventType1.AutoPlacement, GlobalMatchInfo);
+
+                StrategyManager.BlueStrategy.OnJudgeResult(GlobalMatchInfo.Referee.lastJudge);
+                StrategyManager.YellowStrategy.OnJudgeResult(GlobalMatchInfo.Referee.lastJudge);
+
+                GlobalMatchInfo.Referee = new Referee();
             }
             else
             {

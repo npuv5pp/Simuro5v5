@@ -96,6 +96,7 @@ namespace Simuro5v5.Strategy
         void OnMatchStop();
         void OnRoundStart();
         void OnRoundStop();
+        void OnJudgeResult(JudgeResult result);
         WheelInfo GetInstruction(SideInfo sideInfo);
         PlacementInfo GetPlacement(SideInfo sideInfo);
 
@@ -162,6 +163,11 @@ namespace Simuro5v5.Strategy
             client.OnEvent(V5RPC.Proto.EventType.RoundStop, new V5RPC.Proto.EventArguments());
         }
 
+        public void OnJudgeResult(JudgeResult result)
+        {
+            client.OnEvent(V5RPC.Proto.EventType.JudgeResult, new V5RPC.Proto.EventArguments { JudgeResult = result.ToProto() });
+        }
+
         public void Close()
         {
             client.Dispose();
@@ -173,6 +179,19 @@ namespace Simuro5v5.Strategy
     /// </summary>
     public static class ProtoConverter
     {
+        public static Side ToNative(this V5RPC.Proto.JudgeResultEvent.Types.Side side)
+        {
+            switch (side)
+            {
+                case V5RPC.Proto.JudgeResultEvent.Types.Side.Blue:
+                    return Side.Blue;
+                case V5RPC.Proto.JudgeResultEvent.Types.Side.Yellow:
+                    return Side.Yellow;
+                default:
+                    return Side.None;
+            }
+        }
+
         public static Vector2D ToNative(this V5RPC.Proto.Vector2 proto)
         {
             return new Vector2D
@@ -221,6 +240,36 @@ namespace Simuro5v5.Strategy
             };
         }
 
+        public static V5RPC.Proto.JudgeResultEvent.Types.Side ToProto(this Side side)
+        {
+            switch (side)
+            {
+                case Side.Blue:
+                    return V5RPC.Proto.JudgeResultEvent.Types.Side.Blue;
+                case Side.Yellow:
+                    return V5RPC.Proto.JudgeResultEvent.Types.Side.Yellow;
+                default:
+                    return V5RPC.Proto.JudgeResultEvent.Types.Side.Nobody;
+            }
+        }
+
+        public static V5RPC.Proto.JudgeResultEvent.Types.ResultType ToProto(this ResultType type)
+        {
+            switch (type)
+            {
+                case ResultType.FreeKick:
+                    return V5RPC.Proto.JudgeResultEvent.Types.ResultType.FreeKick;
+                case ResultType.GoalKick:
+                    return V5RPC.Proto.JudgeResultEvent.Types.ResultType.GoalKick;
+                case ResultType.PenaltyKick:
+                    return V5RPC.Proto.JudgeResultEvent.Types.ResultType.PenaltyKick;
+                case ResultType.PlaceKick:
+                    return V5RPC.Proto.JudgeResultEvent.Types.ResultType.PlaceKick;
+                default:
+                    return V5RPC.Proto.JudgeResultEvent.Types.ResultType.NormalMatch;
+            }
+        }
+
         public static V5RPC.Proto.Vector2 ToProto(this Vector2D native)
         {
             return new V5RPC.Proto.Vector2 { X = native.x, Y = native.y };
@@ -267,6 +316,16 @@ namespace Simuro5v5.Strategy
             field.TickTotal = native.TickMatch;
             field.TickRound = native.TickRound;
             return field;
+        }
+
+        public static V5RPC.Proto.JudgeResultEvent ToProto(this JudgeResult result)
+        {
+            var rv = new V5RPC.Proto.JudgeResultEvent
+            {
+                Actor = result.Actor.ToProto(),
+                Type = result.ResultType.ToProto()
+            };
+            return rv;
         }
     }
 }
