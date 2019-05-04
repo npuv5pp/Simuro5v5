@@ -659,7 +659,7 @@ MonoBehaviour:
   DataName: {fileID: 1792823752}
   SpeedDropdown: {fileID: 34392340}
   StateBoard: {fileID: 664541622}
-  JudgeBoard: {fileID: 0}
+  JudgeBoard: {fileID: 674955237}
   PauseButtonImage: {fileID: 141750472}
   PauseButtonPaused: {fileID: 21300000, guid: 2ba09217a6c9ec54bae693671d4423de, type: 3}
   PauseButtonNonPaused: {fileID: 21300000, guid: 5509cf62cbb53bf44831613e846657b2,
