@@ -75,12 +75,14 @@ public class PlayMain : MonoBehaviour
         DontDestroyOnLoad(GameObject.Find("/Entity"));
         ConfigManager.ReadConfigFile("config.json");
 
+        StrategyManager = new StrategyManagerRPC();
+        GlobalMatchInfo = MatchInfo.NewDefaultPreset();
         // 绑定物体
         ObjectManager = new ObjectManager();
-        NewMatch();
         ObjectManager.RebindObject();
         ObjectManager.RebindMatchInfo(GlobalMatchInfo);
         Event.Register(Event.EventType0.PlaySceneExited, SceneExited);
+        Event.Register(Event.EventType1.GetGoal, OnGetGoal);
 
         // 等待当前帧渲染完毕后暂停，确保还原后的场景显示到屏幕上
         yield return new WaitForEndOfFrame();
@@ -126,27 +128,18 @@ public class PlayMain : MonoBehaviour
         }
     }
 
-    void NewMatch()
+    void OnGetGoal(object obj)
     {
-        StrategyManager?.CloseBlue();
-        StrategyManager?.CloseYellow();
-
-        StrategyManager = new StrategyManagerRPC();
-        GlobalMatchInfo = MatchInfo.NewDefaultPreset();
-
-        Event.Register(Event.EventType1.GetGoal, delegate (object obj)
+        Side who = (Side)obj;
+        switch (who)
         {
-            Side who = (Side)obj;
-            switch (who)
-            {
-                case Side.Blue:
-                    GlobalMatchInfo.Score.BlueScore++;
-                    break;
-                case Side.Yellow:
-                    GlobalMatchInfo.Score.YellowScore++;
-                    break;
-            }
-        });
+            case Side.Blue:
+                GlobalMatchInfo.Score.BlueScore++;
+                break;
+            case Side.Yellow:
+                GlobalMatchInfo.Score.YellowScore++;
+                break;
+        }
     }
 
     public void InRoundLoop()
@@ -161,9 +154,9 @@ public class PlayMain : MonoBehaviour
             // 裁判判断
             JudgeResult judgeResult = GlobalMatchInfo.Referee.Judge(GlobalMatchInfo);
 
-
             // 广播信息
             Event.Send(Event.EventType1.MatchInfoUpdate, GlobalMatchInfo);
+
             if (judgeResult.ResultType != ResultType.NormalMatch)
             {
                 InRound = false;
