@@ -20,6 +20,11 @@ public class Referee : ICloneable
     private int goalieYellowId;
 
     /// <summary>
+    /// 一场游戏比赛时间 5分钟
+    /// </summary>
+    private int endOfgametime;
+
+    /// <summary>
     /// 停滞时间
     /// </summary>
     [JsonProperty]
@@ -30,6 +35,7 @@ public class Referee : ICloneable
 
     public Referee()
     {
+        endOfgametime = 15000; 
         standoffTime = 0;
         lastJudge = new JudgeResult
         {
@@ -87,6 +93,9 @@ public class Referee : ICloneable
         if (JudgeFree(ref judgeResult))
             return judgeResult;
 
+        if (JudgeEnd(ref judgeResult))
+            return judgeResult;
+
         return new JudgeResult
         {
             ResultType = ResultType.NormalMatch,
@@ -124,6 +133,17 @@ public class Referee : ICloneable
 
     private bool JudgePlace(ref JudgeResult judgeResult)
     {
+        if(matchInfo.TickMatch == 0)
+        {
+            judgeResult = new JudgeResult
+            {
+                Actor = Side.Blue,
+                Reason = "New game start and first PlaceKick",
+                ResultType = ResultType.PlaceKick
+            };
+            return true;
+        }
+
         if (yellowGoalState.InSquare(matchInfo.Ball.pos))
         {
             judgeResult = new JudgeResult
@@ -333,11 +353,12 @@ public class Referee : ICloneable
             standoffTime++;
             if (standoffTime > 500)
             {
+                standoffTime = 0;
                 if (matchInfo.Ball.pos.x > 0 && matchInfo.Ball.pos.y > 0)
                 {
                     judgeResult = new JudgeResult
                     {
-                        ResultType = ResultType.FreeKick,
+                        ResultType = ResultType.FreeKickRightTop,
                         Actor = Side.Blue,
                         Reason = "RightTop Standoff time longer than 10 seconds in game"
                     };
@@ -347,7 +368,7 @@ public class Referee : ICloneable
                 {
                     judgeResult = new JudgeResult
                     {
-                        ResultType = ResultType.FreeKick,
+                        ResultType = ResultType.FreeKickRightBot,
                         Actor = Side.Blue,
                         Reason = "RightBot Standoff time longer than 10 seconds in game"
                     };
@@ -357,7 +378,7 @@ public class Referee : ICloneable
                 {
                     judgeResult = new JudgeResult
                     {
-                        ResultType = ResultType.FreeKick,
+                        ResultType = ResultType.FreeKickLeftTop,
                         Actor = Side.Yellow,
                         Reason = "LeftTop Standoff time longer than 10 seconds in game"
                     };
@@ -367,7 +388,7 @@ public class Referee : ICloneable
                 {
                     judgeResult = new JudgeResult
                     {
-                        ResultType = ResultType.FreeKick,
+                        ResultType = ResultType.FreeKickLeftBot,
                         Actor = Side.Yellow,
                         Reason = "LeftBot Standoff time longer than 10 seconds in game"
                     };
@@ -385,6 +406,24 @@ public class Referee : ICloneable
             return false;
         }
 
+    }
+
+    private bool JudgeEnd(ref JudgeResult judgeResult)
+    {
+        if(matchInfo.TickMatch == endOfgametime)
+        {
+            judgeResult = new JudgeResult
+            {
+                ResultType = ResultType.EndGame,
+                Actor = Side.None,
+                Reason = "Game end"
+            };
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     /// <summary>

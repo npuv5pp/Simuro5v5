@@ -9,8 +9,12 @@ public enum ResultType
     PlaceKick,
     GoalKick,
     PenaltyKick,
-    FreeKick,
-    NormalMatch
+    FreeKickRightTop,
+    FreeKickRightBot,
+    FreeKickLeftTop,
+    FreeKickLeftBot,
+    NormalMatch,
+    EndGame
 }
 
 public struct JudgeResult
