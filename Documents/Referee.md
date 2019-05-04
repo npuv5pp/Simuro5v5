@@ -6,9 +6,9 @@ This platform adopts a new ruling method, relies on automatic referee judgment, 
 
 When a foul situation occurs during the game, three messages are output below the platform:
 
-- Foul Foul situation: Refers to the result of the ruling, which may be PlcaeKick , GoalKick , PenaltyKcik , FreeKick .
-- Action Executor: Refers to the executor of the ruling result. Which next step is the operation, which may be Bule or Yellow.
-- Reason Reason for the foul : `Explain specifically the reasons for the offense or defensive foul.`
+- Foul : Refers to the result of the ruling, which may be PlcaeKick , GoalKick , PenaltyKcik , FreeKick .
+- Action : Refers to the executor of the ruling result. Which next step is the operation, which may be Bule or Yellow.
+- Reason : `Explain specifically the reasons for the offense or defensive foul.`
 
 ## Judgment Result
 
@@ -41,7 +41,7 @@ There are three situations that will be judged as GoalKick goal:
 
 ### 3.PenaltyKick 
 
-There are two situations that will result in PenaltyKick free throws:
+There are two situations that will result in PenaltyKick free throws :
 
 1. The defender has two or more players in the small restricted area, and the offensive player performs the free throw action.
    When Yellow is attacking, when the blue side has two or more players defending in their own restricted area, the output below the platform is :` Foul: PenaltyKick, Yellow team is actor . Reason: Defenders have two robots in SmallState`
