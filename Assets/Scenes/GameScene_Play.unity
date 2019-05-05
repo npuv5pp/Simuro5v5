@@ -2100,7 +2100,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1442525160}
     - target: {fileID: 8483631267726784931, guid: 4cb1dd1410ab7bb40923966c05e52615,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
@@ -2692,7 +2692,6 @@ MonoBehaviour:
   menuMain: {fileID: 292217339}
   menuStrategy: {fileID: 1321613697}
   newMatchButton: {fileID: 186585846}
-  newRoundButton: {fileID: 0}
   resumeButton: {fileID: 1442525160}
   replayButton: {fileID: 289315123}
   loadButton: {fileID: 1922974554}

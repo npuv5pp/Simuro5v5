@@ -157,7 +157,7 @@ public class PlayMain : MonoBehaviour
                     Event.Send(Event.EventType1.AutoPlacement, GlobalMatchInfo);
                     Event.Send(Event.EventType1.RefereeLogUpdate, judgeResult.ToRichText());
                     
-                    //PauseForTime(2, () => { });
+                    PauseForTime(2, () => { });
                 }
 
                 if (GlobalMatchInfo.TickMatch > 0)
@@ -330,8 +330,8 @@ public class PlayMain : MonoBehaviour
         });
         TimedPausing = true;
         yield return new WaitForSecondsRealtime(sec);
-        callback();
         ResumeMatch();
+        callback();
         TimedPausing = false;
     }
 
