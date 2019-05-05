@@ -167,13 +167,13 @@ namespace Simuro5v5.Strategy
     /// </summary>
     public static class ProtoConverter
     {
-        public static Side ToNative(this V5RPC.Proto.JudgeResultEvent.Types.Side side)
+        public static Side ToNative(this V5RPC.Proto.Side side)
         {
             switch (side)
             {
-                case V5RPC.Proto.JudgeResultEvent.Types.Side.Blue:
+                case V5RPC.Proto.Side.Blue:
                     return Side.Blue;
-                case V5RPC.Proto.JudgeResultEvent.Types.Side.Yellow:
+                case V5RPC.Proto.Side.Yellow:
                     return Side.Yellow;
                 default:
                     return Side.Nobody;
@@ -228,16 +228,16 @@ namespace Simuro5v5.Strategy
             };
         }
 
-        public static V5RPC.Proto.JudgeResultEvent.Types.Side ToProto(this Side side)
+        public static V5RPC.Proto.Side ToProto(this Side side)
         {
             switch (side)
             {
                 case Side.Blue:
-                    return V5RPC.Proto.JudgeResultEvent.Types.Side.Blue;
+                    return V5RPC.Proto.Side.Blue;
                 case Side.Yellow:
-                    return V5RPC.Proto.JudgeResultEvent.Types.Side.Yellow;
+                    return V5RPC.Proto.Side.Yellow;
                 default:
-                    return V5RPC.Proto.JudgeResultEvent.Types.Side.Nobody;
+                    return V5RPC.Proto.Side.Nobody;
             }
         }
 
@@ -246,10 +246,13 @@ namespace Simuro5v5.Strategy
             switch (type)
             {
                 case ResultType.FreeKickRightTop:
-                case ResultType.FreeKickLeftBot:
+                    return V5RPC.Proto.JudgeResultEvent.Types.ResultType.FreeKickRightTop;
                 case ResultType.FreeKickRightBot:
+                    return V5RPC.Proto.JudgeResultEvent.Types.ResultType.FreeKickRightBot;
                 case ResultType.FreeKickLeftTop:
-                    return V5RPC.Proto.JudgeResultEvent.Types.ResultType.FreeKick;
+                    return V5RPC.Proto.JudgeResultEvent.Types.ResultType.FreeKickLeftTop;
+                case ResultType.FreeKickLeftBot:
+                    return V5RPC.Proto.JudgeResultEvent.Types.ResultType.FreeKickLeftBot;
                 case ResultType.GoalKick:
                     return V5RPC.Proto.JudgeResultEvent.Types.ResultType.GoalKick;
                 case ResultType.PenaltyKick:
@@ -304,8 +307,7 @@ namespace Simuro5v5.Strategy
                 field.OpponentRobots.Add(native.opp[i].ToProto());
             }
             field.Ball = native.currentBall.ToProto();
-            field.TickTotal = native.TickMatch;
-            field.TickRound = native.TickRound;
+            field.Tick = native.TickMatch;
             return field;
         }
 

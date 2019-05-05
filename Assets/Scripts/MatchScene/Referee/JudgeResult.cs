@@ -6,15 +6,15 @@ using Simuro5v5;
 
 public enum ResultType
 {
+    NormalMatch,
+    EndGame,
     PlaceKick,
     GoalKick,
     PenaltyKick,
     FreeKickRightTop,
     FreeKickRightBot,
     FreeKickLeftTop,
-    FreeKickLeftBot,
-    NormalMatch,
-    EndGame
+    FreeKickLeftBot
 }
 
 public struct JudgeResult
