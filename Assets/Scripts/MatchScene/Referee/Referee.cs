@@ -20,9 +20,35 @@ public class Referee : ICloneable
     private int goalieYellowId;
 
     /// <summary>
-    /// 一场游戏比赛时间 5分钟
+    /// 上下半场游戏比赛时间 5分钟
     /// </summary>
-    private int endOfgametime;
+    private int endOfHalfgametime;
+
+    /// <summary>
+    /// 加时赛游戏比赛时间 3分钟
+    /// </summary>
+    private int endOfOvergametime;
+
+    /// <summary>
+    /// 点球大战中点球方，依次交换顺序
+    /// </summary>
+    private Side penaltySide;
+
+    /// <summary>
+    /// 点球大战中每次罚球点球限制时间 5秒
+    /// </summary>
+    private int penaltyLimitTime;
+
+    /// <summary>
+    /// 点球大战中所执行的时间 
+    /// </summary>
+    private int penaltyTime;
+
+
+    /// <summary>
+    /// 记录点球是否在5次内
+    /// </summary>
+    private int penaltyOfNum;
 
     /// <summary>
     /// 停滞时间
@@ -35,7 +61,12 @@ public class Referee : ICloneable
 
     public Referee()
     {
-        endOfgametime = 15000; 
+        endOfHalfgametime = 15000;
+        endOfOvergametime = 9000;
+        penaltySide = Side.Blue;
+        penaltyLimitTime = 250;
+        penaltyOfNum = 1;
+        penaltyTime = 0;
         standoffTime = 0;
         lastJudge = new JudgeResult
         {
@@ -81,27 +112,53 @@ public class Referee : ICloneable
     {
         JudgeResult judgeResult = default;
 
-        if (JudgePlace(ref judgeResult))
-            return judgeResult;
-
-        if (JudgePenalty(ref judgeResult))
-            return judgeResult;
-
-        if (JudgeGoalie(ref judgeResult))
-            return judgeResult;
-
-        if (JudgeFree(ref judgeResult))
-            return judgeResult;
-
-        if (JudgeEnd(ref judgeResult))
-            return judgeResult;
-
-        return new JudgeResult
+        if (matchInfo.MatchState == MatchState.Penalty)
         {
-            ResultType = ResultType.NormalMatch,
-            Actor = Side.Nobody,
-            Reason = "Normal competition"
-        };
+            if (penaltyTime < penaltyLimitTime)
+            {
+                if (JudgePenaltyGoal(ref judgeResult))
+                    return judgeResult;
+
+                penaltyTime = penaltyTime + 1;
+                return new JudgeResult
+                {
+                    ResultType = ResultType.NormalMatch,
+                    Actor = Side.Nobody,
+                    Reason = "Normal competition"
+                };
+            }
+            else
+            {
+                UpdatePenaltyState(ref judgeResult);
+                return judgeResult;
+            }
+        }
+
+        else
+        {
+            if (JudgePlace(ref judgeResult))
+                return judgeResult;
+
+            if (JudgePenalty(ref judgeResult))
+                return judgeResult;
+
+            if (JudgeGoalie(ref judgeResult))
+                return judgeResult;
+
+            if (JudgeFree(ref judgeResult))
+                return judgeResult;
+
+            if (JudgeEnd(ref judgeResult))
+                return judgeResult;
+
+            return new JudgeResult
+            {
+                ResultType = ResultType.NormalMatch,
+                Actor = Side.Nobody,
+                Reason = "Normal competition"
+            };
+        }
+
     }
 
     private int FindBlueGoalie()
@@ -130,10 +187,94 @@ public class Referee : ICloneable
         }
         return id;
     }
+    private void UpdatePenaltyState(ref JudgeResult judgeResult)
+    {
+        penaltyTime = 0;
+
+        if (penaltySide == Side.Blue)
+        {
+            penaltySide = Side.Yellow;
+            judgeResult = new JudgeResult
+            {
+                ResultType = ResultType.PenaltyKick,
+                Actor = Side.Yellow,
+                Reason = "Over 10 second and turn to yellow penalty"
+            };
+        }
+        else
+        {
+            penaltySide = Side.Blue;
+            penaltyOfNum = penaltyOfNum + 1;
+            judgeResult = new JudgeResult
+            {
+                ResultType = ResultType.PenaltyKick,
+                Actor = Side.Blue,
+                Reason = "Over 10 second and turn to Blue penalty"
+            };
+        }
+
+    }
+    private bool JudgePenaltyGoal(ref JudgeResult judgeResult)
+    {
+        if (yellowGoalState.InSquare(matchInfo.Ball.pos))
+        {
+            if (penaltyOfNum > 5)
+            {
+                judgeResult = new JudgeResult
+                {
+                    ResultType = ResultType.EndGame,
+                    Reason = "In penalty , Blue team win the game",
+                    Actor = Side.Nobody
+                };
+            }
+            else
+            {
+                judgeResult = new JudgeResult
+                {
+                    ResultType = ResultType.PenaltyKick,
+                    Reason = "Blue penalty successfully and turn to yellow penalty",
+                    Actor = Side.Yellow
+                };
+            }
+            penaltyTime = 0;
+            penaltySide = Side.Yellow;
+            Event.Send(Event.EventType1.GetGoal, Side.Blue); //黄方被进球
+            return true;
+        }
+        else if (blueGoalState.InSquare(matchInfo.Ball.pos))
+        {
+            if (penaltyOfNum > 5)
+            {
+                judgeResult = new JudgeResult
+                {
+                    ResultType = ResultType.EndGame,
+                    Reason = "In penalty , Yellow team win the game",
+                    Actor = Side.Nobody
+                };
+            }
+            else
+            {
+                judgeResult = new JudgeResult
+                {
+                    ResultType = ResultType.PenaltyKick,
+                    Reason = "Yellow penalty successfully and trun to Blue penalty",
+                    Actor = Side.Blue
+                };
+            }
+            penaltyTime = 0;
+            penaltySide = Side.Blue;
+            Event.Send(Event.EventType1.GetGoal, Side.Blue); //黄方被进球
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
 
     private bool JudgePlace(ref JudgeResult judgeResult)
     {
-        if(matchInfo.TickMatch == 0)
+        if (matchInfo.TickMatch == 0)
         {
             judgeResult = new JudgeResult
             {
@@ -410,15 +551,50 @@ public class Referee : ICloneable
 
     private bool JudgeEnd(ref JudgeResult judgeResult)
     {
-        if(matchInfo.TickMatch == endOfgametime)
+        if (matchInfo.MatchState == MatchState.FirstHalf)
         {
-            judgeResult = new JudgeResult
+            if (matchInfo.TickMatch == endOfHalfgametime)
             {
-                ResultType = ResultType.EndGame,
-                Actor = Side.Nobody,
-                Reason = "Game end"
-            };
-            return true;
+                matchInfo.MatchState = MatchState.SecondHalf;
+                judgeResult = new JudgeResult
+                {
+                    ResultType = ResultType.EndGame,
+                    Actor = Side.Nobody,
+                    Reason = "FirstHalf Game end"
+                };
+                return true;
+            }
+            else return false;
+        }
+        else if (matchInfo.MatchState == MatchState.SecondHalf)
+        {
+            if (matchInfo.TickMatch == endOfHalfgametime)
+            {
+                matchInfo.MatchState = MatchState.OverTime;
+                judgeResult = new JudgeResult
+                {
+                    ResultType = ResultType.EndGame,
+                    Actor = Side.Nobody,
+                    Reason = "SecondHalf Game end"
+                };
+                return true;
+            }
+            else return false;
+        }
+        else if (matchInfo.MatchState == MatchState.OverTime)
+        {
+            if (matchInfo.TickMatch == endOfOvergametime)
+            {
+                matchInfo.MatchState = MatchState.Penalty;
+                judgeResult = new JudgeResult
+                {
+                    ResultType = ResultType.EndGame,
+                    Actor = Side.Nobody,
+                    Reason = "SecondHalf Game end"
+                };
+                return true;
+            }
+            else return false;
         }
         else
         {
