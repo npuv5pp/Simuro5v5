@@ -65,9 +65,7 @@ namespace Simuro5v5
         /// </summary>
         public int DataLength => data.Count;
 
-        public DataRecorder()
-        {
-        }
+        public DataRecorder() { }
 
         public DataRecorder(string json)
         {
@@ -84,8 +82,8 @@ namespace Simuro5v5
             IsRecording = true;
             beginTime = DateTime.Now;
             Event.Register(Event.EventType1.MatchInfoUpdate, RecordMatchInfo);
-            Event.Register(Event.EventType1.MatchStart, RecordNewMatch);
-            Event.Register(Event.EventType1.RoundStart, RecordNewRound);
+            //Event.Register(Event.EventType1.MatchStart, RecordNewMatch);
+            //Event.Register(Event.EventType1.RoundStart, RecordNewRound);
             Event.Register(Event.EventType1.AutoPlacement, RecordAutoPlacement);
         }
 
@@ -96,8 +94,8 @@ namespace Simuro5v5
         {
             IsRecording = false;
             Event.UnRegister(Event.EventType1.MatchInfoUpdate, RecordMatchInfo);
-            Event.UnRegister(Event.EventType1.MatchStart, RecordNewMatch);
-            Event.UnRegister(Event.EventType1.RoundStart, RecordNewRound);
+            //Event.UnRegister(Event.EventType1.MatchStart, RecordNewMatch);
+            //Event.UnRegister(Event.EventType1.RoundStart, RecordNewRound);
             Event.UnRegister(Event.EventType1.AutoPlacement, RecordAutoPlacement);
         }
 
@@ -110,15 +108,15 @@ namespace Simuro5v5
             RecordState(DataType.InPlaying, obj);
         }
 
-        private void RecordNewMatch(object obj)
-        {
-            RecordState(DataType.NewMatch, obj);
-        }
+        //private void RecordNewMatch(object obj)
+        //{
+        //    RecordState(DataType.NewMatch, obj);
+        //}
 
-        private void RecordNewRound(object obj)
-        {
-            RecordState(DataType.NewRound, obj);
-        }
+        //private void RecordNewRound(object obj)
+        //{
+        //    RecordState(DataType.NewRound, obj);
+        //}
 
         private void RecordAutoPlacement(object obj)
         {

@@ -39,7 +39,7 @@ public class Referee : ICloneable
         standoffTime = 0;
         lastJudge = new JudgeResult
         {
-            Actor = Side.None,
+            Actor = Side.Nobody,
             ResultType = ResultType.NormalMatch,
             Reason = "",
         };
@@ -99,7 +99,7 @@ public class Referee : ICloneable
         return new JudgeResult
         {
             ResultType = ResultType.NormalMatch,
-            Actor = Side.None,
+            Actor = Side.Nobody,
             Reason = "Normal competition"
         };
     }
@@ -415,7 +415,7 @@ public class Referee : ICloneable
             judgeResult = new JudgeResult
             {
                 ResultType = ResultType.EndGame,
-                Actor = Side.None,
+                Actor = Side.Nobody,
                 Reason = "Game end"
             };
             return true;

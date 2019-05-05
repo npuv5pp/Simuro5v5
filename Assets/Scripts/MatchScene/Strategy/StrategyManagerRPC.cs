@@ -94,8 +94,6 @@ namespace Simuro5v5.Strategy
         TeamInfo GetTeamInfo();
         void OnMatchStart();
         void OnMatchStop();
-        void OnRoundStart();
-        void OnRoundStop();
         void OnJudgeResult(JudgeResult result);
         WheelInfo GetInstruction(SideInfo sideInfo);
         PlacementInfo GetPlacement(SideInfo sideInfo);
@@ -153,16 +151,6 @@ namespace Simuro5v5.Strategy
             client.OnEvent(V5RPC.Proto.EventType.MatchStop, new V5RPC.Proto.EventArguments());
         }
 
-        public void OnRoundStart()
-        {
-            client.OnEvent(V5RPC.Proto.EventType.RoundStart, new V5RPC.Proto.EventArguments());
-        }
-
-        public void OnRoundStop()
-        {
-            client.OnEvent(V5RPC.Proto.EventType.RoundStop, new V5RPC.Proto.EventArguments());
-        }
-
         public void OnJudgeResult(JudgeResult result)
         {
             client.OnEvent(V5RPC.Proto.EventType.JudgeResult, new V5RPC.Proto.EventArguments { JudgeResult = result.ToProto() });
@@ -188,7 +176,7 @@ namespace Simuro5v5.Strategy
                 case V5RPC.Proto.JudgeResultEvent.Types.Side.Yellow:
                     return Side.Yellow;
                 default:
-                    return Side.None;
+                    return Side.Nobody;
             }
         }
 

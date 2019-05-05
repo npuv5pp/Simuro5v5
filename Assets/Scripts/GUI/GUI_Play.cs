@@ -33,7 +33,6 @@ public class GUI_Play : MonoBehaviour
 
     // main menu items
     public Button newMatchButton;
-    public Button newRoundButton;
     public Button resumeButton;
     public Button replayButton;
     public Button loadButton;
@@ -178,7 +177,7 @@ public class GUI_Play : MonoBehaviour
     public void CloseMenuAndResume()
     {
         PopMenu();
-        playMain.ResumeRound();
+        playMain.ResumeMatch();
     }
 
     public void PlayMainStartMatch()
@@ -190,11 +189,6 @@ public class GUI_Play : MonoBehaviour
         }
         recorder.Start();
         playMain.StartMatch();
-    }
-
-    public void PlayMainStartRound()
-    {
-        playMain.StartRound();
     }
 
     void Update()
@@ -212,12 +206,9 @@ public class GUI_Play : MonoBehaviour
             }
             else
             {
-                if (!playMain.InPlacement)
-                {
-                    playMain.PauseRound();
-                    PushMenu(menuMain);
-                    resumeButton.Select();
-                }
+                playMain.PauseMatch();
+                PushMenu(menuMain);
+                resumeButton.Select();
             }
         }
         if (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Space))
@@ -225,15 +216,15 @@ public class GUI_Play : MonoBehaviour
             // left clicked, pause
             if (!MenuOpen)
             {
-                if (playMain.StartedMatch && playMain.InRound)
+                if (playMain.Started)
                 {
-                    if (playMain.PausedRound)
+                    if (playMain.Paused)
                     {
-                        playMain.ResumeRound();
+                        playMain.ResumeMatch();
                     }
                     else
                     {
-                        playMain.PauseRound();
+                        playMain.PauseMatch();
                     }
                 }
             }
@@ -278,25 +269,13 @@ public class GUI_Play : MonoBehaviour
         {
             SetStatusInfo("Waiting for strategies");
         }
-        else if (!playMain.StartedMatch)
+        else if (!playMain.Started)
         {
-            SetStatusInfo("Waiting for new game");
+            SetStatusInfo("Waiting for new match");
         }
         else
         {
-            if (playMain.InPlacement)
-            {
-                SetStatusInfo("Auto placement");
-            }
-            else if (playMain.InRound)
-            {
-                // In round
-                SetStatusInfo(playMain.PausedRound ? "Paused round" : "In playing");
-            }
-            else
-            {
-                SetStatusInfo("Waiting for new round");
-            }
+            SetStatusInfo(playMain.Paused ? "Paused round" : "In playing");
         }
     }
 
@@ -304,8 +283,7 @@ public class GUI_Play : MonoBehaviour
     {
         // update buttons' status
         newMatchButton.interactable = playMain.LoadSucceed;
-        newRoundButton.interactable = playMain.StartedMatch;
-        resumeButton.interactable = playMain.InRound && playMain.PausedRound;
+        resumeButton.interactable = playMain.Started && playMain.Paused;
         unloadButton.interactable = playMain.LoadSucceed;
     }
 

@@ -21,7 +21,7 @@ namespace Simuro5v5
     {
         Yellow,
         Blue,
-        None,
+        Nobody,
     };
 
     /// <summary>
@@ -48,18 +48,13 @@ namespace Simuro5v5
         public int TickMatch;
         public int TickRound;
 
-        public GameState GameState;
-        public Side WhosBall;
-
         public MatchScore Score;
-        public ControlState ControlState;
         public Referee Referee;
 
         public MatchInfo()
         {
             BlueRobots = new Robot[Const.RobotsPerTeam];
             YellowRobots = new Robot[Const.RobotsPerTeam];
-            ControlState = ControlState.DefaultState;
             Referee = new Referee();
         }
 
@@ -67,7 +62,6 @@ namespace Simuro5v5
         {
             BlueRobots = new Robot[Const.RobotsPerTeam];
             YellowRobots = new Robot[Const.RobotsPerTeam];
-            ControlState = ControlState.DefaultState;
             Referee = new Referee();
 
             UpdateFrom(ball, blue, yellow);
@@ -78,12 +72,9 @@ namespace Simuro5v5
             return new MatchInfo()
             {
                 Ball = Ball,
-                GameState = GameState,
-                WhosBall = WhosBall,
                 TickMatch = TickMatch,
                 TickRound = TickRound,
                 Score = Score,
-                ControlState = ControlState,
                 Referee = (Referee)Referee.Clone(),
                 BlueRobots = (Robot[])BlueRobots.Clone(),
                 YellowRobots = (Robot[])YellowRobots.Clone(),
@@ -126,10 +117,7 @@ namespace Simuro5v5
             YellowRobots = (Robot[])matchInfo.YellowRobots.Clone();
             Ball = matchInfo.Ball;
             TickMatch = matchInfo.TickMatch;
-            GameState = matchInfo.GameState;
-            WhosBall = matchInfo.WhosBall;
             Score = matchInfo.Score;
-            ControlState = matchInfo.ControlState;
             Referee = matchInfo.Referee;
         }
 
@@ -155,22 +143,11 @@ namespace Simuro5v5
             Ball = newBall;
         }
 
-        public void UpdateState(GameState gameState, Side whosBall)
-        {
-            GameState = gameState;
-            if (gameState != 0)
-            {
-                WhosBall = whosBall;
-            }
-        }
-
         public SideInfo GetSide(Side side)
         {
             SideInfo si = new SideInfo
             {
                 currentBall = Ball,
-                whosBall = (int)WhosBall,
-                gameState = (int)GameState
             };
             Robot[] home = null, opp = null;
             if (side == Side.Blue)
@@ -191,36 +168,6 @@ namespace Simuro5v5
         }
     }
 
-    public struct ControlState
-    {
-        // 比赛已经开始
-        public bool StartedMatch { get; set; }
-        // 回合已经开始
-        public bool InRound { get; set; }
-        // 回合已经暂停
-        public bool PausedRound { get; set; }
-        // 在摆位中
-        public bool InPlacement { get; set; }
-
-        public void Reset()
-        {
-            StartedMatch = false;
-            //LoadSucceed = false;
-            InRound = false;
-            PausedRound = true;
-            InPlacement = false;
-        }
-
-        public static ControlState DefaultState =>
-            new ControlState
-            {
-                StartedMatch = false,
-                InRound = false,
-                PausedRound = true,
-                InPlacement = false,
-            };
-    }
-
     public struct MatchScore
     {
         public int BlueScore;
@@ -234,8 +181,6 @@ namespace Simuro5v5
         public Ball currentBall;
         public int TickMatch;
         public int TickRound;
-        public int gameState;
-        public int whosBall;
 
         public SideInfo() { }
 
@@ -470,5 +415,21 @@ namespace Simuro5v5
     public class TeamInfo
     {
         public string Name { get; set; }
+    }
+
+    public static class Extended
+    {
+        public static Side ToAnother(this Side side)
+        {
+            switch (side)
+            {
+                case Side.Blue:
+                    return Side.Yellow;
+                case Side.Yellow:
+                    return Side.Blue;
+                default:
+                    return Side.Nobody;
+            }
+        }
     }
 }
