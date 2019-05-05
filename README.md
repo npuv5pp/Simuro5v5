@@ -56,6 +56,10 @@ This platform adopts a new ruling method, relies on automatic referee judgment, 
 
 For specific documents, please refer to [referee documents](https://github.com/npuv5pp/Simuro5v5/blob/master/Documents/Referee.md)
 
+# Right attack hypothesis
+
+The platform supports the right-attack hypothesis, which means that no matter which side the strategy is loaded, you can think of yourself as the blue side (on the right side of the venue). The function platform is enabled by default. To close it, modify the `EnableConvertYellowData` field in the config.json file in the root directory of the platform to `false`.
+
 # Credits
 
 Copyright (C) Northwestern Polytechnical University V5++ team. all rights reserved.

@@ -55,5 +55,9 @@
 
 具体文档参见[裁判文档](https://github.com/npuv5pp/Simuro5v5/blob/master/Documents/Referee_zh.md)。
 
+## 右攻假设
+
+平台支持右攻假设，即：无论策略加载到哪一方，都可以认为自己在蓝方（场地右侧）。该功能平台默认开启，如需关闭，修改平台根目录下的config.json文件中`EnableConvertYellowData`字段为`false`。
+
 ## Credits
 版权所有(C) 西北工业大学V5++团队。保留所有权利。
