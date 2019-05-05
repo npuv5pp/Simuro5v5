@@ -8,10 +8,15 @@ using Event = Simuro5v5.EventSystem.Event;
 
 public class PlayMain : MonoBehaviour
 {
-    public bool debugging;
-
-    public bool Paused;
-    public bool Started;
+    /// <summary>
+    /// 在比赛运行的整个时间内为真
+    /// </summary>
+    public bool Started { get; private set; }
+    
+    /// <summary>
+    /// 在比赛暂停时为真
+    /// </summary>
+    public bool Paused { get; private set; }
 
     // 策略已经加载成功
     public bool LoadSucceed => StrategyManager.IsBlueReady && StrategyManager.IsYellowReady;
@@ -142,13 +147,16 @@ public class PlayMain : MonoBehaviour
             else if (judgeResult.ResultType != ResultType.NormalMatch)
             {
                 // 需要摆位
-                Debug.Log("placementing...");
+                Debug.Log("placing...");
 
-                UpdatePlacementToScene(judgeResult.Actor.ToAnother());
-                GlobalMatchInfo.TickMatch++;
+                PauseForTime(3, () =>
+                {
+                    UpdatePlacementToScene(judgeResult.Actor.ToAnother());
+                    GlobalMatchInfo.TickMatch++;
 
-                Event.Send(Event.EventType1.AutoPlacement, GlobalMatchInfo);
-                Event.Send(Event.EventType1.RefereeLogUpdate, judgeResult.ToRichText());
+                    Event.Send(Event.EventType1.AutoPlacement, GlobalMatchInfo);
+                    Event.Send(Event.EventType1.RefereeLogUpdate, judgeResult.ToRichText());
+                });
             }
             else
             {
@@ -295,7 +303,7 @@ public class PlayMain : MonoBehaviour
     {
         if (sec > 0)
         {
-            ObjectManager.Pause();
+            PauseMatch();
             StartCoroutine(_PauseCoroutine(sec, callback));
         }
     }
@@ -312,6 +320,7 @@ public class PlayMain : MonoBehaviour
         TimedPausing = true;
         yield return new WaitForSecondsRealtime(sec);
         callback();
+        ResumeMatch();
         TimedPausing = false;
     }
 
