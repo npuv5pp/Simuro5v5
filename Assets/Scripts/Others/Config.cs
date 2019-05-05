@@ -23,12 +23,6 @@ namespace Simuro5v5.Config
         public static int BlueStrategyPort { get; set; }
         public static int YellowStrategyPort { get; set; }
 
-        public static bool RunStrategyServer { get; set; }
-        public static bool EnableStrategyLog { get; set; }
-        public static string BlueStrategyLogFile { get; set; }
-        public static string YellowStrategyLogFile { get; set; }
-        public static string StrategyServer { get; set; }
-        public static string StrategyServerScript { get; set; }
         public static int ConnectTimeout { get; set; }
         public static bool UseUdp { get; set; }
 
@@ -37,13 +31,6 @@ namespace Simuro5v5.Config
             BlueStrategyPort = 20000;
             YellowStrategyPort = 20001;
 
-            RunStrategyServer = true;
-            EnableStrategyLog = true;
-            BlueStrategyLogFile = @"StrategyServer\BlueStrategy.log";
-            YellowStrategyLogFile = @"StrategyServer\YellowStrategy.log";
-
-            StrategyServer = @"StrategyServer\dist\server\server.exe";
-            StrategyServerScript = @"";
             ConnectTimeout = 3000;
             UseUdp = false;
         }
@@ -56,7 +43,7 @@ namespace Simuro5v5.Config
 
         static GeneralConfig()
         {
-            EnableConvertYellowData = false;
+            EnableConvertYellowData = true;
         }
     }
 
@@ -102,7 +89,7 @@ namespace Simuro5v5.Config
 
         public static void ToFile(string path)
         {
-            using (var filestream = System.IO.File.Create(path))
+            using (var filestream = File.Create(path))
             {
                 var bs = System.Text.Encoding.UTF8.GetBytes(ToJson());
                 filestream.Write(bs, 0, bs.Length);

@@ -12,7 +12,6 @@ using Simuro5v5;
 using Simuro5v5.Config;
 using TMPro;
 using Event = Simuro5v5.EventSystem.Event;
-using static Simuro5v5.Strategy.NetStrategy;
 using System;
 
 public class GUI_Play : MonoBehaviour

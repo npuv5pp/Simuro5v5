@@ -52,9 +52,9 @@ public class PlayMain : MonoBehaviour
 
     IEnumerator Start()
     {
+        ConfigManager.ReadConfigFile("config.json");
         Singleton = gameObject;
         DontDestroyOnLoad(GameObject.Find("/Entity"));
-        ConfigManager.ReadConfigFile("config.json");
 
         StrategyManager = new StrategyManagerRPC();
         GlobalMatchInfo = MatchInfo.NewDefaultPreset();
