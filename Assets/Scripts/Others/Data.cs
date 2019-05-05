@@ -24,21 +24,14 @@ namespace Simuro5v5
         Nobody,
     };
 
-    /// <summary>
-    /// Completely describe the information of a shot, including:
-    /// 1. Information such as the position, angular velocity, and line speed of the object;
-    /// 2. Game progress information;
-    /// 3. Competition time;
-    /// 4. Score;
-    /// 5. Referee.
-    ///
-    /// 完整描述某一拍的信息，包括：
-    /// 1. 物体的位置、角速度、线速度等信息；
-    /// 2. 比赛进程信息；
-    /// 3. 比赛时间；
-    /// 4. 比分；
-    /// 5. 裁判。
-    /// </summary>
+    public enum MatchState
+    {
+        FirstHalf,
+        SecondHalf,
+        OverTime,
+        Penalty
+    }
+
     public class MatchInfo : ICloneable
     {
         public Robot[] BlueRobots { get; set; }
@@ -46,7 +39,8 @@ namespace Simuro5v5
         public Ball Ball;
 
         public int TickMatch;
-        public int TickRound;
+
+        public MatchState MatchState;
 
         public MatchScore Score;
         public Referee Referee;
@@ -73,7 +67,6 @@ namespace Simuro5v5
             {
                 Ball = Ball,
                 TickMatch = TickMatch,
-                TickRound = TickRound,
                 Score = Score,
                 Referee = (Referee)Referee.Clone(),
                 BlueRobots = (Robot[])BlueRobots.Clone(),
@@ -163,7 +156,6 @@ namespace Simuro5v5
                       select new OpponentRobot { pos = rb.pos, rotation = rb.rotation }).ToArray();
             if (side == Side.Yellow) si.ConvertToOtherSide();
             si.TickMatch = TickMatch;
-            si.TickRound = TickRound;
             return si;
         }
     }

@@ -178,7 +178,6 @@ public class PlayMain : MonoBehaviour
         ObjectManager.SetStill();
         GlobalMatchInfo.Score = new MatchScore();
         GlobalMatchInfo.TickMatch = 0;
-        GlobalMatchInfo.TickRound = 0;
         GlobalMatchInfo.Referee = new Referee();
 
         StrategyManager.BlueStrategy.OnMatchStart();
