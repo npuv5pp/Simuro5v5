@@ -149,14 +149,25 @@ public class PlayMain : MonoBehaviour
                 // 需要摆位
                 Debug.Log("placing...");
 
-                PauseForTime(3, () =>
+                void Callback()
                 {
                     UpdatePlacementToScene(judgeResult.Actor.ToAnother());
                     GlobalMatchInfo.TickMatch++;
 
                     Event.Send(Event.EventType1.AutoPlacement, GlobalMatchInfo);
                     Event.Send(Event.EventType1.RefereeLogUpdate, judgeResult.ToRichText());
-                });
+                    
+                    //PauseForTime(2, () => { });
+                }
+
+                if (GlobalMatchInfo.TickMatch > 0)
+                {
+                    PauseForTime(2, Callback);
+                }
+                else
+                {
+                    Callback();
+                }
             }
             else
             {
