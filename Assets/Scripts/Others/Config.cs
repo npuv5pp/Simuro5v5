@@ -56,7 +56,7 @@ namespace Simuro5v5.Config
 
         static GeneralConfig()
         {
-            EnableConvertYellowData = true;
+            EnableConvertYellowData = false;
         }
     }
 
