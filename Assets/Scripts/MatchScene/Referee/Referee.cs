@@ -46,7 +46,7 @@ public class Referee : ICloneable
     /// 点球大战中所执行的时间 
     /// </summary>
     private int penaltyTime;
-    
+
     /// <summary>
     /// 记录点球是否在5次内
     /// </summary>
@@ -70,8 +70,6 @@ public class Referee : ICloneable
         penaltyOfNum = 1;
         penaltyTime = 0;
         standoffTime = 0;
-        blueScore = matchInfo.Score.BlueScore;
-        yellowScore = matchInfo.Score.YellowScore;
         lastJudge = new JudgeResult
         {
             Actor = Side.Nobody,
@@ -102,6 +100,8 @@ public class Referee : ICloneable
     public JudgeResult Judge(MatchInfo matchInfo)
     {
         this.matchInfo = matchInfo;
+        blueScore = matchInfo.Score.BlueScore;
+        yellowScore = matchInfo.Score.YellowScore;
         this.blueRobots = matchInfo.BlueRobots;
         this.yellowRobots = matchInfo.YellowRobots;
         this.goalieBlueId = FindBlueGoalie();
@@ -115,9 +115,9 @@ public class Referee : ICloneable
     private JudgeResult CollectJudge()
     {
         JudgeResult judgeResult = default;
-        
+
         //正常比赛状态：上半场、下半场、加时赛
-        if (matchInfo.MatchState == MatchState.FirstHalf || matchInfo.MatchState == MatchState.SecondHalf 
+        if (matchInfo.MatchState == MatchState.FirstHalf || matchInfo.MatchState == MatchState.SecondHalf
             || matchInfo.MatchState == MatchState.OverTime)
         {
             if (JudgePlace(ref judgeResult))
@@ -721,7 +721,7 @@ public class Referee : ICloneable
                     };
                 }
                 return true;
-            }    
+            }
             else return false;
         }
         else
@@ -748,5 +748,5 @@ public class Referee : ICloneable
             return true;
         }
     }
-    
+
 }

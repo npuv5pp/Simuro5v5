@@ -12,7 +12,7 @@ public class PlayMain : MonoBehaviour
     /// 在比赛运行的整个时间内为真
     /// </summary>
     public bool Started { get; private set; }
-    
+
     /// <summary>
     /// 在比赛暂停时为真
     /// </summary>
@@ -73,7 +73,7 @@ public class PlayMain : MonoBehaviour
     void FixedUpdate()
     {
         timeTick++;
-        
+
         if (timeTick % 2 == 0) // 偶数拍
         {
             return;
@@ -81,7 +81,7 @@ public class PlayMain : MonoBehaviour
 
         ObjectManager.UpdateFromScene();
 
-        
+
         if (LoadSucceed && Started)
         {
             InMatchLoop();
@@ -138,7 +138,7 @@ public class PlayMain : MonoBehaviour
         {
             JudgeResult judgeResult = GlobalMatchInfo.Referee.Judge(GlobalMatchInfo);
 
-            if (judgeResult.ResultType == ResultType.EndGame)
+            if (judgeResult.ResultType == ResultType.GameOver)
             {
                 // 时间到，比赛结束
                 Debug.Log("Game Over");
@@ -156,7 +156,7 @@ public class PlayMain : MonoBehaviour
 
                     Event.Send(Event.EventType1.AutoPlacement, GlobalMatchInfo);
                     Event.Send(Event.EventType1.RefereeLogUpdate, judgeResult.ToRichText());
-                    
+
                     PauseForTime(2, () => { });
                 }
 
@@ -173,11 +173,11 @@ public class PlayMain : MonoBehaviour
             {
                 // 正常比赛
                 UpdateWheelsToScene();
-                GlobalMatchInfo.TickMatch++; 
+                GlobalMatchInfo.TickMatch++;
                 Event.Send(Event.EventType1.MatchInfoUpdate, GlobalMatchInfo);
             }
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             Debug.Log(e.Message);
             StopMatch();
