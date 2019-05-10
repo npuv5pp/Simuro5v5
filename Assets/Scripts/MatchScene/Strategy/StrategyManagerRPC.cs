@@ -261,7 +261,7 @@ namespace Simuro5v5.Strategy
                     return V5RPC.Proto.JudgeResultEvent.Types.ResultType.PlaceKick;
 
                 default:
-                    return V5RPC.Proto.JudgeResultEvent.Types.ResultType.PlaceKick;
+                    throw new ArgumentException($"Error type {type.ToString()}");
             }
         }
 

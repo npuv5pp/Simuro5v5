@@ -272,9 +272,35 @@ public class GUI_Play : MonoBehaviour
         {
             SetStatusInfo("Waiting for new match");
         }
+        else if (playMain.Paused)
+        {
+            SetStatusInfo("Paused round");
+        }
         else
         {
-            SetStatusInfo(playMain.Paused ? "Paused round" : "In playing");
+            switch (playMain.GlobalMatchInfo.MatchState)
+            {
+                case MatchState.FirstHalf:
+                    {
+                        SetStatusInfo("First Half In Playing");
+                        break;
+                    }
+                case MatchState.SecondHalf:
+                    {
+                        SetStatusInfo("First Half In Playing");
+                        break;
+                    }
+                case MatchState.OverTime:
+                    {
+                        SetStatusInfo("Over Time In Playing");
+                        break;
+                    }
+                case MatchState.Penalty:
+                    {
+                        SetStatusInfo("Penalty Shootout In Playing");
+                        break;
+                    }
+            }
         }
     }
 
