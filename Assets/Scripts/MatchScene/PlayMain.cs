@@ -239,7 +239,14 @@ public class PlayMain : MonoBehaviour
     void UpdateWheelsToScene()
     {
         WheelInfo wheelsBlue = StrategyManager.BlueStrategy.GetInstruction(GlobalMatchInfo.GetSide(Side.Blue));
-        WheelInfo wheelsYellow = StrategyManager.YellowStrategy.GetInstruction(GlobalMatchInfo.GetSide(Side.Yellow));
+
+        SideInfo yellow = GlobalMatchInfo.GetSide(Side.Yellow);
+        if (GeneralConfig.EnableConvertYellowData)
+        {
+            yellow.ConvertToOtherSide();
+        }
+        WheelInfo wheelsYellow = StrategyManager.YellowStrategy.GetInstruction(yellow);
+
         wheelsBlue.Normalize();     //轮速规整化
         wheelsYellow.Normalize();   //轮速规整化
 
