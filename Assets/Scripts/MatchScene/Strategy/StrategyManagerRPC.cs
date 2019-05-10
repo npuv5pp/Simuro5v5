@@ -167,13 +167,13 @@ namespace Simuro5v5.Strategy
     /// </summary>
     public static class ProtoConverter
     {
-        public static Side ToNative(this V5RPC.Proto.Side side)
+        public static Side ToNative(this V5RPC.Proto.Team side)
         {
             switch (side)
             {
-                case V5RPC.Proto.Side.Blue:
+                case V5RPC.Proto.Team.Self:
                     return Side.Blue;
-                case V5RPC.Proto.Side.Yellow:
+                case V5RPC.Proto.Team.Opponent:
                     return Side.Yellow;
                 default:
                     return Side.Nobody;
@@ -228,16 +228,16 @@ namespace Simuro5v5.Strategy
             };
         }
 
-        public static V5RPC.Proto.Side ToProto(this Side side)
+        public static V5RPC.Proto.Team ToProto(this Side side)
         {
             switch (side)
             {
                 case Side.Blue:
-                    return V5RPC.Proto.Side.Blue;
+                    return V5RPC.Proto.Team.Self;
                 case Side.Yellow:
-                    return V5RPC.Proto.Side.Yellow;
+                    return V5RPC.Proto.Team.Opponent;
                 default:
-                    return V5RPC.Proto.Side.Nobody;
+                    return V5RPC.Proto.Team.Nobody;
             }
         }
 
@@ -259,8 +259,9 @@ namespace Simuro5v5.Strategy
                     return V5RPC.Proto.JudgeResultEvent.Types.ResultType.PenaltyKick;
                 case ResultType.PlaceKick:
                     return V5RPC.Proto.JudgeResultEvent.Types.ResultType.PlaceKick;
+
                 default:
-                    return V5RPC.Proto.JudgeResultEvent.Types.ResultType.NormalMatch;
+                    return V5RPC.Proto.JudgeResultEvent.Types.ResultType.PlaceKick;
             }
         }
 
@@ -303,7 +304,7 @@ namespace Simuro5v5.Strategy
             var field = new V5RPC.Proto.Field();
             for (int i = 0; i < 5; i++)
             {
-                field.OurRobots.Add(native.home[i].ToProto());
+                field.SelfRobots.Add(native.home[i].ToProto());
                 field.OpponentRobots.Add(native.opp[i].ToProto());
             }
             field.Ball = native.currentBall.ToProto();
@@ -315,7 +316,7 @@ namespace Simuro5v5.Strategy
         {
             var rv = new V5RPC.Proto.JudgeResultEvent
             {
-                Actor = result.Actor.ToProto(),
+                OffensiveTeam = result.Actor.ToProto(),
                 Type = result.ResultType.ToProto()
             };
             return rv;

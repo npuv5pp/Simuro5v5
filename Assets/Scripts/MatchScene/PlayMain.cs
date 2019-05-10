@@ -173,8 +173,7 @@ public class PlayMain : MonoBehaviour
             {
                 // 正常比赛
                 UpdateWheelsToScene();
-                GlobalMatchInfo.TickMatch++;
-
+                GlobalMatchInfo.TickMatch++; 
                 Event.Send(Event.EventType1.MatchInfoUpdate, GlobalMatchInfo);
             }
         }
