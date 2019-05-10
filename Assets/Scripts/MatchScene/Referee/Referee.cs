@@ -19,6 +19,9 @@ public class Referee : ICloneable
     private int goalieBlueId;
     private int goalieYellowId;
 
+    private int blueScore;
+    private int yellowScore;
+
     /// <summary>
     /// 上下半场游戏比赛时间 5分钟
     /// </summary>
@@ -43,8 +46,7 @@ public class Referee : ICloneable
     /// 点球大战中所执行的时间 
     /// </summary>
     private int penaltyTime;
-
-
+    
     /// <summary>
     /// 记录点球是否在5次内
     /// </summary>
@@ -68,6 +70,8 @@ public class Referee : ICloneable
         penaltyOfNum = 1;
         penaltyTime = 0;
         standoffTime = 0;
+        blueScore = matchInfo.Score.BlueScore;
+        yellowScore = matchInfo.Score.YellowScore;
         lastJudge = new JudgeResult
         {
             Actor = Side.Nobody,
@@ -111,30 +115,10 @@ public class Referee : ICloneable
     private JudgeResult CollectJudge()
     {
         JudgeResult judgeResult = default;
-
-        if (matchInfo.MatchState == MatchState.Penalty)
-        {
-            if (penaltyTime < penaltyLimitTime)
-            {
-                if (JudgePenaltyGoal(ref judgeResult))
-                    return judgeResult;
-
-                penaltyTime = penaltyTime + 1;
-                return new JudgeResult
-                {
-                    ResultType = ResultType.NormalMatch,
-                    Actor = Side.Nobody,
-                    Reason = "Normal competition"
-                };
-            }
-            else
-            {
-                UpdatePenaltyState(ref judgeResult);
-                return judgeResult;
-            }
-        }
-
-        else
+        
+        //正常比赛状态：上半场、下半场、加时赛
+        if (matchInfo.MatchState == MatchState.FirstHalf || matchInfo.MatchState == MatchState.SecondHalf 
+            || matchInfo.MatchState == MatchState.OverTime)
         {
             if (JudgePlace(ref judgeResult))
                 return judgeResult;
@@ -148,9 +132,10 @@ public class Referee : ICloneable
             if (JudgeFree(ref judgeResult))
                 return judgeResult;
 
-            if (JudgeEnd(ref judgeResult))
+            //判断上下半场、加时赛结束，如果此时游戏分出胜负，则返回gameover
+            if (JudgeHalfOrGameEnd(ref judgeResult))
                 return judgeResult;
-
+            //默认返回正常比赛
             return new JudgeResult
             {
                 ResultType = ResultType.NormalMatch,
@@ -158,7 +143,39 @@ public class Referee : ICloneable
                 Reason = "Normal competition"
             };
         }
+        //点球大战状态
+        else
+        {
+            //点球限制时间未结束
+            if (penaltyTime < penaltyLimitTime)
+            {
+                if (JudgePenaltyGoal(ref judgeResult))
+                    return judgeResult;
 
+                //未进球，拍数增加
+                penaltyTime = penaltyTime + 1;
+                return new JudgeResult
+                {
+                    ResultType = ResultType.NormalMatch,
+                    Actor = Side.Nobody,
+                    Reason = "Normal competition"
+                };
+            }
+            //点球限制时间结束，更新状态
+            else
+            {
+                //五轮结束，进行结算
+                if (penaltyOfNum == 5 && penaltySide == Side.Yellow)
+                {
+                    JudgeFiveRoundPenalty(ref judgeResult);
+                }
+                else
+                {
+                    UpdatePenaltyState(ref judgeResult);
+                }
+                return judgeResult;
+            }
+        }
     }
 
     private int FindBlueGoalie()
@@ -187,10 +204,45 @@ public class Referee : ICloneable
         }
         return id;
     }
+
+    //第五轮点球，且黄方已经点完，进行判断是否该结束比赛,同时更新数据
+    private void JudgeFiveRoundPenalty(ref JudgeResult judgeResult)
+    {
+        if (blueScore > yellowScore)
+        {
+            judgeResult = new JudgeResult
+            {
+                ResultType = ResultType.GameOver,
+                Reason = "Blue team win the game",
+                Actor = Side.Nobody
+            };
+        }
+        else if (blueScore < yellowScore)
+        {
+            judgeResult = new JudgeResult
+            {
+                ResultType = ResultType.GameOver,
+                Reason = "Yellow team win the game",
+                Actor = Side.Nobody
+            };
+        }
+        else
+        {
+            penaltyTime = 0;
+            penaltySide = Side.Blue;
+            penaltyOfNum = penaltyOfNum + 1;
+            judgeResult = new JudgeResult
+            {
+                ResultType = ResultType.PenaltyKick,
+                Actor = Side.Blue,
+                Reason = "Over 10 second and turn to Blue penalty"
+            };
+        }
+    }
+
     private void UpdatePenaltyState(ref JudgeResult judgeResult)
     {
         penaltyTime = 0;
-
         if (penaltySide == Side.Blue)
         {
             penaltySide = Side.Yellow;
@@ -216,13 +268,15 @@ public class Referee : ICloneable
     }
     private bool JudgePenaltyGoal(ref JudgeResult judgeResult)
     {
+        //若比赛超过五轮后，采用“突然死亡法”，先进球者先获胜 
         if (yellowGoalState.InSquare(matchInfo.Ball.pos))
         {
+            //点球大战超过五轮后，进球直接胜利
             if (penaltyOfNum > 5)
             {
                 judgeResult = new JudgeResult
                 {
-                    ResultType = ResultType.EndGame,
+                    ResultType = ResultType.GameOver,
                     Reason = "In penalty , Blue team win the game",
                     Actor = Side.Nobody
                 };
@@ -243,14 +297,46 @@ public class Referee : ICloneable
         }
         else if (blueGoalState.InSquare(matchInfo.Ball.pos))
         {
+            //点球大战超过五轮后，进球直接胜利
             if (penaltyOfNum > 5)
             {
                 judgeResult = new JudgeResult
                 {
-                    ResultType = ResultType.EndGame,
+                    ResultType = ResultType.GameOver,
                     Reason = "In penalty , Yellow team win the game",
                     Actor = Side.Nobody
                 };
+            }
+            //特殊情况：黄方点球时，且为第五轮点球，进行结算
+            if (penaltyOfNum == 5)
+            {
+                if (blueScore > yellowScore)
+                {
+                    judgeResult = new JudgeResult
+                    {
+                        ResultType = ResultType.GameOver,
+                        Reason = "Blue team win the game",
+                        Actor = Side.Nobody
+                    };
+                }
+                else if (blueScore < yellowScore)
+                {
+                    judgeResult = new JudgeResult
+                    {
+                        ResultType = ResultType.GameOver,
+                        Reason = "Yellow team win the game",
+                        Actor = Side.Nobody
+                    };
+                }
+                else
+                {
+                    judgeResult = new JudgeResult
+                    {
+                        ResultType = ResultType.PenaltyKick,
+                        Reason = "Yellow penalty successfully and trun to Blue penalty",
+                        Actor = Side.Blue
+                    };
+                }
             }
             else
             {
@@ -263,7 +349,7 @@ public class Referee : ICloneable
             }
             penaltyTime = 0;
             penaltySide = Side.Blue;
-            Event.Send(Event.EventType1.GetGoal, Side.Blue); //黄方被进球
+            Event.Send(Event.EventType1.GetGoal, Side.Yellow); //蓝方被进球
             return true;
         }
         else
@@ -274,6 +360,7 @@ public class Referee : ICloneable
 
     private bool JudgePlace(ref JudgeResult judgeResult)
     {
+        //首拍，执行开球
         if (matchInfo.TickMatch == 0)
         {
             judgeResult = new JudgeResult
@@ -284,7 +371,7 @@ public class Referee : ICloneable
             };
             return true;
         }
-
+        //进球
         if (yellowGoalState.InSquare(matchInfo.Ball.pos))
         {
             judgeResult = new JudgeResult
@@ -296,7 +383,6 @@ public class Referee : ICloneable
             Event.Send(Event.EventType1.GetGoal, Side.Blue); //黄方被进球
             return true;
         }
-
         if (blueGoalState.InSquare(matchInfo.Ball.pos))
         {
             judgeResult = new JudgeResult
@@ -308,7 +394,6 @@ public class Referee : ICloneable
             Event.Send(Event.EventType1.GetGoal, Side.Yellow); //蓝方被进球
             return true;
         }
-
         return false;
     }
 
@@ -483,7 +568,6 @@ public class Referee : ICloneable
                 return true;
             }
         }
-
         return false;
 
     }
@@ -549,7 +633,7 @@ public class Referee : ICloneable
 
     }
 
-    private bool JudgeEnd(ref JudgeResult judgeResult)
+    private bool JudgeHalfOrGameEnd(ref JudgeResult judgeResult)
     {
         if (matchInfo.MatchState == MatchState.FirstHalf)
         {
@@ -558,7 +642,7 @@ public class Referee : ICloneable
                 matchInfo.MatchState = MatchState.SecondHalf;
                 judgeResult = new JudgeResult
                 {
-                    ResultType = ResultType.EndGame,
+                    ResultType = ResultType.EndHalf,
                     Actor = Side.Nobody,
                     Reason = "FirstHalf Game end"
                 };
@@ -568,32 +652,76 @@ public class Referee : ICloneable
         }
         else if (matchInfo.MatchState == MatchState.SecondHalf)
         {
+            //下半场结束，判断比分是否结束
             if (matchInfo.TickMatch == endOfHalfgametime)
             {
-                matchInfo.MatchState = MatchState.OverTime;
-                judgeResult = new JudgeResult
+                if (blueScore > yellowScore)
                 {
-                    ResultType = ResultType.EndGame,
-                    Actor = Side.Nobody,
-                    Reason = "SecondHalf Game end"
-                };
+                    judgeResult = new JudgeResult
+                    {
+                        ResultType = ResultType.GameOver,
+                        Reason = "Blue team win the game",
+                        Actor = Side.Nobody
+                    };
+                }
+                else if (blueScore < yellowScore)
+                {
+                    judgeResult = new JudgeResult
+                    {
+                        ResultType = ResultType.GameOver,
+                        Reason = "Yellow team win the game",
+                        Actor = Side.Nobody
+                    };
+                }
+                else
+                {
+                    matchInfo.MatchState = MatchState.OverTime;
+                    judgeResult = new JudgeResult
+                    {
+                        ResultType = ResultType.EndHalf,
+                        Actor = Side.Nobody,
+                        Reason = "SecondHalf Game end and start"
+                    };
+                }
                 return true;
             }
             else return false;
         }
+        //加时赛结束，同样判断比分
         else if (matchInfo.MatchState == MatchState.OverTime)
         {
             if (matchInfo.TickMatch == endOfOvergametime)
             {
-                matchInfo.MatchState = MatchState.Penalty;
-                judgeResult = new JudgeResult
+                if (blueScore > yellowScore)
                 {
-                    ResultType = ResultType.EndGame,
-                    Actor = Side.Nobody,
-                    Reason = "SecondHalf Game end"
-                };
+                    judgeResult = new JudgeResult
+                    {
+                        ResultType = ResultType.GameOver,
+                        Reason = "Game over, Blue team win the game",
+                        Actor = Side.Nobody
+                    };
+                }
+                else if (blueScore < yellowScore)
+                {
+                    judgeResult = new JudgeResult
+                    {
+                        ResultType = ResultType.GameOver,
+                        Reason = "Game over, Yellow team win the game",
+                        Actor = Side.Nobody
+                    };
+                }
+                else
+                {
+                    matchInfo.MatchState = MatchState.Penalty;
+                    judgeResult = new JudgeResult
+                    {
+                        ResultType = ResultType.EndHalf,
+                        Actor = Side.Nobody,
+                        Reason = "Overtime Game end ,and start Penalty game"
+                    };
+                }
                 return true;
-            }
+            }    
             else return false;
         }
         else
@@ -620,6 +748,5 @@ public class Referee : ICloneable
             return true;
         }
     }
-
-
+    
 }

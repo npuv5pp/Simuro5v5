@@ -7,7 +7,8 @@ using Simuro5v5;
 public enum ResultType
 {
     NormalMatch,
-    EndGame,
+    EndHalf,        //半场结束 上半场下半场加时赛结束、接口使拍数变0
+    GameOver,        //游戏结束，用来判断胜负
     PlaceKick,
     GoalKick,
     PenaltyKick,
