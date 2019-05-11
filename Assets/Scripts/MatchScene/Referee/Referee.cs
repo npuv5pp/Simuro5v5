@@ -22,6 +22,10 @@ public class Referee : ICloneable
     private int blueScore;
     private int yellowScore;
 
+    private Vector2D[] BlueRobotsPos;
+    private Vector2D[] YellowRobotsPos;
+    private Vector2D BallPos;
+
     /// <summary>
     /// 上下半场游戏比赛时间 5分钟
     /// </summary>
@@ -46,7 +50,7 @@ public class Referee : ICloneable
     /// 点球大战中所执行的时间 
     /// </summary>
     private int penaltyTime;
-
+    
     /// <summary>
     /// 记录点球是否在5次内
     /// </summary>
@@ -70,6 +74,14 @@ public class Referee : ICloneable
         penaltyOfNum = 1;
         penaltyTime = 0;
         standoffTime = 0;
+        blueScore = matchInfo.Score.BlueScore;
+        yellowScore = matchInfo.Score.YellowScore;
+        for(int i = 0;i<Const.RobotsPerTeam; i++)
+        {
+            BlueRobotsPos[i] = matchInfo.BlueRobots[i].pos;
+            YellowRobotsPos[i] = matchInfo.YellowRobots[i].pos;
+        }
+        BallPos = matchInfo.Ball.pos;
         lastJudge = new JudgeResult
         {
             Actor = Side.Nobody,
@@ -100,8 +112,6 @@ public class Referee : ICloneable
     public JudgeResult Judge(MatchInfo matchInfo)
     {
         this.matchInfo = matchInfo;
-        blueScore = matchInfo.Score.BlueScore;
-        yellowScore = matchInfo.Score.YellowScore;
         this.blueRobots = matchInfo.BlueRobots;
         this.yellowRobots = matchInfo.YellowRobots;
         this.goalieBlueId = FindBlueGoalie();
@@ -115,9 +125,9 @@ public class Referee : ICloneable
     private JudgeResult CollectJudge()
     {
         JudgeResult judgeResult = default;
-
+        
         //正常比赛状态：上半场、下半场、加时赛
-        if (matchInfo.MatchState == MatchState.FirstHalf || matchInfo.MatchState == MatchState.SecondHalf
+        if (matchInfo.MatchState == MatchState.FirstHalf || matchInfo.MatchState == MatchState.SecondHalf 
             || matchInfo.MatchState == MatchState.OverTime)
         {
             if (JudgePlace(ref judgeResult))
@@ -363,13 +373,30 @@ public class Referee : ICloneable
         //首拍，执行开球
         if (matchInfo.TickMatch == 0)
         {
+            string matchState;
+            switch (matchInfo.MatchState)
+            {
+                case MatchState.FirstHalf:
+                    matchState = "First Half";
+                    break;
+                case MatchState.SecondHalf:
+                    matchState = "Secnod Half";
+                    break;
+                case MatchState.OverTime:
+                    matchState = "OverTime";
+                    break;
+                default:
+                    matchState = "";
+                    break;
+            }
             judgeResult = new JudgeResult
             {
                 Actor = Side.Blue,
-                Reason = "New game start and first PlaceKick",
+                Reason = matchState + " start and first PlaceKick",
                 ResultType = ResultType.PlaceKick
             };
             return true;
+            
         }
         //进球
         if (yellowGoalState.InSquare(matchInfo.Ball.pos))
@@ -399,6 +426,17 @@ public class Referee : ICloneable
 
     private bool JudgePenalty(ref JudgeResult judgeResult)
     {
+        //考虑进入点球大战中，且首拍为0.进行点球
+        if(matchInfo.MatchState == MatchState.Penalty && matchInfo.TickMatch == 0)
+        {
+            judgeResult = new JudgeResult
+            {
+                ResultType = ResultType.PenaltyKick,
+                Actor = Side.Blue,
+                Reason = "Penalty start and blue penalty"
+            };
+            return true;
+        }
         if (matchInfo.Ball.pos.x > 0)
         {
             int smallStateNum = 0;
@@ -721,7 +759,7 @@ public class Referee : ICloneable
                     };
                 }
                 return true;
-            }
+            }    
             else return false;
         }
         else
@@ -749,4 +787,50 @@ public class Referee : ICloneable
         }
     }
 
+    //自动摆位判断
+    public void JudgeAutoPlacement(MatchInfo matchInfo, JudgeResult judgeResult)
+    {
+        switch (judgeResult.ResultType)
+        {
+            case ResultType.PenaltyKick:
+                JudgePenaltyPlacement(judgeResult);
+                break;
+        }
+    }
+
+    private void JudgePenaltyPlacement(JudgeResult judgeResult)
+    {
+
+        //蓝方执行点球时相关坐标
+        Vector2D yellowPenaltyBallPos = new Vector2D(-72.5f, 0f);//点球坐标
+        Vector2D yellowPenaltyGoaliePos = new Vector2D(-106f, 0f);//守门员坐标
+        //黄方的安全区域点
+        Vector2D[] yellowPenaltyOfYellowSafePos = new Vector2D[5] { new Vector2D(5f, 6f), new Vector2D(5f, 16f), new Vector2D(5f, 26f), new Vector2D(5f, 26f), new Vector2D(5f, 26f) };
+        //蓝方的安全区域点
+        Vector2D[] yellowPenaltyOfBuleSafePos = new Vector2D[5] { new Vector2D(5f, -6f), new Vector2D(5f, -16f), new Vector2D(5f, -26f), new Vector2D(5f, -26f), new Vector2D(5f, -26f) };
+
+        if (judgeResult.Actor == Side.Blue)
+        {
+            int yellowGoalieId = FindYellowGoalie();
+            //没有守门员，放置守门员点
+            if(yellowGoalieId == -1)
+            {
+                YellowRobotsPos[0] = yellowPenaltyGoaliePos;
+                yellowGoalieId = 0;
+            }
+            else
+            {
+                //如果守门员没有压在球门线，将其压线
+                if(YellowRobotsPos[yellowGoalieId].x >= -106 )
+                {
+                    YellowRobotsPos[yellowGoalieId].x = -106;
+                }
+            }
+            for(int i = 0;i<Const.RobotsPerTeam;i++)
+            {
+                ;
+            }
+        }
+    }
+    
 }

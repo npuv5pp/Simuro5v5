@@ -275,6 +275,12 @@ namespace Simuro5v5
         public float y;
 
         public static Vector2D Zero => new Vector2D();
+        
+        public Vector2D(float x , float y)
+        {
+            this.x = x;
+            this.y = y;
+        }
 
         public Vector3 GetUnityVector3()
         {

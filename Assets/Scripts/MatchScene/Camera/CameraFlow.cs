@@ -20,7 +20,8 @@ public class CameraFlow : MonoBehaviour
     private Camera cam;
     private float angle;
     private Vector3 offset = new Vector3(-50, 50, 0);
-    private float MinLocateMin = 8;
+    private float MinLocate = 8;
+    private float MaxLocate = 100;
 
     void Start()
     {
@@ -338,8 +339,8 @@ public class CameraFlow : MonoBehaviour
 
         float dis = offset.magnitude;
         dis += Input.GetAxis("Mouse ScrollWheel") * -50;
-
-        if ((target.position + offset.normalized * dis).y > MinLocateMin)
+        Vector3 targetPlusOffset = target.position + offset.normalized * dis;
+        if (targetPlusOffset.y > MinLocate && targetPlusOffset.y < MaxLocate)
         {
             offset = offset.normalized * dis;
         }
