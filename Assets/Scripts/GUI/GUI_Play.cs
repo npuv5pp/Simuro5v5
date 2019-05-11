@@ -53,8 +53,8 @@ public class GUI_Play : MonoBehaviour
     public TMP_Text refereeLogText;
     public TMP_Text statusText;
 
-    public TMP_Text blueTeamName;
-    public TMP_Text yellowTeamName;
+    public Text blueTeamName;
+    public Text yellowTeamName;
 
     Stack<GameObject> MenuStack { get; set; }
 
