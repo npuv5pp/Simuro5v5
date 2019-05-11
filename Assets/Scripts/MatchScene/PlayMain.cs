@@ -12,7 +12,7 @@ public class PlayMain : MonoBehaviour
     /// 在比赛运行的整个时间内为真
     /// </summary>
     public bool Started { get; private set; }
-    
+
     /// <summary>
     /// 在比赛暂停时为真
     /// </summary>
@@ -23,7 +23,7 @@ public class PlayMain : MonoBehaviour
 
     int timeTick = 0;       // 时间计时器。每次物理拍加一。FixedUpdate奇数拍运行，偶数拍跳过.
     public static GameObject Singleton;
-    public StrategyManagerRPC StrategyManager { get; private set; }
+    public StrategyManager StrategyManager { get; private set; }
     public MatchInfo GlobalMatchInfo { get; private set; }
     public static ObjectManager ObjectManager { get; private set; }
 
@@ -56,7 +56,7 @@ public class PlayMain : MonoBehaviour
         Singleton = gameObject;
         DontDestroyOnLoad(GameObject.Find("/Entity"));
 
-        StrategyManager = new StrategyManagerRPC();
+        StrategyManager = new StrategyManager();
         GlobalMatchInfo = MatchInfo.NewDefaultPreset();
         // 绑定物体
         ObjectManager = new ObjectManager();
@@ -73,7 +73,7 @@ public class PlayMain : MonoBehaviour
     void FixedUpdate()
     {
         timeTick++;
-        
+
         if (timeTick % 2 == 0) // 偶数拍
         {
             return;
@@ -81,7 +81,7 @@ public class PlayMain : MonoBehaviour
 
         ObjectManager.UpdateFromScene();
 
-        
+
         if (LoadSucceed && Started)
         {
             InMatchLoop();
@@ -128,7 +128,7 @@ public class PlayMain : MonoBehaviour
             {
                 // 正常比赛
                 UpdateWheelsToScene();
-                GlobalMatchInfo.TickMatch++; 
+                GlobalMatchInfo.TickMatch++;
                 Event.Send(Event.EventType1.MatchInfoUpdate, GlobalMatchInfo);
             }
             else
@@ -157,7 +157,7 @@ public class PlayMain : MonoBehaviour
                 }
             }
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             Debug.Log(e.Message);
             StopMatch();
@@ -178,8 +178,8 @@ public class PlayMain : MonoBehaviour
         GlobalMatchInfo.TickMatch = 0;
         GlobalMatchInfo.Referee = new Referee();
 
-        StrategyManager.BlueStrategy.OnMatchStart();
-        StrategyManager.YellowStrategy.OnMatchStart();
+        StrategyManager.Blue.OnMatchStart();
+        StrategyManager.Yellow.OnMatchStart();
 
         Started = true;
         Paused = true;
@@ -193,8 +193,8 @@ public class PlayMain : MonoBehaviour
         Paused = true;
         ObjectManager.Pause();
 
-        StrategyManager.BlueStrategy.OnMatchStop();
-        StrategyManager.YellowStrategy.OnMatchStop();
+        StrategyManager.Blue.OnMatchStop();
+        StrategyManager.Yellow.OnMatchStop();
         Event.Send(Event.EventType1.MatchStop, GlobalMatchInfo);
     }
 
@@ -218,14 +218,14 @@ public class PlayMain : MonoBehaviour
 
     void UpdateWheelsToScene()
     {
-        WheelInfo wheelsBlue = StrategyManager.BlueStrategy.GetInstruction(GlobalMatchInfo.GetSide(Side.Blue));
+        WheelInfo wheelsBlue = StrategyManager.Blue.GetInstruction(GlobalMatchInfo.GetSide(Side.Blue));
 
         SideInfo yellow = GlobalMatchInfo.GetSide(Side.Yellow);
         if (GeneralConfig.EnableConvertYellowData)
         {
             yellow.ConvertToOtherSide();
         }
-        WheelInfo wheelsYellow = StrategyManager.YellowStrategy.GetInstruction(yellow);
+        WheelInfo wheelsYellow = StrategyManager.Yellow.GetInstruction(yellow);
 
         wheelsBlue.Normalize();     //轮速规整化
         wheelsYellow.Normalize();   //轮速规整化
@@ -236,8 +236,8 @@ public class PlayMain : MonoBehaviour
 
     void UpdatePlacementToScene(Side whosball)
     {
-        PlacementInfo blueInfo = StrategyManager.BlueStrategy.GetPlacement(GlobalMatchInfo.GetSide(Side.Blue));
-        PlacementInfo yellowInfo = StrategyManager.YellowStrategy.GetPlacement(GlobalMatchInfo.GetSide(Side.Yellow));
+        PlacementInfo blueInfo = StrategyManager.Blue.GetPlacement(GlobalMatchInfo.GetSide(Side.Blue));
+        PlacementInfo yellowInfo = StrategyManager.Yellow.GetPlacement(GlobalMatchInfo.GetSide(Side.Yellow));
         blueInfo.Normalize();
         yellowInfo.Normalize();
 
@@ -258,23 +258,16 @@ public class PlayMain : MonoBehaviour
         }
     }
 
-    public void LoadStrategy(Side side, string endpoint)
+    public bool LoadStrategy(Side side)
     {
         switch (side)
         {
             case Side.Blue:
-                StrategyManager.ConnectBlue(endpoint);
-                break;
+                return StrategyManager.ConnectBlue();
             case Side.Yellow:
-                StrategyManager.ConnectYellow(endpoint);
-                break;
+                return StrategyManager.ConnectYellow();
         }
-    }
-
-    public void LoadStrategy(string blueEndpoint, string yellowEndpoint)
-    {
-        StrategyManager.ConnectBlue(blueEndpoint);
-        StrategyManager.ConnectYellow(yellowEndpoint);
+        return false;
     }
 
     public void RemoveStrategy(Side side)
@@ -282,18 +275,18 @@ public class PlayMain : MonoBehaviour
         switch (side)
         {
             case Side.Blue:
-                StrategyManager.CloseBlue();
+                StrategyManager.Blue.Close();
                 break;
             case Side.Yellow:
-                StrategyManager.CloseYellow();
+                StrategyManager.Yellow.Close();
                 break;
         }
     }
 
     public void RemoveStrategy()
     {
-        StrategyManager.CloseBlue();
-        StrategyManager.CloseYellow();
+        RemoveStrategy(Side.Blue);
+        RemoveStrategy(Side.Yellow);
     }
 
     private void PauseForTime(int sec, TimedPauseCallback callback)

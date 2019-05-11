@@ -13,6 +13,7 @@ using Simuro5v5.Config;
 using TMPro;
 using Event = Simuro5v5.EventSystem.Event;
 using System;
+using Simuro5v5.Strategy;
 
 public class GUI_Play : MonoBehaviour
 {
@@ -115,6 +116,21 @@ public class GUI_Play : MonoBehaviour
         }
     }
 
+    class StrategyFactory : IStrategyFactory
+    {
+        public string BlueEP { get; set; }
+        public string YellowEP { get; set; }
+        public IStrategy CreateBlue()
+        {
+            return new RPCStrategy(BlueEP);
+        }
+
+        public IStrategy CreateYellow()
+        {
+            return new RPCStrategy(YellowEP);
+        }
+    }
+
     public void AnimInGameAndLoadStrategy()
     {
         AnimInGame();
@@ -129,16 +145,21 @@ public class GUI_Play : MonoBehaviour
         else
             yellow_ep = yellowInputField.text;
 
+        var factory = new StrategyFactory
+        {
+            BlueEP = blue_ep,
+            YellowEP = yellow_ep
+        };
+        playMain.StrategyManager.StrategyFactory = factory;
+
         try
         {
-            playMain.LoadStrategy(Side.Blue, blue_ep);
-        }
-        catch (TimeoutException e)
-        {
-            Debug.LogError(e.Message);
-            Win32Dialog.ShowMessageBox("蓝方策略连接超时", "Timeout");
-            AnimOutGame();
-            return;
+            if (!playMain.LoadStrategy(Side.Blue))
+            {
+                Win32Dialog.ShowMessageBox("蓝方策略连接超时", "Timeout");
+                AnimOutGame();
+                return;
+            }
         }
         catch (Exception e)
         {
@@ -150,14 +171,12 @@ public class GUI_Play : MonoBehaviour
 
         try
         {
-            playMain.LoadStrategy(Side.Yellow, yellow_ep);
-        }
-        catch (TimeoutException e)
-        {
-            Debug.LogError(e.Message);
-            Win32Dialog.ShowMessageBox("黄方策略连接超时", "Timeout");
-            AnimOutGame();
-            return;
+            if (!playMain.LoadStrategy(Side.Yellow))
+            {
+                Win32Dialog.ShowMessageBox("黄方策略连接超时", "Timeout");
+                AnimOutGame();
+                return;
+            }
         }
         catch (Exception e)
         {
@@ -257,8 +276,8 @@ public class GUI_Play : MonoBehaviour
         }
         else
         {
-            SetBlueTeamname(playMain.StrategyManager.BlueTeamInfo.Name);
-            SetYellowTeamname(playMain.StrategyManager.YellowTeamInfo.Name);
+            SetBlueTeamname(playMain.StrategyManager.Blue.GetTeamInfo().Name);
+            SetYellowTeamname(playMain.StrategyManager.Yellow.GetTeamInfo().Name);
         }
     }
 
@@ -394,7 +413,7 @@ public class GUI_Play : MonoBehaviour
 
     void SetRefereeInfo(object obj)
     {
-        var info = (string) obj;
+        var info = (string)obj;
         SetRefereeInfo(info);
     }
 
