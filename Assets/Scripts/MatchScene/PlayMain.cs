@@ -12,7 +12,7 @@ public class PlayMain : MonoBehaviour
     /// 在比赛运行的整个时间内为真
     /// </summary>
     public bool Started { get; private set; }
-
+    
     /// <summary>
     /// 在比赛暂停时为真
     /// </summary>
@@ -73,7 +73,7 @@ public class PlayMain : MonoBehaviour
     void FixedUpdate()
     {
         timeTick++;
-
+        
         if (timeTick % 2 == 0) // 偶数拍
         {
             return;
@@ -81,39 +81,11 @@ public class PlayMain : MonoBehaviour
 
         ObjectManager.UpdateFromScene();
 
-
+        
         if (LoadSucceed && Started)
         {
             InMatchLoop();
         }
-
-        //if (LoadSucceed && StartedMatch)
-        //{
-        //    if (InRound)
-        //    {
-        //        // 回合进行中
-        //        InRoundLoop();
-        //    }
-        //    else if (InPlacement)
-        //    {
-        //        // 回合结束
-        //        // 自动摆位
-        //        if (!autoPlaced)
-        //        {
-        //            // 摆位时状态机不会停止运行，在这里确保不会运行两次摆位函数
-        //            autoPlaced = true;
-        //            InRound = false;
-        //            PauseForTime(3, delegate ()
-        //            {
-        //                AutoPlacement();
-        //                GlobalMatchInfo.TickMatch++;
-        //                InPlacement = false;
-        //                autoPlaced = false;
-        //                StartRound();
-        //            });
-        //        }
-        //    }
-        //}
     }
 
     void OnGetGoal(object obj)
@@ -142,9 +114,24 @@ public class PlayMain : MonoBehaviour
             {
                 // 时间到，比赛结束
                 Debug.Log("Game Over");
+                Event.Send(Event.EventType1.RefereeLogUpdate, judgeResult.ToRichText());
                 StopMatch();
             }
-            else if (judgeResult.ResultType != ResultType.NormalMatch)
+            else if (judgeResult.ResultType == ResultType.EndHalf)
+            {
+                // 半场结束
+                Debug.Log("End half");
+                GlobalMatchInfo.TickMatch = 0;
+                Event.Send(Event.EventType1.RefereeLogUpdate, judgeResult.ToRichText());
+            }
+            else if (judgeResult.ResultType == ResultType.NormalMatch)
+            {
+                // 正常比赛
+                UpdateWheelsToScene();
+                GlobalMatchInfo.TickMatch++; 
+                Event.Send(Event.EventType1.MatchInfoUpdate, GlobalMatchInfo);
+            }
+            else
             {
                 // 需要摆位
                 Debug.Log("placing...");
@@ -156,7 +143,7 @@ public class PlayMain : MonoBehaviour
 
                     Event.Send(Event.EventType1.AutoPlacement, GlobalMatchInfo);
                     Event.Send(Event.EventType1.RefereeLogUpdate, judgeResult.ToRichText());
-
+                    
                     PauseForTime(2, () => { });
                 }
 
@@ -169,15 +156,8 @@ public class PlayMain : MonoBehaviour
                     Callback();
                 }
             }
-            else
-            {
-                // 正常比赛
-                UpdateWheelsToScene();
-                GlobalMatchInfo.TickMatch++;
-                Event.Send(Event.EventType1.MatchInfoUpdate, GlobalMatchInfo);
-            }
         }
-        catch (Exception e)
+        catch(Exception e)
         {
             Debug.Log(e.Message);
             StopMatch();

@@ -287,7 +287,7 @@ public class GUI_Play : MonoBehaviour
                     }
                 case MatchState.SecondHalf:
                     {
-                        SetStatusInfo("First Half In Playing");
+                        SetStatusInfo("Second Half In Playing");
                         break;
                     }
                 case MatchState.OverTime:
