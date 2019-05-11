@@ -29,6 +29,7 @@ public class GUI_Replay : MonoBehaviour
     public Image PauseButtonImage;
     public Sprite PauseButtonPaused;
     public Sprite PauseButtonNonPaused;
+    public TextMeshProUGUI tickText;
 
     public static DataRecorder Recorder { get; set; }
     private ObjectManager ObjectManager { get; set; }
@@ -140,6 +141,7 @@ public class GUI_Replay : MonoBehaviour
         StateBoard.Render(data.type);
         Debug.Assert(data.matchInfo != null, "data.matchInfo != null");
         JudgeBoard.Render(data.matchInfo.Referee.lastJudge);
+        tickText.text = $"{data.matchInfo.TickMatch}/{GUI_Replay.Recorder.DataLength}";
     }
 
     /// <summary>
@@ -262,11 +264,11 @@ public class GUI_Replay : MonoBehaviour
     /// <summary>
     /// 鼠标在速度滑动条上滑动事件。
     /// </summary>
-    /// <param name="_data"></param>
-    public void OnSpeedScrolled(BaseEventData _data)
+    /// <param name="data"></param>
+    public void OnSpeedScrolled(BaseEventData data)
     {
-        var data = _data as PointerEventData;
-        SpeedDropdown.value -= (int)data.scrollDelta.y;
+        var pointerEventData = (PointerEventData)data;
+        SpeedDropdown.value -= (int)pointerEventData.scrollDelta.y;
     }
 
     public void ExportDataRecord()

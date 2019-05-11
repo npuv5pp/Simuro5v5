@@ -141,12 +141,12 @@ public class PlayMain : MonoBehaviour
                     UpdatePlacementToScene(judgeResult.Actor.ToAnother());
                     GlobalMatchInfo.TickMatch++;
 
-                    Event.Send(Event.EventType1.AutoPlacement, GlobalMatchInfo);
-                    Event.Send(Event.EventType1.RefereeLogUpdate, judgeResult.ToRichText());
-                    
                     PauseForTime(2, () => { });
                 }
 
+                Event.Send(Event.EventType1.AutoPlacement, GlobalMatchInfo);
+                Event.Send(Event.EventType1.RefereeLogUpdate, judgeResult.ToRichText());
+                    
                 if (GlobalMatchInfo.TickMatch > 0)
                 {
                     PauseForTime(2, Callback);
