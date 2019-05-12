@@ -25,6 +25,10 @@ public class Referee : ICloneable
 
     private Vector2D[] BlueRobotsPos;
     private Vector2D[] YellowRobotsPos;
+
+    private Vector2D[] OffensiveRobotsPos;
+    private Vector2D[] DefenderRobotsPos;
+
     private Vector2D BallPos;
 
     /// <summary>
@@ -68,19 +72,18 @@ public class Referee : ICloneable
 
     public Referee()
     {
-        endOfHalfgametime = 15000;
+        endOfHalfgametime = 150000;
         endOfOvergametime = 9000;
         penaltySide = Side.Blue;
         penaltyLimitTime = 250;
-        penaltyOfNum = 1;
         penaltyTime = 0;
         standoffTime = 0;
 
         BlueRobotsPos = new Vector2D[Const.RobotsPerTeam];
         YellowRobotsPos = new Vector2D[Const.RobotsPerTeam];
+        OffensiveRobotsPos = new Vector2D[Const.RobotsPerTeam];
+        DefenderRobotsPos = new Vector2D[Const.RobotsPerTeam];
 
-        ObjectManager.FindObjects(out BlueObject, out YellowObject, out BallObject);
-        
         lastJudge = new JudgeResult
         {
             Actor = Side.Nobody,
@@ -98,6 +101,8 @@ public class Referee : ICloneable
         };
     }
 
+    private UprightRectangle defenderHalfState;
+    private UprightRectangle offensiveHalfState;
     private static readonly UprightRectangle yellowHalfState = new UprightRectangle(-110, 0, 90, -90);
     private static readonly UprightRectangle yellowGoalState = new UprightRectangle(-125, -110, 20, -20);
     private static readonly UprightRectangle yellowBigState = new UprightRectangle(-125, -75, 40, -40);
@@ -106,7 +111,7 @@ public class Referee : ICloneable
     private static readonly UprightRectangle blueGoalState = new UprightRectangle(110, 125, 20, -20);
     private static readonly UprightRectangle blueBigState = new UprightRectangle(75, 125, 40, -40);
     private static readonly UprightRectangle blueSmallState = new UprightRectangle(95, 125, 25, -25);
-
+    private static readonly UprightRectangle stadiumState = new UprightRectangle(-110, 110, 90, -90);
     ///<summary>
     ///判断比赛状态，返回JudgeResult类
     /// </summary>
@@ -160,8 +165,17 @@ public class Referee : ICloneable
         //点球大战状态
         else
         {
-            //点球限制时间未结束
-            if (penaltyTime < penaltyLimitTime)
+            if (matchInfo.TickMatch == 0)
+            {
+                return new JudgeResult
+                {
+                    ResultType = ResultType.PenaltyKick,
+                    Actor = Side.Blue,
+                    Reason = "Penalty competition start , Blue first"
+                };
+            }
+                //点球限制时间未结束
+                if (penaltyTime < penaltyLimitTime)
             {
                 if (JudgePenaltyGoal(ref judgeResult))
                     return judgeResult;
@@ -217,7 +231,7 @@ public class Referee : ICloneable
         }
         return id;
     }
-    
+
 
     //第五轮点球，且黄方已经点完，进行判断是否该结束比赛,同时更新数据
     private void JudgeFiveRoundPenalty(ref JudgeResult judgeResult)
@@ -828,194 +842,243 @@ public class Referee : ICloneable
 
     private void JudgePenaltyPlacement(MatchInfo matchInfo, JudgeResult judgeResult)
     {
-
-        //蓝方执行点球时相关坐标
-        Vector2D bluePenaltyBallPos = new Vector2D(-72.5f, 0f);//点球坐标
-        Vector2D bluePenaltyYellowTeamGoaliePos = new Vector2D(-106f, 0f);//守门员坐标
-        //黄方的安全区域点
-        SafePos[] bluePenaltyOfYellowSafePos = new SafePos[5] { new SafePos(new Vector2D(5f, 6f)), new SafePos(new Vector2D(5f, 16f))
-            , new SafePos(new Vector2D(5f, 26f)), new SafePos(new Vector2D(5f, 36f)), new SafePos(new Vector2D(5f, 46f)) };
+        Vector2D PenaltyBallPos;//点球坐标
+        Vector2D PenaltyDefenderGoaliePos;//守门员坐标
+                                          //黄方的安全区域点
+        SafePos[] PenaltyDefenderSafePos;
 
         //蓝方的安全区域点
-        SafePos[] bluePenaltyOfBlueSafePos = new SafePos[5] { new SafePos(new Vector2D(5f, -6f)), new SafePos(new Vector2D(5f, -16f))
-            , new SafePos(new Vector2D(5f, -26f)), new SafePos(new Vector2D(5f, -36f)), new SafePos(new Vector2D(5f, -46f)) };
-        
-
-        //黄方执行点球时相关坐标
-        Vector2D yellowPenaltyBallPos = new Vector2D(72.5f, 0f);//点球坐标
-        Vector2D yellowPenaltyBlueTeamGoaliePos = new Vector2D(106f, 0f);//守门员坐标
-        //黄方的安全区域点
-        SafePos[] yellowPenaltyOfYellowSafePos = new SafePos[5] { new SafePos(new Vector2D(-5f, -6f)), new SafePos(new Vector2D(-5f, -16f))
-            , new SafePos(new Vector2D(5f, 26f)), new SafePos(new Vector2D(-5f, -36f)), new SafePos(new Vector2D(-5f, -46f)) };
-
-        //蓝方的安全区域点
-        SafePos[] yellowPenaltyOfBlueSafePos = new SafePos[5] { new SafePos(new Vector2D(-5f, 6f)), new SafePos(new Vector2D(-5f, 16f))
-            , new SafePos(new Vector2D(-5f, 26f)), new SafePos(new Vector2D(-5f, 36f)), new SafePos(new Vector2D(-5f, 46f)) };
-       
+        SafePos[] PenaltyOffensiveSafePos;
+        int GoalieId = FindGoalie(Side.Blue);
         if (judgeResult.Actor == Side.Blue)
         {
-            //判断是否对安全区有重叠
-            JudgeSatePosOverlap(bluePenaltyOfBlueSafePos, bluePenaltyOfYellowSafePos);
-            BallPos = bluePenaltyBallPos;
-            int yellowGoalieId = FindGoalie(Side.Yellow);
-            //没有守门员，放置守门员点
-            if (yellowGoalieId == -1)
-            {
-                YellowRobotsPos[0] = bluePenaltyYellowTeamGoaliePos;
-                yellowGoalieId = 0;
-            }
-            else
-            {
-                //如果守门员没有压在球门线，将其压线
-                if (YellowRobotsPos[yellowGoalieId].x >= -106)
-                {
-                    YellowRobotsPos[yellowGoalieId].x = -106;
-                }
-            }
-            //先对黄方进行检测
-            for (int i = 0; i < Const.RobotsPerTeam; i++)
-            {
-                if (i == yellowGoalieId)
-                {
-                    continue;
-                }
-                else
-                {
-                    //如果位置在黄方半场内，规范化位置
-                    if (yellowHalfState.PointIn(YellowRobotsPos[i]))
-                    {
-                        for(int j = 0; j<Const.RobotsPerTeam;j++)
-                        {
-                            if(!bluePenaltyOfYellowSafePos[j].occupy)
-                            {
-                                YellowRobotsPos[i] = bluePenaltyOfYellowSafePos[j].safePos;
-                                bluePenaltyOfYellowSafePos[j].occupy = true;
-                            }
-                        }
-                    }
-                }
-            }
-            //再对蓝方进行检测
-            for (int i = 0; i < Const.RobotsPerTeam; i++)
-            {
-                if (yellowHalfState.PointIn(BlueRobotsPos[i]))
-                {
-                    for (int j = 0; j < Const.RobotsPerTeam; j++)
-                    {
-                        if (!bluePenaltyOfBlueSafePos[j].occupy)
-                        {
-                            BlueRobotsPos[i] = bluePenaltyOfBlueSafePos[j].safePos;
-                            bluePenaltyOfBlueSafePos[j].occupy = true;
-                        }
-                    }
-                }
-            }
+            //蓝方执行点球时相关坐标
+            PenaltyBallPos = new Vector2D(-72.5f, 0f);//点球坐标
+            PenaltyDefenderGoaliePos = new Vector2D(-106f, 0f);//守门员坐标
+                                                               //黄方的安全区域点
+            PenaltyDefenderSafePos = new SafePos[5] { new SafePos(new Vector2D(5f, 6f)), new SafePos(new Vector2D(5f, 16f))
+            , new SafePos(new Vector2D(5f, 26f)), new SafePos(new Vector2D(5f, 36f)), new SafePos(new Vector2D(5f, 46f)) };
+
+            //蓝方的安全区域点
+            PenaltyOffensiveSafePos = new SafePos[5] { new SafePos(new Vector2D(5f, -6f)), new SafePos(new Vector2D(5f, -16f))
+            , new SafePos(new Vector2D(5f, -26f)), new SafePos(new Vector2D(5f, -36f)), new SafePos(new Vector2D(5f, -46f)) };
+
+            JudgeSatePosOverlap(PenaltyOffensiveSafePos, PenaltyDefenderSafePos, Side.Blue, Side.Yellow);
+            GoalieId = FindGoalie(Side.Blue);
+            UpdateOffAndDefInfo(Side.Blue);
         }
-        else if (judgeResult.Actor == Side.Yellow)
+        else
         {
-            //判断是否对安全区有重叠
-            JudgeSatePosOverlap(yellowPenaltyOfBlueSafePos, yellowPenaltyOfYellowSafePos);
-            BallPos = yellowPenaltyBallPos;
-            int blueGoalieId = FindGoalie(Side.Blue);
-            //没有守门员，放置守门员点
-            if (blueGoalieId == -1)
+            //黄方执行点球时相关坐标
+            PenaltyBallPos = new Vector2D(72.5f, 0f);//点球坐标
+            PenaltyDefenderGoaliePos = new Vector2D(106f, 0f);//守门员坐标
+                                                              //黄方的安全区域点
+            PenaltyDefenderSafePos = new SafePos[5] { new SafePos(new Vector2D(-5f, -6f)), new SafePos(new Vector2D(-5f, -16f))
+            , new SafePos(new Vector2D(5f, -26f)), new SafePos(new Vector2D(-5f, -36f)), new SafePos(new Vector2D(-5f, -46f)) };
+
+            //蓝方的安全区域点
+            PenaltyOffensiveSafePos = new SafePos[5] { new SafePos(new Vector2D(-5f, 6f)), new SafePos(new Vector2D(-5f, 16f))
+            , new SafePos(new Vector2D(-5f, 26f)), new SafePos(new Vector2D(-5f, 36f)), new SafePos(new Vector2D(-5f, 46f)) };
+
+            JudgeSatePosOverlap(PenaltyOffensiveSafePos, PenaltyDefenderSafePos, Side.Yellow, Side.Blue);
+            GoalieId = FindGoalie(Side.Yellow);
+            UpdateOffAndDefInfo(Side.Yellow);
+        }
+        BallPos = PenaltyBallPos;
+        if (GoalieId == -1)
+        {
+            DefenderRobotsPos[0] = PenaltyDefenderGoaliePos;
+            GoalieId = 0;
+        }
+        else
+        {
+            //如果守门员没有压在球门线，将其压线
+            if (judgeResult.Actor == Side.Blue)
             {
-                BlueRobotsPos[0] = yellowPenaltyBlueTeamGoaliePos;
-                blueGoalieId = 0;
+                if (OffensiveRobotsPos[GoalieId].x >= -106 || OffensiveRobotsPos[GoalieId].x <= -120)
+                {
+                    OffensiveRobotsPos[GoalieId].x = -106;
+                }
             }
             else
             {
-                //如果守门员没有压在球门线，将其压线
-                if (BlueRobotsPos[blueGoalieId].x >= -106)
+                if (OffensiveRobotsPos[GoalieId].x <= 106 || OffensiveRobotsPos[GoalieId].x >= 120)
                 {
-                    BlueRobotsPos[blueGoalieId].x = -106;
+                    OffensiveRobotsPos[GoalieId].x = 106;
                 }
             }
-            //先对蓝方进行检测
-            for (int i = 0; i < Const.RobotsPerTeam; i++)
+
+        }
+        //先对防守方检测
+        for (int i = 0; i < Const.RobotsPerTeam; i++)
+        {
+            if (i == GoalieId)
             {
-                if (i == blueGoalieId)
-                {
-                    continue;
-                }
-                else
-                {
-                    //如果位置在蓝方半场内，规范化位置
-                    if (blueHalfState.PointIn(BlueRobotsPos[i]))
-                    {
-                        for (int j = 0; j < Const.RobotsPerTeam; j++)
-                        {
-                            if (!yellowPenaltyOfBlueSafePos[j].occupy)
-                            {
-                                BlueRobotsPos[i] = yellowPenaltyOfBlueSafePos[j].safePos;
-                                yellowPenaltyOfBlueSafePos[j].occupy = true;
-                            }
-                        }
-                    }
-                }
+                continue;
             }
-            //再对黄方进行检测
-            for (int i = 0; i < Const.RobotsPerTeam; i++)
+            else
             {
-                if (blueHalfState.PointIn(YellowRobotsPos[i]))
+                //如果位置在防守方半场内，规范化位置
+                if (defenderHalfState.PointIn(DefenderRobotsPos[i]) || !stadiumState.PointIn(DefenderRobotsPos[i]))
                 {
                     for (int j = 0; j < Const.RobotsPerTeam; j++)
                     {
-                        if (!yellowPenaltyOfYellowSafePos[j].occupy)
+                        if (!PenaltyDefenderSafePos[j].occupy)
                         {
-                            YellowRobotsPos[i] = yellowPenaltyOfYellowSafePos[j].safePos;
-                            yellowPenaltyOfYellowSafePos[j].occupy = true;
+                            DefenderRobotsPos[i] = PenaltyDefenderSafePos[j].safePos;
+                            PenaltyDefenderSafePos[j].occupy = true;
+                            break;
                         }
                     }
                 }
             }
         }
-        UpdatePlacementPos(matchInfo);
+        int attackRobotID=-1;
+
+        //再对进攻方进行检测
+        for (int i = 0; i < Const.RobotsPerTeam; i++)
+        {
+            //只允许有一个进攻球员在防守半场中
+            if(defenderHalfState.PointIn(OffensiveRobotsPos[i] )&&attackRobotID ==-1)
+            {
+                attackRobotID = i;
+                continue;
+            }
+            if (defenderHalfState.PointIn(OffensiveRobotsPos[i]) || !stadiumState.PointIn(OffensiveRobotsPos[i]))
+            {
+                for (int j = 0; j < Const.RobotsPerTeam; j++)
+                {
+                    if (!PenaltyOffensiveSafePos[j].occupy)
+                    {
+                        OffensiveRobotsPos[i] = PenaltyOffensiveSafePos[j].safePos;
+                        PenaltyOffensiveSafePos[j].occupy = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (judgeResult.Actor == Side.Blue)
+        {
+            UpdatePlacementPos(matchInfo, Side.Blue);
+        }
+        else
+        {
+            UpdatePlacementPos(matchInfo, Side.Yellow);
+        }
+
     }
 
-    private void JudgePlacePlacement(MatchInfo matchInfo,JudgeResult judgeResult)
+    private void JudgePlacePlacement(MatchInfo matchInfo, JudgeResult judgeResult)
     {
         Vector2D PlaceBall = new Vector2D(0, 0);
     }
 
-    private void UpdatePlacementPos(MatchInfo matchInfo)
+    //更新进攻方和防守方信息
+    private void UpdateOffAndDefInfo(Side Defender)
     {
-        matchInfo.Ball.pos = BallPos;
-        for (int i = 0; i < Const.RobotsPerTeam; i++)
+        if (Defender == Side.Blue)
         {
-            matchInfo.BlueRobots[i].pos = BlueRobotsPos[i];
-            matchInfo.YellowRobots[i].pos = YellowRobotsPos[i];
+            for (int i = 0; i < Const.RobotsPerTeam; i++)
+            {
+                DefenderRobotsPos[i] = BlueRobotsPos[i];
+                OffensiveRobotsPos[i] = YellowRobotsPos[i];
+            }
+            offensiveHalfState = blueHalfState;
+            defenderHalfState = yellowHalfState;
+        }
+        else
+        {
+            for (int i = 0; i < Const.RobotsPerTeam; i++)
+            {
+                DefenderRobotsPos[i] = YellowRobotsPos[i];
+                OffensiveRobotsPos[i] = BlueRobotsPos[i];
+            }
+            offensiveHalfState = yellowHalfState;
+            defenderHalfState = blueHalfState;
         }
     }
 
-    private void JudgeSatePosOverlap(SafePos[] BlueSafePos, SafePos[] YellowSafePos)
+    private void UpdatePlacementPos(MatchInfo matchInfo, Side Offensive)
+    {
+        matchInfo.Ball.pos = BallPos;
+        if (Offensive == Side.Blue)
+        {
+            for (int i = 0; i < Const.RobotsPerTeam; i++)
+            {
+                matchInfo.BlueRobots[i].pos = OffensiveRobotsPos[i];
+                matchInfo.YellowRobots[i].pos = DefenderRobotsPos[i];
+            }
+        }
+        else
+        {
+            for (int i = 0; i < Const.RobotsPerTeam; i++)
+            {
+                matchInfo.YellowRobots[i].pos = OffensiveRobotsPos[i];
+                matchInfo.BlueRobots[i].pos = DefenderRobotsPos[i];
+            }
+        }
+    }
+
+    //判断是否占用安全区域情况
+    private void JudgeSatePosOverlap(SafePos[] OffensiveSafePos, SafePos[] DefenderSafePos, Side Offensive, Side Defender)
     {
         for (int i = 0; i < Const.RobotsPerTeam; i++)
         {
-            for(int j = 0;j< Const.RobotsPerTeam;j++)
+            for (int j = 0; j < Const.RobotsPerTeam; j++)
             {
-                //检验蓝方安全区域
-                if(!BlueSafePos[i].occupy&&BlueSafePos[i].safeSquare.PointIn(BlueRobotsPos[j]))
+                //warning Point in 需要是两个区域进行判断
+                //进攻方是蓝方时
+                if (Offensive == Side.Blue)
                 {
-                    BlueSafePos[i].occupy = true;
+                    //检验蓝方安全区域
+                    if (!OffensiveSafePos[i].occupy && OffensiveSafePos[i].safeSquare.PointIn(BlueRobotsPos[j]))
+                    {
+                        OffensiveSafePos[i].occupy = true;
+                    }
+                    if (!OffensiveSafePos[i].occupy && OffensiveSafePos[i].safeSquare.PointIn(YellowRobotsPos[j]))
+                    {
+                        //如果一方安全区被另一方占用，抢夺另一方对应的安全区
+                        OffensiveSafePos[i].safePos = DefenderSafePos[i].safePos;
+                        DefenderSafePos[i].occupy = true;
+                    }
+                    //检验黄方安全区域
+                    if (!DefenderSafePos[i].occupy && DefenderSafePos[i].safeSquare.PointIn(YellowRobotsPos[j]))
+                    {
+                        DefenderSafePos[i].occupy = true;
+                    }
+                    if (!DefenderSafePos[i].occupy && DefenderSafePos[i].safeSquare.PointIn(BlueRobotsPos[j]))
+                    {
+                        //如果一方安全区被另一方占用，抢夺另一方对应的安全区
+                        DefenderSafePos[i].safePos = OffensiveSafePos[i].safePos;
+                        OffensiveSafePos[i].occupy = true;
+                    }
                 }
-                if(!BlueSafePos[i].occupy&&BlueSafePos[i].safeSquare.PointIn(YellowRobotsPos[j]))
+                //进攻方是黄方时
+                else
                 {
-                    //如果一方安全区被另一方占用，抢夺另一方对应的安全区
-                    BlueSafePos[i].safePos = YellowSafePos[i].safePos;
-                    YellowSafePos[i].occupy = true;
-                }
-
-                //检验黄方安全区域
-                if (!YellowSafePos[i].occupy && YellowSafePos[i].safeSquare.PointIn(YellowRobotsPos[j]))
-                {
-                    YellowSafePos[i].occupy = true;
-                }
-                if (!YellowSafePos[i].occupy && YellowSafePos[i].safeSquare.PointIn(BlueRobotsPos[j]))
-                {
-                    //如果一方安全区被另一方占用，抢夺另一方对应的安全区
-                    YellowSafePos[i].safePos = YellowSafePos[i].safePos;
-                    BlueSafePos[i].occupy = true;
+                    //检验黄方安全区域
+                    if (!OffensiveSafePos[i].occupy && OffensiveSafePos[i].safeSquare.PointIn(YellowRobotsPos[j]))
+                    {
+                        OffensiveSafePos[i].occupy = true;
+                    }
+                    if (!OffensiveSafePos[i].occupy && OffensiveSafePos[i].safeSquare.PointIn(BlueRobotsPos[j]))
+                    {
+                        //如果一方安全区被另一方占用，抢夺另一方对应的安全区
+                        OffensiveSafePos[i].safePos = DefenderSafePos[i].safePos;
+                        DefenderSafePos[i].occupy = true;
+                    }
+                    //检验蓝方安全区域
+                    if (!DefenderSafePos[i].occupy && DefenderSafePos[i].safeSquare.PointIn(BlueRobotsPos[j]))
+                    {
+                        DefenderSafePos[i].occupy = true;
+                    }
+                    if (!DefenderSafePos[i].occupy && DefenderSafePos[i].safeSquare.PointIn(YellowRobotsPos[j]))
+                    {
+                        //如果一方安全区被另一方占用，抢夺另一方对应的安全区
+                        DefenderSafePos[i].safePos = OffensiveSafePos[i].safePos;
+                        OffensiveSafePos[i].occupy = true;
+                    }
                 }
             }
         }
