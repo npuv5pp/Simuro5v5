@@ -345,6 +345,43 @@ namespace Simuro5v5
         {
             ClampToRect(Const.Field.Right, Const.Field.Left, Const.Field.Top, Const.Field.Bottom);
         }
+
+        public static Vector2D operator +(Vector2D lhs, Vector2D rhs)
+        {
+            return new Vector2D(lhs.x + rhs.y, lhs.x + rhs.y);
+        }
+
+        public static Vector2D operator -(Vector2D vec)
+        {
+            return new Vector2D(-vec.x, -vec.y);
+        }
+
+        public static Vector2D operator -(Vector2D lhs, Vector2D rhs)
+        {
+            return lhs + (-rhs);
+        }
+
+        public static float operator *(Vector2D lhs, Vector2D rhs)
+        {
+            return lhs.x * rhs.x + lhs.y * rhs.y;
+        }
+
+        public static Vector2D operator /(Vector2D vec, float v)
+        {
+            return new Vector2D(vec.x / v, vec.y / v);
+        }
+
+        /// <summary>
+        /// 旋转向量
+        /// </summary>
+        /// <param name="angle">逆时针旋转角，采用弧度制</param>
+        /// <returns></returns>
+        public Vector2D Rotate(float angle)
+        {
+            return new Vector2D(
+                x * Mathf.Cos(angle) - y * Mathf.Sin(angle),
+                x * Mathf.Sin(angle) + y * Mathf.Cos(angle));
+        }
     }
 
     [Serializable]
