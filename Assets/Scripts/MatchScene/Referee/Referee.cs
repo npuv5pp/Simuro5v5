@@ -10,8 +10,9 @@ using Event = Simuro5v5.EventSystem.Event;
 public class Referee : ICloneable
 {
     //Class
-    private GameObject[] BlueObject => PlayMain.ObjectManager.blueObject;
-    private GameObject[] YellowObject => PlayMain.ObjectManager.yellowObject;
+    private GameObject[] BlueObject;
+    private GameObject[] YellowObject;
+    private GameObject BallObject;
     private MatchInfo matchInfo;
     private Robot[] blueRobots;
     private Robot[] yellowRobots;
@@ -77,6 +78,8 @@ public class Referee : ICloneable
         
         BlueRobotsPos = new Vector2D[Const.RobotsPerTeam];
         YellowRobotsPos = new Vector2D[Const.RobotsPerTeam];
+
+        ObjectManager.FindObjects(out BlueObject, out YellowObject, out BallObject);
         
         lastJudge = new JudgeResult
         {

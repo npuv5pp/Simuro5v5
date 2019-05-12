@@ -21,11 +21,10 @@ public class PlayMain : MonoBehaviour
     // 策略已经加载成功
     public bool LoadSucceed => StrategyManager.IsBlueReady && StrategyManager.IsYellowReady;
 
-    int timeTick = 0;       // 时间计时器。每次物理拍加一。FixedUpdate奇数拍运行，偶数拍跳过.
     public static GameObject Singleton;
     public StrategyManager StrategyManager { get; private set; }
     public MatchInfo GlobalMatchInfo { get; private set; }
-    public static ObjectManager ObjectManager { get; private set; }
+    public ObjectManager ObjectManager { get; private set; }
 
     public delegate void TimedPauseCallback();
     bool TimedPausing { get; set; }
@@ -70,19 +69,19 @@ public class PlayMain : MonoBehaviour
         ObjectManager.Pause();
     }
 
-    void FixedUpdate()
-    {
-        timeTick++;
-        // 偶数拍，跳过
-        if (timeTick % 2 == 0) return;
+    // void FixedUpdate()
+    // {
+    //     timeTick++;
+    //     // 偶数拍，跳过
+    //     if (timeTick % 2 == 0) return;
 
-        ObjectManager.UpdateFromScene();
+    //     ObjectManager.UpdateFromScene();
 
-        if (LoadSucceed && Started)
-        {
-            InMatchLoop();
-        }
-    }
+    //     if (LoadSucceed && Started)
+    //     {
+    //         InMatchLoop();
+    //     }
+    // }
 
     void OnGetGoal(object obj)
     {
@@ -100,60 +99,52 @@ public class PlayMain : MonoBehaviour
 
     public void InMatchLoop()
     {
-        if (Paused) return;
+        if (!LoadSucceed || !Started || Paused) return;
 
-        try
+        JudgeResult judgeResult = GlobalMatchInfo.Referee.Judge(GlobalMatchInfo);
+
+        if (judgeResult.ResultType == ResultType.GameOver)
         {
-            JudgeResult judgeResult = GlobalMatchInfo.Referee.Judge(GlobalMatchInfo);
+            // 时间到，比赛结束
+            Debug.Log("Game Over");
+            StopMatch();
+        }
+        else if (judgeResult.ResultType == ResultType.EndHalf)
+        {
+            // 半场结束
+            Debug.Log("End half");
+            GlobalMatchInfo.TickMatch = 0;
+        }
+        else if (judgeResult.ResultType == ResultType.NormalMatch)
+        {
+            // 正常比赛
+            UpdateWheelsToScene();
+            GlobalMatchInfo.TickMatch++;
+            Event.Send(Event.EventType1.MatchInfoUpdate, GlobalMatchInfo);
+        }
+        else
+        {
+            // 需要摆位
+            Debug.Log("placing...");
 
-            if (judgeResult.ResultType == ResultType.GameOver)
+            void Callback()
             {
-                // 时间到，比赛结束
-                Debug.Log("Game Over");
-                StopMatch();
-            }
-            else if (judgeResult.ResultType == ResultType.EndHalf)
-            {
-                // 半场结束
-                Debug.Log("End half");
-                GlobalMatchInfo.TickMatch = 0;
-            }
-            else if (judgeResult.ResultType == ResultType.NormalMatch)
-            {
-                // 正常比赛
-                UpdateWheelsToScene();
+                UpdatePlacementToScene(judgeResult);
                 GlobalMatchInfo.TickMatch++;
-                Event.Send(Event.EventType1.MatchInfoUpdate, GlobalMatchInfo);
+
+                PauseForTime(2, () => { });
+            }
+
+            Event.Send(Event.EventType1.AutoPlacement, GlobalMatchInfo);
+
+            if (GlobalMatchInfo.TickMatch > 0)
+            {
+                PauseForTime(2, Callback);
             }
             else
             {
-                // 需要摆位
-                Debug.Log("placing...");
-
-                void Callback()
-                {
-                    UpdatePlacementToScene(judgeResult);
-                    GlobalMatchInfo.TickMatch++;
-
-                    PauseForTime(2, () => { });
-                }
-
-                Event.Send(Event.EventType1.AutoPlacement, GlobalMatchInfo);
-                    
-                if (GlobalMatchInfo.TickMatch > 0)
-                {
-                    PauseForTime(2, Callback);
-                }
-                else
-                {
-                    Callback();
-                }
+                Callback();
             }
-        }
-        catch (Exception e)
-        {
-            Debug.Log(e.Message);
-            StopMatch();
         }
     }
 
@@ -183,16 +174,20 @@ public class PlayMain : MonoBehaviour
     /// <summary>
     /// 停止比赛
     /// </summary>
-    public void StopMatch()
+    /// <param name="willNotifyStrategies">是否向策略发送通知，如果是由于策略出现错误需要停止比赛，可以指定为false。默认为true</param>
+    public void StopMatch(bool willNotifyStrategies=true)
     {
         GlobalMatchInfo.TickMatch = 0;
         Started = false;
         Paused = true;
         ObjectManager.Pause();
 
-        StrategyManager.Blue.OnMatchStop();
-        StrategyManager.Yellow.OnMatchStop();
         Event.Send(Event.EventType1.MatchStop, GlobalMatchInfo);
+        if (willNotifyStrategies)
+        {
+            StrategyManager.Blue.OnMatchStop();
+            StrategyManager.Yellow.OnMatchStop();
+        }
     }
 
     public void PauseMatch()

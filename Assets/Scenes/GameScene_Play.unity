@@ -1279,7 +1279,7 @@ PrefabInstance:
     - target: {fileID: 8483631267726784931, guid: 4cb1dd1410ab7bb40923966c05e52615,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: AnimInGameAndLoadStrategy
+      value: TryLoadStrategy
       objectReference: {fileID: 0}
     - target: {fileID: 8483631267726784931, guid: 4cb1dd1410ab7bb40923966c05e52615,
         type: 3}
@@ -4280,7 +4280,12 @@ PrefabInstance:
     - target: {fileID: 8483631267726784931, guid: 4cb1dd1410ab7bb40923966c05e52615,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: AnimOutGameAndRemoveStrategy
+      value: StopMatchAndRemoveStrategy
+      objectReference: {fileID: 0}
+    - target: {fileID: 8483631267726784931, guid: 4cb1dd1410ab7bb40923966c05e52615,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 7904618840930341540, guid: 4cb1dd1410ab7bb40923966c05e52615,
         type: 3}

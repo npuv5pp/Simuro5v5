@@ -32,6 +32,31 @@ namespace Simuro5v5
             OutputMatchInfo = matchInfo;
         }
 
+        /// <summary>
+        /// 从场景中获取机器人和球的GameObject
+        /// </summary>
+        /// <param name="blue"></param>
+        /// <param name="yellow"></param>
+        /// <param name="ball"></param>
+        public static void FindObjects(out GameObject[] blue, out GameObject[] yellow, out GameObject ball)
+        {
+            ball = GameObject.Find("Ball");
+            blue = new GameObject[5] {
+                GameObject.Find("Blue0"),
+                GameObject.Find("Blue1"),
+                GameObject.Find("Blue2"),
+                GameObject.Find("Blue3"),
+                GameObject.Find("Blue4")
+            };
+            yellow = new GameObject[5] {
+                GameObject.Find("Yellow0"),
+                GameObject.Find("Yellow1"),
+                GameObject.Find("Yellow2"),
+                GameObject.Find("Yellow3"),
+                GameObject.Find("Yellow4"),
+            };
+        }
+
         public void RebindObject(GameObject entity)
         {
             ballObject = entity.transform.Find("Ball").gameObject;
@@ -74,21 +99,12 @@ namespace Simuro5v5
         /// </summary>
         public void RebindObject()
         {
-            ballObject = GameObject.Find("Ball");
-            blueObject = new GameObject[5] {
-                GameObject.Find("Blue0"),
-                GameObject.Find("Blue1"),
-                GameObject.Find("Blue2"),
-                GameObject.Find("Blue3"),
-                GameObject.Find("Blue4")
-            };
-            yellowObject = new GameObject[5] {
-                GameObject.Find("Yellow0"),
-                GameObject.Find("Yellow1"),
-                GameObject.Find("Yellow2"),
-                GameObject.Find("Yellow3"),
-                GameObject.Find("Yellow4"),
-            };
+            GameObject[] blues, yellows;
+            GameObject ball;
+            FindObjects(out blues, out yellows, out ball);
+            blueObject = blues;
+            yellowObject = yellows;
+            ballObject = ball;
 
             ballComponent = ballObject.GetComponent<ControlBall>();
             blueComponent = new ControlRobot[5] {

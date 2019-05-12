@@ -82,8 +82,6 @@ public class GUI_Play : MonoBehaviour
 
         blueInputField.text = $"127.0.0.1:{StrategyConfig.BlueStrategyPort}";
         yellowInputField.text = $"127.0.0.1:{StrategyConfig.YellowStrategyPort}";
-
-        // Event.Register(Event.EventType1.RefereeLogUpdate, SetRefereeInfo);
     }
 
     public void LoadMainScene()
@@ -99,7 +97,11 @@ public class GUI_Play : MonoBehaviour
         SceneManager.LoadScene("GameScene_Replay");
     }
 
-    public void AnimOutGameAndRemoveStrategy()
+    /// <summary>
+    /// 停止比赛并尝试移除策略
+    /// </summary>
+    /// <param name="willNotifyStrategies">是否向策略发送通知，如果是由于策略出现错误需要停止比赛，可以指定为false。默认为true</param>
+    public void StopMatchAndRemoveStrategy(bool willNotifyStrategies=true)
     {
         AnimOutGame();
         recorder.Stop();
@@ -107,19 +109,24 @@ public class GUI_Play : MonoBehaviour
 
         try
         {
-            playMain.StopMatch();
-            playMain.RemoveStrategy();
+            playMain.StopMatch(willNotifyStrategies);
         }
         catch (Exception e)
         {
             Debug.LogError(e.Message);
-            Win32Dialog.ShowMessageBox("卸载超时，强制卸载", "Remove Failed");
+            Win32Dialog.ShowMessageBox("通讯失败，强制卸载", "Remove Failed");
+        }
+        finally
+        {
+            playMain.RemoveStrategy();
         }
     }
 
-    public void AnimInGameAndLoadStrategy()
+    /// <summary>
+    /// 尝试加载策略
+    /// </summary>
+    public void TryLoadStrategy()
     {
-        AnimInGame();
         string blue_ep, yellow_ep;
         if (blueInputField.text.Trim() == "")
             blue_ep = "127.0.0.1";
@@ -134,6 +141,7 @@ public class GUI_Play : MonoBehaviour
         try
         {
             playMain.LoadStrategy(blue_ep, yellow_ep);
+            AnimInGame();
         }
         catch (StrategyException e)
         {
@@ -163,6 +171,30 @@ public class GUI_Play : MonoBehaviour
         }
         recorder.Start();
         playMain.StartMatch();
+    }
+
+    int timeTick = 0;
+
+    void FixedUpdate()
+    {
+        timeTick++;
+        // 偶数拍，跳过
+        if (timeTick % 2 == 0) return;
+
+        playMain.ObjectManager.UpdateFromScene();
+
+        try
+        {
+            playMain.InMatchLoop();
+        }
+        catch (TimeoutException e)
+        {
+            Debug.LogError(e);
+            Win32Dialog.ShowMessageBox("策略连接异常", "Strategy Connection");
+            // 退出比赛
+            StopMatchAndRemoveStrategy(false);
+            throw;
+        }
     }
 
     void Update()
@@ -215,7 +247,7 @@ public class GUI_Play : MonoBehaviour
 
     void UpdateAnim()
     {
-        if (playMain.Started && playMain.LoadSucceed)
+        if (playMain.LoadSucceed)
         {
             AnimInGame();
         }
