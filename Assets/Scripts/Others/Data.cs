@@ -38,11 +38,10 @@ namespace Simuro5v5
         public Robot[] YellowRobots { get; set; }
         public Ball Ball;
 
+        public MatchScore Score;
         public int TickMatch;
-
         public MatchState MatchState;
 
-        public MatchScore Score;
         public Referee Referee;
 
         public MatchInfo()
@@ -52,6 +51,13 @@ namespace Simuro5v5
             Referee = new Referee();
         }
 
+        public MatchInfo(Robot[] blue, Robot[] yellow, Ball ball)
+        {
+            BlueRobots = (Robot[])blue.Clone();
+            YellowRobots = (Robot[])yellow.Clone();
+            Ball = ball;
+        }
+
         public MatchInfo(GameObject ball, GameObject[] blue, GameObject[] yellow)
         {
             BlueRobots = new Robot[Const.RobotsPerTeam];
@@ -59,6 +65,29 @@ namespace Simuro5v5
             Referee = new Referee();
 
             UpdateFrom(ball, blue, yellow);
+        }
+
+        /// <summary>
+        /// 将两个摆位信息拼接成一个MatchInfo
+        /// </summary>
+        /// <param name="blue">蓝方摆位信息</param>
+        /// <param name="yellow">黄方摆位信息</param>
+        /// <param name="whosball">球的信息来自哪方</param>
+        public MatchInfo(PlacementInfo blue, PlacementInfo yellow, Side whosball)
+        {
+            BlueRobots = (Robot[])blue.Robots.Clone();
+            YellowRobots = (Robot[])yellow.Robots.Clone();
+            switch (whosball)
+            {
+                case Side.Blue:
+                    Ball = blue.Ball;
+                    break;
+                case Side.Yellow:
+                    Ball = yellow.Ball;
+                    break;
+                default:
+                    throw new ArgumentException("whosball cannot be Nobody");
+            }
         }
 
         public object Clone()
@@ -112,6 +141,19 @@ namespace Simuro5v5
             TickMatch = matchInfo.TickMatch;
             Score = matchInfo.Score;
             Referee = matchInfo.Referee;
+        }
+
+        public void UpdateFrom(Robot[] robots, Side side)
+        {
+            switch (side)
+            {
+                case Side.Blue:
+                    BlueRobots = (Robot[])robots.Clone();
+                    break;
+                case Side.Yellow:
+                    YellowRobots = (Robot[])robots.Clone();
+                    break;
+            }
         }
 
         public void UpdateFrom(GameObject ball, GameObject[] blue, GameObject[] yellow)

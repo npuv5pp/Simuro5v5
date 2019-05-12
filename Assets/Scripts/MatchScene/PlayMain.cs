@@ -81,7 +81,6 @@ public class PlayMain : MonoBehaviour
 
         ObjectManager.UpdateFromScene();
 
-
         if (LoadSucceed && Started)
         {
             InMatchLoop();
@@ -138,7 +137,7 @@ public class PlayMain : MonoBehaviour
 
                 void Callback()
                 {
-                    UpdatePlacementToScene(judgeResult.Actor.ToAnother());
+                    UpdatePlacementToScene(judgeResult);
                     GlobalMatchInfo.TickMatch++;
 
                     PauseForTime(2, () => { });
@@ -176,6 +175,7 @@ public class PlayMain : MonoBehaviour
         ObjectManager.SetStill();
         GlobalMatchInfo.Score = new MatchScore();
         GlobalMatchInfo.TickMatch = 0;
+        GlobalMatchInfo.MatchState = MatchState.FirstHalf;
         GlobalMatchInfo.Referee = new Referee();
 
         StrategyManager.Blue.OnMatchStart();
@@ -234,28 +234,53 @@ public class PlayMain : MonoBehaviour
         ObjectManager.SetYellowWheels(wheelsYellow);
     }
 
-    void UpdatePlacementToScene(Side whosball)
+    void UpdatePlacementToScene(JudgeResult judgeResult)
     {
-        PlacementInfo blueInfo = StrategyManager.Blue.GetPlacement(GlobalMatchInfo.GetSide(Side.Blue));
-        PlacementInfo yellowInfo = StrategyManager.Yellow.GetPlacement(GlobalMatchInfo.GetSide(Side.Yellow));
-        blueInfo.Normalize();
-        yellowInfo.Normalize();
+        var currMi = (MatchInfo)GlobalMatchInfo.Clone();
+        PlacementInfo blueInfo;
+        PlacementInfo yellowInfo;
 
-        if (GeneralConfig.EnableConvertYellowData)
-            yellowInfo.ConvertToOtherSide();
+        switch (judgeResult.WhoisFirst)
+        {
+            case Side.Blue:
+                // 蓝方先摆位
+                blueInfo = StrategyManager.Blue.GetPlacement(currMi.GetSide(Side.Blue));
+                // 将蓝方返回的数据同步到currMi
+                currMi.UpdateFrom(blueInfo.Robots, Side.Blue);
+                // 黄方后摆位
+                yellowInfo = StrategyManager.Yellow.GetPlacement(currMi.GetSide(Side.Yellow));
 
-        ObjectManager.SetBluePlacement(blueInfo);
-        ObjectManager.SetYellowPlacement(yellowInfo);
+                // 转换数据
+                if (GeneralConfig.EnableConvertYellowData)
+                    yellowInfo.ConvertToOtherSide();
+
+                break;
+            case Side.Yellow:
+                // 黄方先摆位
+                yellowInfo = StrategyManager.Yellow.GetPlacement(currMi.GetSide(Side.Yellow));
+                // 由于右攻假设，需要先将黄方数据转换
+                if (GeneralConfig.EnableConvertYellowData)
+                    yellowInfo.ConvertToOtherSide();
+
+                // 将黄方返回的数据同步到currMi
+                currMi.UpdateFrom(yellowInfo.Robots, Side.Yellow);
+                // 蓝方后摆位
+                blueInfo = StrategyManager.Blue.GetPlacement(currMi.GetSide(Side.Blue));
+                break;
+            default:
+                throw new ArgumentException("Side cannot be Nobody");
+        }
+
+        // 从两方数据拼接MatchInfo，球的数据取决于judgeResult
+        var mi = new MatchInfo(blueInfo, yellowInfo, judgeResult.Actor);
+        GlobalMatchInfo.Referee.JudgeAutoPlacement(mi, judgeResult);
+
+        // 设置场地
+        ObjectManager.SetBluePlacement(mi.BlueRobots);
+        ObjectManager.SetYellowPlacement(mi.YellowRobots);
+        ObjectManager.SetBallPlacement(mi.Ball);
+
         ObjectManager.SetStill();
-
-        if (whosball == Side.Blue)                        // 先摆后摆另考虑
-        {
-            ObjectManager.SetBallPlacement(blueInfo);
-        }
-        else
-        {
-            ObjectManager.SetBallPlacement(yellowInfo);
-        }
     }
 
     public bool LoadStrategy(Side side)
