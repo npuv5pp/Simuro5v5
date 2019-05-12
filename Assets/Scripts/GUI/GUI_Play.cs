@@ -1,8 +1,9 @@
-﻿/************************************************************************
- * GUI_Replay
- * 1.比赛界面，包括esc进入菜单
- * 2.比赛菜单，包括回到比赛、进入回放、退出
-************************************************************************/
+﻿/// <summary>
+/// Play场景的UI。
+/// 主要通过PlayMain脚本操作比赛，同时将其中的信息显示在UI上
+/// GUI_Play --> PlayMain --> StrategyManager
+///                      \--> ObjectManager
+/// </summary>
 
 using UnityEngine;
 using UnityEngine.UI;
@@ -82,7 +83,7 @@ public class GUI_Play : MonoBehaviour
         blueInputField.text = $"127.0.0.1:{StrategyConfig.BlueStrategyPort}";
         yellowInputField.text = $"127.0.0.1:{StrategyConfig.YellowStrategyPort}";
 
-        Event.Register(Event.EventType1.RefereeLogUpdate, SetRefereeInfo);
+        // Event.Register(Event.EventType1.RefereeLogUpdate, SetRefereeInfo);
     }
 
     public void LoadMainScene()
@@ -116,21 +117,6 @@ public class GUI_Play : MonoBehaviour
         }
     }
 
-    class StrategyFactory : IStrategyFactory
-    {
-        public string BlueEP { get; set; }
-        public string YellowEP { get; set; }
-        public IStrategy CreateBlue()
-        {
-            return new RPCStrategy(BlueEP);
-        }
-
-        public IStrategy CreateYellow()
-        {
-            return new RPCStrategy(YellowEP);
-        }
-    }
-
     public void AnimInGameAndLoadStrategy()
     {
         AnimInGame();
@@ -145,45 +131,15 @@ public class GUI_Play : MonoBehaviour
         else
             yellow_ep = yellowInputField.text;
 
-        var factory = new StrategyFactory
-        {
-            BlueEP = blue_ep,
-            YellowEP = yellow_ep
-        };
-        playMain.StrategyManager.StrategyFactory = factory;
-
         try
         {
-            if (!playMain.LoadStrategy(Side.Blue))
-            {
-                Win32Dialog.ShowMessageBox("蓝方策略连接超时", "Timeout");
-                AnimOutGame();
-                return;
-            }
+            playMain.LoadStrategy(blue_ep, yellow_ep);
         }
-        catch (Exception e)
+        catch (StrategyException e)
         {
-            Debug.LogError(e.Message);
-            Win32Dialog.ShowMessageBox("蓝方策略连接失败", "Failed");
+            Debug.LogError(e);
+            Win32Dialog.ShowMessageBox($"{(e.side == Side.Blue ? "蓝方" : "黄方")}策略连接失败", "Failed");
             AnimOutGame();
-            return;
-        }
-
-        try
-        {
-            if (!playMain.LoadStrategy(Side.Yellow))
-            {
-                Win32Dialog.ShowMessageBox("黄方策略连接超时", "Timeout");
-                AnimOutGame();
-                return;
-            }
-        }
-        catch (Exception e)
-        {
-            Debug.LogError(e.Message);
-            Win32Dialog.ShowMessageBox("黄方策略连接失败", "Failed");
-            AnimOutGame();
-            return;
         }
     }
 
@@ -248,16 +204,18 @@ public class GUI_Play : MonoBehaviour
             }
         }
 
+        UpdateRefereeText();
         UpdateTimeText();
         UpdateScoreText();
         UpdateButtons();
         UpdateStatusText();
         UpdateTeamname();
+        UpdateAnim();
     }
 
     void UpdateAnim()
     {
-        if (playMain.LoadSucceed)
+        if (playMain.Started && playMain.LoadSucceed)
         {
             AnimInGame();
         }
@@ -340,6 +298,11 @@ public class GUI_Play : MonoBehaviour
     {
         SetBlueScoreText(MatchInfo.Score.BlueScore);
         SetYellowScoreText(MatchInfo.Score.YellowScore);
+    }
+
+    void UpdateRefereeText()
+    {
+        SetRefereeInfo(MatchInfo.Referee.lastJudge.ToRichText());
     }
 
     void PushMenu(GameObject newMenu)
@@ -444,10 +407,5 @@ public class GUI_Play : MonoBehaviour
         topAnim.OutGame();
         refereeAnim.OutGame();
         cameraAnim.OutGame();
-    }
-
-    private void OnDestroy()
-    {
-        Event.UnRegister(Event.EventType1.RefereeLogUpdate, SetRefereeInfo);
     }
 }

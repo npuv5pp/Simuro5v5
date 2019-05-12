@@ -73,11 +73,8 @@ public class PlayMain : MonoBehaviour
     void FixedUpdate()
     {
         timeTick++;
-
-        if (timeTick % 2 == 0) // 偶数拍
-        {
-            return;
-        }
+        // 偶数拍，跳过
+        if (timeTick % 2 == 0) return;
 
         ObjectManager.UpdateFromScene();
 
@@ -113,7 +110,6 @@ public class PlayMain : MonoBehaviour
             {
                 // 时间到，比赛结束
                 Debug.Log("Game Over");
-                Event.Send(Event.EventType1.RefereeLogUpdate, judgeResult.ToRichText());
                 StopMatch();
             }
             else if (judgeResult.ResultType == ResultType.EndHalf)
@@ -121,7 +117,6 @@ public class PlayMain : MonoBehaviour
                 // 半场结束
                 Debug.Log("End half");
                 GlobalMatchInfo.TickMatch = 0;
-                Event.Send(Event.EventType1.RefereeLogUpdate, judgeResult.ToRichText());
             }
             else if (judgeResult.ResultType == ResultType.NormalMatch)
             {
@@ -144,7 +139,6 @@ public class PlayMain : MonoBehaviour
                 }
 
                 Event.Send(Event.EventType1.AutoPlacement, GlobalMatchInfo);
-                Event.Send(Event.EventType1.RefereeLogUpdate, judgeResult.ToRichText());
                     
                 if (GlobalMatchInfo.TickMatch > 0)
                 {
@@ -186,6 +180,9 @@ public class PlayMain : MonoBehaviour
         Event.Send(Event.EventType1.MatchStart, GlobalMatchInfo);
     }
 
+    /// <summary>
+    /// 停止比赛
+    /// </summary>
     public void StopMatch()
     {
         GlobalMatchInfo.TickMatch = 0;
@@ -283,16 +280,34 @@ public class PlayMain : MonoBehaviour
         ObjectManager.SetStill();
     }
 
-    public bool LoadStrategy(Side side)
+    public bool LoadStrategy(string blue_ep, string yellow_ep)
     {
-        switch (side)
+        var factory = new StrategyFactory
         {
-            case Side.Blue:
-                return StrategyManager.ConnectBlue();
-            case Side.Yellow:
-                return StrategyManager.ConnectYellow();
+            BlueEP = blue_ep,
+            YellowEP = yellow_ep
+        };
+        StrategyManager.StrategyFactory = factory;
+
+        try
+        {
+            StrategyManager.ConnectBlue();
         }
-        return false;
+        catch (Exception e)
+        {
+            throw new StrategyException(Side.Blue, e);
+        }
+
+        try
+        {
+            StrategyManager.ConnectYellow();
+        }
+        catch (Exception e)
+        {
+            throw new StrategyException(Side.Yellow, e);
+        }
+
+        return true;
     }
 
     public void RemoveStrategy(Side side)
@@ -347,5 +362,34 @@ public class PlayMain : MonoBehaviour
     private void OnApplicationQuit()
     {
         Event.Send(Event.EventType0.PlatformExiting);
+    }
+
+    class StrategyFactory : IStrategyFactory
+    {
+        public string BlueEP { get; set; }
+        public string YellowEP { get; set; }
+        public IStrategy CreateBlue()
+        {
+            try
+            {
+                return new RPCStrategy(BlueEP);
+            }
+            catch (Exception e)
+            {
+                throw new StrategyException(Side.Blue, e);
+            }
+        }
+
+        public IStrategy CreateYellow()
+        {
+            try
+            {
+                return new RPCStrategy(YellowEP);
+            }
+            catch (Exception e)
+            {
+                throw new StrategyException(Side.Blue, e);
+            }
+        }
     }
 }

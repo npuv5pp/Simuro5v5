@@ -107,83 +107,104 @@ namespace Simuro5v5
             };
         }
 
+        /// <summary>
+        /// 将场地设置为默认
+        /// </summary>
         public void SetToDefault()
         {
             RevertScene(MatchInfo.NewDefaultPreset());
         }
 
+        /// <summary>
+        /// 设置蓝方机器人的轮速
+        /// </summary>
+        /// <param name="ws"></param>
         public void SetBlueWheels(WheelInfo ws)
         {
             for (int i = 0; i < 5; i++)
             {
                 if (OutputMatchInfo != null)
                 {
+                    // 在MatchInfo中保存轮速
                     OutputMatchInfo.BlueRobots[i].wheel.left = ws.Wheels[i].left;
                     OutputMatchInfo.BlueRobots[i].wheel.right = ws.Wheels[i].right;
                 }
+                // 设置场景中机器人的轮速
                 blueComponent[i].SetWheelVelocity(ws.Wheels[i]);
             }
         }
 
+        /// <summary>
+        /// 设置黄方机器人的轮速
+        /// </summary>
+        /// <param name="ws"></param>
         public void SetYellowWheels(WheelInfo ws)
         {
             for (int i = 0; i < 5; i++)
             {
                 if (OutputMatchInfo != null)
                 {
+                    // 在MatchInfo中保存轮速
                     OutputMatchInfo.YellowRobots[i].wheel.left = ws.Wheels[i].left;
                     OutputMatchInfo.YellowRobots[i].wheel.right = ws.Wheels[i].right;
                 }
+                // 设置场景中机器人的轮速
                 yellowComponent[i].SetWheelVelocity(ws.Wheels[i]);
             }
         }
 
-        public void SetBluePlacement(PlacementInfo sInfo)
-        {
-            for (int i = 0; i < 5; i++)
-            {
-                blueComponent[i].SetPlacement(sInfo.Robots[i]);
-            }
-        }
-
+        /// <summary>
+        /// 设置蓝方机器人的位置
+        /// </summary>
+        /// <param name="robots"></param>
         public void SetBluePlacement(Robot[] robots)
         {
             for (int i = 0; i < 5; i++)
             {
+                if (OutputMatchInfo != null)
+                {
+                    // 保存信息
+                    OutputMatchInfo.BlueRobots[i] = robots[i];
+                }
+                // 设置位置
                 blueComponent[i].SetPlacement(robots[i]);
             }
         }
 
-        public void SetYellowPlacement(PlacementInfo sInfo)
-        {
-            for (int i = 0; i < 5; i++)
-            {
-                yellowComponent[i].SetPlacement(sInfo.Robots[i]);
-            }
-        }
-
+        /// <summary>
+        /// 设置黄方机器人的位置
+        /// </summary>
+        /// <param name="robots"></param>
         public void SetYellowPlacement(Robot[] robots)
         {
             for (int i = 0; i < 5; i++)
             {
+                if (OutputMatchInfo != null)
+                {
+                    // 保存信息
+                    OutputMatchInfo.YellowRobots[i] = robots[i];
+                }
+                // 设置位置
                 yellowComponent[i].SetPlacement(robots[i]);
             }
         }
 
-        public void SetBallPlacement(PlacementInfo sInfo)
-        {
-            ballComponent.SetPlacement(sInfo.Ball);
-        }
-
+        /// <summary>
+        /// 设置球的位置
+        /// </summary>
+        /// <param name="ball"></param>
         public void SetBallPlacement(Ball ball)
         {
-            var b = ball;
-            b.Normalize();
-            ballComponent.SetPlacement(b);
+            ball.Normalize();
+            if (OutputMatchInfo != null)
+            {
+                OutputMatchInfo.Ball = ball;
+            }
+            ballComponent.SetPlacement(ball);
         }
 
         /// <summary>
-        /// 所有物体静止
+        /// 使所有物体静止
         /// </summary>
         public void SetStill()
         {
@@ -196,7 +217,7 @@ namespace Simuro5v5
         }
 
         /// <summary>
-        /// 从指定MatchInfo还原场景
+        /// 从指定MatchInfo还原场景，包括速度和位置
         /// </summary>
         /// <param name="matchInfo"></param>
         public void RevertScene(MatchInfo matchInfo)

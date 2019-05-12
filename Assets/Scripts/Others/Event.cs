@@ -85,18 +85,12 @@ namespace Simuro5v5.EventSystem
 
             MatchStart,
             MatchStop,
-            RoundStart,
-            RoundPause,
-            RoundResume,
-            RoundStop,
             AutoPlacement,
 
             StrategyBlueLoaded,         // IStrategy策略实例
             StrategyYellowLoaded,       // IStrategy策略实例
             StrategyBlueFreed,
             StrategyYellowFreed,
-            
-            ReplayInfoUpdate
         }
 
         /// <summary>

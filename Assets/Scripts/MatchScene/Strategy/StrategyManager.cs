@@ -46,14 +46,17 @@ namespace Simuro5v5.Strategy
 
         public bool Connect()
         {
-            try
-            {
-                cachedTeamInfo = client.GetTeamInfo().ToNative();
-            }
-            catch (TimeoutException)
-            {
-                return false;
-            }
+            // try
+            // {
+                // cachedTeamInfo = client.GetTeamInfo().ToNative();
+            // }
+            // catch (TimeoutException)
+            // {
+            //     return false;
+            // }
+
+            // 直接抛出更好？
+            cachedTeamInfo = client.GetTeamInfo().ToNative();
             IsConnected = true;
             return true;
         }
@@ -77,7 +80,9 @@ namespace Simuro5v5.Strategy
 
         public TeamInfo GetTeamInfo()
         {
-            return client.GetTeamInfo().ToNative();
+            if (cachedTeamInfo == null)
+                cachedTeamInfo = client.GetTeamInfo().ToNative();
+            return cachedTeamInfo;
         }
 
         public WheelInfo GetInstruction(SideInfo sideInfo)
@@ -161,5 +166,15 @@ namespace Simuro5v5.Strategy
         }
     }
 
-}
+    [System.Serializable]
+    public class StrategyException : System.Exception
+    {
+        public Side side;
 
+        public StrategyException(Side side, Exception innerException) : base(innerException.Message, innerException)
+        {
+            this.side = side;
+        }
+    }
+
+}
