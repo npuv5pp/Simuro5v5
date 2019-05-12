@@ -383,7 +383,7 @@ public class PlayMain : MonoBehaviour
             }
             catch (Exception e)
             {
-                throw new StrategyException(Side.Blue, e);
+                throw new StrategyException(Side.Yellow, e);
             }
         }
     }

@@ -46,17 +46,14 @@ namespace Simuro5v5.Strategy
 
         public bool Connect()
         {
-            // try
-            // {
-                // cachedTeamInfo = client.GetTeamInfo().ToNative();
-            // }
-            // catch (TimeoutException)
-            // {
-            //     return false;
-            // }
-
-            // 直接抛出更好？
-            cachedTeamInfo = client.GetTeamInfo().ToNative();
+            try
+            {
+                cachedTeamInfo = client.GetTeamInfo().ToNative();
+            }
+            catch (TimeoutException)
+            {
+                return false;
+            }
             IsConnected = true;
             return true;
         }
