@@ -9,9 +9,9 @@ namespace Simuro5v5
 {
     public enum Side
     {
+        Nobody,
         Yellow,
         Blue,
-        Nobody,
     };
 
     public enum MatchPhase

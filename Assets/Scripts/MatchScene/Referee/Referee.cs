@@ -60,14 +60,15 @@ public class Referee : ICloneable
     private int endOfOvergametime;
 
     /// <summary>
-    /// 点球大战中点球方，依次交换顺序
-    /// </summary>
-    private Side penaltySide;
-
-    /// <summary>
-    /// 点球大战中每次罚球点球限制时间 5秒
+    /// 点球大战中每次罚球点球限制时间5秒
     /// </summary>
     private int penaltyLimitTime;
+
+    /// <summary>
+    /// 点球大战中点球方，依次交换顺序
+    /// TODO: 将这些信息暴露出去，显示在UI上
+    /// </summary>
+    private Side penaltySide;
 
     /// <summary>
     /// 点球大战中所执行的时间
@@ -76,11 +77,17 @@ public class Referee : ICloneable
 
     /// <summary>
     /// 记录点球次数
+    /// TODO: 将这些信息暴露出去，显示在UI上
     /// </summary>
     private int penaltyOfNum;
 
     /// <summary>
-    /// 停滞时间
+    /// 球的最大的停滞时间
+    /// </summary>
+    private int maxStandoffTime;
+
+    /// <summary>
+    /// 球的停滞时间
     /// </summary>
     [JsonProperty]
     private int standoffTime;
@@ -99,6 +106,7 @@ public class Referee : ICloneable
         penaltyLimitTime = 250;
         penaltyTime = 0;
         standoffTime = 0;
+        maxStandoffTime = 500;
 
         BlueRobotsPos = new Vector2D[Const.RobotsPerTeam];
         YellowRobotsPos = new Vector2D[Const.RobotsPerTeam];
@@ -126,7 +134,7 @@ public class Referee : ICloneable
 
     /// <summary>
     /// 根据传入的matchInfo，结合已保存的信息，给出下一拍应有的动作（JudgeResult）。<br/>
-    /// 这个接口不会对<parmref name="matchInfo">作任何修改。
+    /// 这个接口不会对<parmref name="matchInfo">作任何修改，所有的信息由返回值给出
     /// </summary>
     /// <param name="matchInfo">需要被判断的比赛信息</param>
     /// <returns>下一拍应有的动作信息</returns>
@@ -139,7 +147,6 @@ public class Referee : ICloneable
         this.yellowRobots = matchInfo.YellowRobots;
         this.goalieBlueId = FindGoalie(Side.Blue);
         this.goalieYellowId = FindGoalie(Side.Yellow);
-
 
         var result = CollectJudge();
         savedJudge = result;
@@ -304,7 +311,7 @@ public class Referee : ICloneable
             {
                 ResultType = ResultType.PenaltyKick,
                 Actor = Side.Blue,
-                Reason = "Over 10 second and turn to Blue penalty"
+                Reason = "Over 5 second and turn to Blue penalty"
             };
         }
     }
@@ -319,7 +326,7 @@ public class Referee : ICloneable
             {
                 ResultType = ResultType.PenaltyKick,
                 Actor = Side.Yellow,
-                Reason = "Over 10 second and turn to yellow penalty"
+                Reason = "Over 5 second and turn to yellow penalty"
             };
         }
         else
@@ -330,7 +337,7 @@ public class Referee : ICloneable
             {
                 ResultType = ResultType.PenaltyKick,
                 Actor = Side.Blue,
-                Reason = "Over 10 second and turn to Blue penalty"
+                Reason = "Over 5 second and turn to Blue penalty"
             };
         }
 
@@ -361,7 +368,7 @@ public class Referee : ICloneable
             }
             penaltyTime = 0;
             penaltySide = Side.Yellow;
-            Event.Send(Event.EventType1.GetGoal, Side.Blue); //黄方被进球
+            judgeResult.WhoGoal = Side.Blue;
             return true;
         }
         else if (blueGoalState.PointIn(matchInfo.Ball.pos))
@@ -418,7 +425,7 @@ public class Referee : ICloneable
             }
             penaltyTime = 0;
             penaltySide = Side.Blue;
-            Event.Send(Event.EventType1.GetGoal, Side.Yellow); //蓝方被进球
+            judgeResult.WhoGoal = Side.Yellow;
             return true;
         }
         else
@@ -439,7 +446,7 @@ public class Referee : ICloneable
                     matchState = "First Half";
                     break;
                 case MatchPhase.SecondHalf:
-                    matchState = "Secnod Half";
+                    matchState = "Second Half";
                     break;
                 case MatchPhase.OverTime:
                     matchState = "OverTime";
@@ -466,7 +473,7 @@ public class Referee : ICloneable
                 Reason = "Be scored and PlaceKick again",
                 ResultType = ResultType.PlaceKick
             };
-            Event.Send(Event.EventType1.GetGoal, Side.Blue); //黄方被进球
+            judgeResult.WhoGoal = Side.Blue;
             return true;
         }
         if (blueGoalState.PointIn(matchInfo.Ball.pos))
@@ -477,7 +484,7 @@ public class Referee : ICloneable
                 Reason = "Be scored and PlaceKick again",
                 ResultType = ResultType.PlaceKick
             };
-            Event.Send(Event.EventType1.GetGoal, Side.Yellow); //蓝方被进球
+            judgeResult.WhoGoal = Side.Yellow;
             return true;
         }
         return false;
@@ -673,7 +680,7 @@ public class Referee : ICloneable
         if (matchInfo.Ball.linearVelocity.GetUnityVector2().magnitude < 5)
         {
             standoffTime++;
-            if (standoffTime > 500)
+            if (standoffTime > maxStandoffTime)
             {
                 standoffTime = 0;
                 if (matchInfo.Ball.pos.x > 0 && matchInfo.Ball.pos.y > 0)

@@ -22,24 +22,35 @@ public enum ResultType
     FreeKickLeftBot
 }
 
+[JsonObject(MemberSerialization.OptIn)]
 public struct JudgeResult
 {
     /// <summary>
     /// 下一拍的动作类型
     /// </summary>
+    [JsonProperty]
     [JsonConverter(typeof(StringEnumConverter))]
     public ResultType ResultType { get; set; }
     
     /// <summary>
     /// 如果ResultType是摆位，则表示摆位的进攻方
     /// </summary>
+    [JsonProperty]
     [JsonConverter(typeof(StringEnumConverter))]
     public Side Actor { get; set; }
 
     /// <summary>
     /// 如果ResultType是摆位，则表示摆位的具体原因
     /// </summary>
+    [JsonProperty]
     public string Reason { get; set; }
+
+    /// <summary>
+    /// 如果不为Nobody，则表明当前拍有队伍进球
+    /// </summary>
+    [JsonProperty]
+    [JsonConverter(typeof(StringEnumConverter))]
+    public Side WhoGoal { get; set; }
 
     /// <summary>
     /// 获取哪方先摆位
