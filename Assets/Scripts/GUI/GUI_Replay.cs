@@ -140,7 +140,7 @@ public class GUI_Replay : MonoBehaviour
 
         StateBoard.Render(data.type);
         Debug.Assert(data.matchInfo != null, "data.matchInfo != null");
-        JudgeBoard.Render(data.matchInfo.Referee.lastJudge);
+        JudgeBoard.Render(data.matchInfo.Referee.savedJudge);
         tickText.text = $"{data.matchInfo.TickMatch}/{GUI_Replay.Recorder.DataLength}";
     }
 

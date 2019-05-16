@@ -5,10 +5,13 @@ using UnityEditor;
 using Simuro5v5;
 using System;
 
+/// <summary>
+/// 裁判的判定结果类型。用于指定下一拍的动作
+/// </summary>
 public enum ResultType
 {
     NormalMatch,
-    EndHalf,        //半场结束 上半场下半场加时赛结束、接口使拍数变0
+    NextPhase,        //半场结束 上半场下半场加时赛结束、接口使拍数变0
     GameOver,        //游戏结束，用来判断胜负
     PlaceKick,
     GoalKick,
@@ -22,19 +25,19 @@ public enum ResultType
 public struct JudgeResult
 {
     /// <summary>
-    /// 本次摆位的类型
+    /// 下一拍的动作类型
     /// </summary>
     [JsonConverter(typeof(StringEnumConverter))]
     public ResultType ResultType { get; set; }
     
     /// <summary>
-    /// 本次摆位的进攻方
+    /// 如果ResultType是摆位，则表示摆位的进攻方
     /// </summary>
     [JsonConverter(typeof(StringEnumConverter))]
     public Side Actor { get; set; }
 
     /// <summary>
-    /// 本次摆位的原因细节
+    /// 如果ResultType是摆位，则表示摆位的具体原因
     /// </summary>
     public string Reason { get; set; }
 

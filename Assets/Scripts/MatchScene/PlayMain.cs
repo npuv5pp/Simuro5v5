@@ -6,6 +6,9 @@ using Simuro5v5.Config;
 using Simuro5v5.Strategy;
 using Event = Simuro5v5.EventSystem.Event;
 
+/// <summary>
+/// 这个类用来维护比赛的状态，以及负责协调策略与场地
+/// </mmary>
 public class PlayMain : MonoBehaviour
 {
     /// <summary>
@@ -69,20 +72,6 @@ public class PlayMain : MonoBehaviour
         ObjectManager.Pause();
     }
 
-    // void FixedUpdate()
-    // {
-    //     timeTick++;
-    //     // 偶数拍，跳过
-    //     if (timeTick % 2 == 0) return;
-
-    //     ObjectManager.UpdateFromScene();
-
-    //     if (LoadSucceed && Started)
-    //     {
-    //         InMatchLoop();
-    //     }
-    // }
-
     void OnGetGoal(object obj)
     {
         Side who = (Side)obj;
@@ -97,49 +86,80 @@ public class PlayMain : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 维护比赛状态，根据裁判的判定结果执行不同的动作。<br/>
+    /// 
+    /// 裁判的判定：
+    /// 裁判共有3类判定结果：结束一个阶段（NextPhase和GameOver）、正常比赛（NormalMatch）以及摆位（xxxKick）；
+    /// 另外要注意的是，裁判不会主动修改MatchInfo中的任何信息。<br/>
+    ///
+    /// 判定结果的执行：
+    /// 结束一个阶段则结束一个阶段，并将时间设置为0；
+    /// 正常比赛则从策略中获取轮速，并将时间加一，触发事件；
+    /// 摆位则从策略中获取摆位信息，并将时间加一，触发事件。<br/>
+    ///
+    /// 比赛阶段：
+    /// 一场比赛最多分为4个阶段：上半场、下半场、加时、点球大战；<br/>
+    /// 每个阶段都由一个摆位开始，由NextPhase或者GameOver结束；
+    /// 每个阶段结束后，不会清空比分，但会清空比赛时间，将比赛时间设置为0以使得下一拍的裁判得知这是一个新的阶段；
+    /// 每个阶段运行期间可能产生正常比赛和摆位两种状态。<br/>
+    /// 
+    /// 比赛时间：
+    /// 实际的比赛时间从1开始；
+    /// 指定为0表示切换到了新的阶段，不算做实际比赛时间；
+    /// 能够使得时间增加一的判定结果有正常比赛和摆位两个;<br/>
+    /// 
+    /// 事件的触发：
+    /// 时间每增加一之后就会触发MatchInfoUpdate事件，时间重置为0时不会触发该事件；
+    /// 摆位时会触发AutoPlacement事件。<br/>
+    /// </summary>
     public void InMatchLoop()
     {
         if (!LoadSucceed || !Started || Paused) return;
 
+        /// 从裁判中获取下一拍的动作。
         JudgeResult judgeResult = GlobalMatchInfo.Referee.Judge(GlobalMatchInfo);
 
         if (judgeResult.ResultType == ResultType.GameOver)
         {
-            // 时间到，比赛结束
+            // 整场比赛结束
             Debug.Log("Game Over");
             StopMatch();
         }
-        else if (judgeResult.ResultType == ResultType.EndHalf)
+        else if (judgeResult.ResultType == ResultType.NextPhase)
         {
-            // 半场结束
-            Debug.Log("End half");
-            GlobalMatchInfo.TickMatch = 0;
+            // 上阶段结束
+            Debug.Log("next phase");
+            GlobalMatchInfo.MatchPhase = GlobalMatchInfo.MatchPhase.NextPhase();
+            GlobalMatchInfo.TickMatch = 0;      // 时间指定为0，使得下一拍的裁判得知新阶段的开始
         }
         else if (judgeResult.ResultType == ResultType.NormalMatch)
         {
             // 正常比赛
             UpdateWheelsToScene();
+            // 时间加一，触发事件
             GlobalMatchInfo.TickMatch++;
             Event.Send(Event.EventType1.MatchInfoUpdate, GlobalMatchInfo);
         }
         else
         {
-            // 需要摆位
+            // 摆位
             Debug.Log("placing...");
 
             void Callback()
             {
                 UpdatePlacementToScene(judgeResult);
+                // 时间加一，触发事件
                 GlobalMatchInfo.TickMatch++;
+                Event.Send(Event.EventType1.MatchInfoUpdate, GlobalMatchInfo);
+                Event.Send(Event.EventType1.AutoPlacement, GlobalMatchInfo);
 
-                PauseForTime(2, () => { });
+                PauseForSeconds(2, () => { });
             }
-
-            Event.Send(Event.EventType1.AutoPlacement, GlobalMatchInfo);
 
             if (GlobalMatchInfo.TickMatch > 0)
             {
-                PauseForTime(2, Callback);
+                PauseForSeconds(2, Callback);
             }
             else
             {
@@ -149,19 +169,20 @@ public class PlayMain : MonoBehaviour
     }
 
     /// <summary>
-    /// 新比赛开始
-    /// 重设场景，时间清空，裁判历史数据清空
+    /// 新比赛开始<br/>
+    /// 比分、阶段信息清空，时间置为零，裁判信息清空；还原默认场地；通知策略
     /// </summary>
     public void StartMatch()
     {
         Started = false;
 
-        ObjectManager.SetToDefault();
-        ObjectManager.SetStill();
         GlobalMatchInfo.Score = new MatchScore();
         GlobalMatchInfo.TickMatch = 0;
-        GlobalMatchInfo.MatchState = MatchState.FirstHalf;
+        GlobalMatchInfo.MatchPhase = MatchPhase.FirstHalf;
         GlobalMatchInfo.Referee = new Referee();
+
+        ObjectManager.SetToDefault();
+        ObjectManager.SetStill();
 
         StrategyManager.Blue.OnMatchStart();
         StrategyManager.Yellow.OnMatchStart();
@@ -172,24 +193,35 @@ public class PlayMain : MonoBehaviour
     }
 
     /// <summary>
-    /// 停止比赛
+    /// 停止比赛<br/>
+    /// 比分、阶段信息清空，时间置为零，裁判信息清空；还原默认场地；根据<parmref name="willNotifyStrategies">参数决定是否通知策略
     /// </summary>
     /// <param name="willNotifyStrategies">是否向策略发送通知，如果是由于策略出现错误需要停止比赛，可以指定为false。默认为true</param>
     public void StopMatch(bool willNotifyStrategies=true)
     {
-        GlobalMatchInfo.TickMatch = 0;
         Started = false;
         Paused = true;
+
+        GlobalMatchInfo.Score = new MatchScore();
+        GlobalMatchInfo.TickMatch = 0;
+        GlobalMatchInfo.MatchPhase = MatchPhase.FirstHalf;
+        GlobalMatchInfo.Referee = new Referee();
+
+        ObjectManager.SetToDefault();
+        ObjectManager.SetStill();
         ObjectManager.Pause();
 
-        Event.Send(Event.EventType1.MatchStop, GlobalMatchInfo);
         if (willNotifyStrategies)
         {
             StrategyManager.Blue.OnMatchStop();
             StrategyManager.Yellow.OnMatchStop();
         }
+        Event.Send(Event.EventType1.MatchStop, GlobalMatchInfo);
     }
 
+    /// <summary>
+    /// 如果比赛开始则暂停比赛。
+    /// </summary>
     public void PauseMatch()
     {
         if (Started)
@@ -199,6 +231,9 @@ public class PlayMain : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 继续比赛
+    /// </summary>
     public void ResumeMatch()
     {
         if (Started)
@@ -208,6 +243,9 @@ public class PlayMain : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 从策略中获取轮速并输入到场地中
+    /// </summary>
     void UpdateWheelsToScene()
     {
         WheelInfo wheelsBlue = StrategyManager.Blue.GetInstruction(GlobalMatchInfo.GetSide(Side.Blue));
@@ -226,6 +264,10 @@ public class PlayMain : MonoBehaviour
         ObjectManager.SetYellowWheels(wheelsYellow);
     }
 
+    /// <summary>
+    /// 从策略中获取摆位信息并做检查和修正，之后输入到场地中。
+    /// </summary>
+    /// <param name="judgeResult">摆位的原因信息</param>
     void UpdatePlacementToScene(JudgeResult judgeResult)
     {
         var currMi = (MatchInfo)GlobalMatchInfo.Clone();
@@ -275,6 +317,15 @@ public class PlayMain : MonoBehaviour
         ObjectManager.SetStill();
     }
 
+    /// <summary>
+    /// 从指定的endpoint字符串中加载双方策略
+    /// </summary>
+    /// <param name="blue_ep"></param>
+    /// <param name="yellow_ep"></param>
+    /// <returns></returns>
+    /// <exception cref="StrategyException">
+    /// 加载失败则抛出该错误
+    /// </exception>
     public bool LoadStrategy(string blue_ep, string yellow_ep)
     {
         var factory = new StrategyFactory
@@ -305,6 +356,9 @@ public class PlayMain : MonoBehaviour
         return true;
     }
 
+    /// <summary>
+    /// 移除一方的策略
+    /// </summary>
     public void RemoveStrategy(Side side)
     {
         switch (side)
@@ -318,13 +372,19 @@ public class PlayMain : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 移除两方的策略
+    /// </summary>
     public void RemoveStrategy()
     {
         RemoveStrategy(Side.Blue);
         RemoveStrategy(Side.Yellow);
     }
 
-    private void PauseForTime(int sec, TimedPauseCallback callback)
+    /// <summary>
+    /// 暂停<parmref name="sec">秒，然后执行<parmref name="callback">。
+    /// </summary>
+    private void PauseForSeconds(int sec, TimedPauseCallback callback)
     {
         if (sec > 0)
         {

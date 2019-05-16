@@ -287,24 +287,24 @@ public class GUI_Play : MonoBehaviour
         }
         else
         {
-            switch (playMain.GlobalMatchInfo.MatchState)
+            switch (playMain.GlobalMatchInfo.MatchPhase)
             {
-                case MatchState.FirstHalf:
+                case MatchPhase.FirstHalf:
                     {
                         SetStatusInfo("First Half In Playing");
                         break;
                     }
-                case MatchState.SecondHalf:
+                case MatchPhase.SecondHalf:
                     {
                         SetStatusInfo("Second Half In Playing");
                         break;
                     }
-                case MatchState.OverTime:
+                case MatchPhase.OverTime:
                     {
                         SetStatusInfo("Over Time In Playing");
                         break;
                     }
-                case MatchState.Penalty:
+                case MatchPhase.Penalty:
                     {
                         SetStatusInfo("Penalty Shootout In Playing");
                         break;
@@ -334,7 +334,7 @@ public class GUI_Play : MonoBehaviour
 
     void UpdateRefereeText()
     {
-        SetRefereeInfo(MatchInfo.Referee.lastJudge.ToRichText());
+        SetRefereeInfo(MatchInfo.Referee.savedJudge.ToRichText());
     }
 
     void PushMenu(GameObject newMenu)

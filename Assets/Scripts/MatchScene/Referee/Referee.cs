@@ -7,6 +7,12 @@ using UnityEngine;
 using Event = Simuro5v5.EventSystem.Event;
 using Simuro5v5.Util;
 
+/// <summary>
+/// 裁判根据比赛规则对场地信息进行判断。
+/// 有两个主要的对外接口：Judge和JudgeAutoPlacement
+/// Judge接口根据传入的MatchInfo，做出对下一拍动作的指示；
+/// JudgeAutoPlacement接口用于更正摆位的位置，将不合法的位置合法化。
+/// </summary>
 public class Referee : ICloneable
 {
     //Class
@@ -16,6 +22,18 @@ public class Referee : ICloneable
     private MatchInfo matchInfo;
     private Robot[] blueRobots;
     private Robot[] yellowRobots;
+
+    private UprightRectangle defenderHalfState;
+    private UprightRectangle offensiveHalfState;
+    private static readonly UprightRectangle yellowHalfState = new UprightRectangle(-110, 0, 90, -90);
+    private static readonly UprightRectangle yellowGoalState = new UprightRectangle(-125, -110, 20, -20);
+    private static readonly UprightRectangle yellowBigState = new UprightRectangle(-125, -75, 40, -40);
+    private static readonly UprightRectangle yellowSmallState = new UprightRectangle(-125, -95, 25, -25);
+    private static readonly UprightRectangle blueHalfState = new UprightRectangle(0, 110, 90, -90);
+    private static readonly UprightRectangle blueGoalState = new UprightRectangle(110, 125, 20, -20);
+    private static readonly UprightRectangle blueBigState = new UprightRectangle(75, 125, 40, -40);
+    private static readonly UprightRectangle blueSmallState = new UprightRectangle(95, 125, 25, -25);
+    private static readonly UprightRectangle stadiumState = new UprightRectangle(-110, 110, 90, -90);
 
     private int goalieBlueId;
     private int goalieYellowId;
@@ -52,12 +70,12 @@ public class Referee : ICloneable
     private int penaltyLimitTime;
 
     /// <summary>
-    /// 点球大战中所执行的时间 
+    /// 点球大战中所执行的时间
     /// </summary>
     private int penaltyTime;
 
     /// <summary>
-    /// 记录点球是否在5次内
+    /// 记录点球次数
     /// </summary>
     private int penaltyOfNum;
 
@@ -67,12 +85,15 @@ public class Referee : ICloneable
     [JsonProperty]
     private int standoffTime;
 
+    /// <summary>
+    /// 保存最近一次的判决结果
+    /// </summary>
     [JsonProperty]
-    public JudgeResult lastJudge;
+    public JudgeResult savedJudge;
 
     public Referee()
     {
-        endOfHalfgametime = 150000;
+        endOfHalfgametime = 15000;
         endOfOvergametime = 9000;
         penaltySide = Side.Blue;
         penaltyLimitTime = 250;
@@ -84,7 +105,9 @@ public class Referee : ICloneable
         OffensiveRobotsPos = new Vector2D[Const.RobotsPerTeam];
         DefenderRobotsPos = new Vector2D[Const.RobotsPerTeam];
 
-        lastJudge = new JudgeResult
+        ObjectManager.FindObjects(out BlueObject, out YellowObject, out BallObject);
+
+        savedJudge = new JudgeResult
         {
             Actor = Side.Nobody,
             ResultType = ResultType.NormalMatch,
@@ -97,24 +120,16 @@ public class Referee : ICloneable
         return new Referee
         {
             standoffTime = standoffTime,
-            lastJudge = lastJudge
+            savedJudge = savedJudge
         };
     }
 
-    private UprightRectangle defenderHalfState;
-    private UprightRectangle offensiveHalfState;
-    private static readonly UprightRectangle yellowHalfState = new UprightRectangle(-110, 0, 90, -90);
-    private static readonly UprightRectangle yellowGoalState = new UprightRectangle(-125, -110, 20, -20);
-    private static readonly UprightRectangle yellowBigState = new UprightRectangle(-125, -75, 40, -40);
-    private static readonly UprightRectangle yellowSmallState = new UprightRectangle(-125, -95, 25, -25);
-    private static readonly UprightRectangle blueHalfState = new UprightRectangle(0, 110, 90, -90);
-    private static readonly UprightRectangle blueGoalState = new UprightRectangle(110, 125, 20, -20);
-    private static readonly UprightRectangle blueBigState = new UprightRectangle(75, 125, 40, -40);
-    private static readonly UprightRectangle blueSmallState = new UprightRectangle(95, 125, 25, -25);
-    private static readonly UprightRectangle stadiumState = new UprightRectangle(-110, 110, 90, -90);
-    ///<summary>
-    ///判断比赛状态，返回JudgeResult类
+    /// <summary>
+    /// 根据传入的matchInfo，结合已保存的信息，给出下一拍应有的动作（JudgeResult）。<br/>
+    /// 这个接口不会对<parmref name="matchInfo">作任何修改。
     /// </summary>
+    /// <param name="matchInfo">需要被判断的比赛信息</param>
+    /// <returns>下一拍应有的动作信息</returns>
     public JudgeResult Judge(MatchInfo matchInfo)
     {
         this.blueScore = matchInfo.Score.BlueScore;
@@ -127,8 +142,34 @@ public class Referee : ICloneable
 
 
         var result = CollectJudge();
-        lastJudge = result;
+        savedJudge = result;
         return result;
+    }
+
+    /// <summary>
+    /// 判断一个摆位是否合法，不合法则根据规则矫正
+    /// </summary>
+    /// <param name="matchInfo">摆位的信息</param>
+    /// <param name="judgeResult">上次摆位的信息</param>
+    public void JudgeAutoPlacement(MatchInfo matchInfo, JudgeResult judgeResult)
+    {
+        for (int i = 0; i < Const.RobotsPerTeam; i++)
+        {
+            this.BlueRobotsPos[i] = matchInfo.BlueRobots[i].pos;
+            this.YellowRobotsPos[i] = matchInfo.YellowRobots[i].pos;
+        }
+        this.BallPos = matchInfo.Ball.pos;
+
+
+        switch (judgeResult.ResultType)
+        {
+            case ResultType.PenaltyKick:
+                JudgePenaltyPlacement(matchInfo, judgeResult);
+                break;
+            case ResultType.PlaceKick:
+                JudgePlacePlacement(matchInfo, judgeResult);
+                break;
+        }
     }
 
     private JudgeResult CollectJudge()
@@ -136,8 +177,8 @@ public class Referee : ICloneable
         JudgeResult judgeResult = default;
 
         //正常比赛状态：上半场、下半场、加时赛
-        if (matchInfo.MatchState == MatchState.FirstHalf || matchInfo.MatchState == MatchState.SecondHalf
-            || matchInfo.MatchState == MatchState.OverTime)
+        if (matchInfo.MatchPhase == MatchPhase.FirstHalf || matchInfo.MatchPhase == MatchPhase.SecondHalf
+            || matchInfo.MatchPhase == MatchPhase.OverTime)
         {
             if (JudgePlace(ref judgeResult))
                 return judgeResult;
@@ -296,7 +337,7 @@ public class Referee : ICloneable
     }
     private bool JudgePenaltyGoal(ref JudgeResult judgeResult)
     {
-        //若比赛超过五轮后，采用“突然死亡法”，先进球者先获胜 
+        //若比赛超过五轮后，采用“突然死亡法”，先进球者先获胜
         if (yellowGoalState.PointIn(matchInfo.Ball.pos))
         {
             //点球大战超过五轮后，进球直接胜利
@@ -392,15 +433,15 @@ public class Referee : ICloneable
         if (matchInfo.TickMatch == 0)
         {
             string matchState;
-            switch (matchInfo.MatchState)
+            switch (matchInfo.MatchPhase)
             {
-                case MatchState.FirstHalf:
+                case MatchPhase.FirstHalf:
                     matchState = "First Half";
                     break;
-                case MatchState.SecondHalf:
+                case MatchPhase.SecondHalf:
                     matchState = "Secnod Half";
                     break;
-                case MatchState.OverTime:
+                case MatchPhase.OverTime:
                     matchState = "OverTime";
                     break;
                 default:
@@ -445,7 +486,7 @@ public class Referee : ICloneable
     private bool JudgePenalty(ref JudgeResult judgeResult)
     {
         //考虑进入点球大战中，且首拍为0.进行点球
-        if (matchInfo.MatchState == MatchState.Penalty && matchInfo.TickMatch == 0)
+        if (matchInfo.MatchPhase == MatchPhase.Penalty && matchInfo.TickMatch == 0)
         {
             judgeResult = new JudgeResult
             {
@@ -691,14 +732,14 @@ public class Referee : ICloneable
 
     private bool JudgeHalfOrGameEnd(ref JudgeResult judgeResult)
     {
-        if (matchInfo.MatchState == MatchState.FirstHalf)
+        if (matchInfo.MatchPhase == MatchPhase.FirstHalf)
         {
             if (matchInfo.TickMatch == endOfHalfgametime)
             {
-                matchInfo.MatchState = MatchState.SecondHalf;
+                // matchInfo.MatchPhase = MatchPhase.SecondHalf;
                 judgeResult = new JudgeResult
                 {
-                    ResultType = ResultType.EndHalf,
+                    ResultType = ResultType.NextPhase,
                     Actor = Side.Nobody,
                     Reason = "FirstHalf Game end"
                 };
@@ -706,7 +747,7 @@ public class Referee : ICloneable
             }
             else return false;
         }
-        else if (matchInfo.MatchState == MatchState.SecondHalf)
+        else if (matchInfo.MatchPhase == MatchPhase.SecondHalf)
         {
             //下半场结束，判断比分是否结束
             if (matchInfo.TickMatch == endOfHalfgametime)
@@ -731,10 +772,10 @@ public class Referee : ICloneable
                 }
                 else
                 {
-                    matchInfo.MatchState = MatchState.OverTime;
+                    // matchInfo.MatchPhase = MatchPhase.OverTime;
                     judgeResult = new JudgeResult
                     {
-                        ResultType = ResultType.EndHalf,
+                        ResultType = ResultType.NextPhase,
                         Actor = Side.Nobody,
                         Reason = "SecondHalf Game end and start"
                     };
@@ -744,7 +785,7 @@ public class Referee : ICloneable
             else return false;
         }
         //加时赛结束，同样判断比分
-        else if (matchInfo.MatchState == MatchState.OverTime)
+        else if (matchInfo.MatchPhase == MatchPhase.OverTime)
         {
             if (matchInfo.TickMatch == endOfOvergametime)
             {
@@ -768,10 +809,10 @@ public class Referee : ICloneable
                 }
                 else
                 {
-                    matchInfo.MatchState = MatchState.Penalty;
+                    // matchInfo.MatchPhase = MatchPhase.Penalty;
                     judgeResult = new JudgeResult
                     {
-                        ResultType = ResultType.EndHalf,
+                        ResultType = ResultType.NextPhase,
                         Actor = Side.Nobody,
                         Reason = "Overtime Game end ,and start Penalty game"
                     };
@@ -802,28 +843,6 @@ public class Referee : ICloneable
         else
         {
             return true;
-        }
-    }
-
-    //自动摆位判断
-    public void JudgeAutoPlacement(MatchInfo matchInfo, JudgeResult judgeResult)
-    {
-        for (int i = 0; i < Const.RobotsPerTeam; i++)
-        {
-            this.BlueRobotsPos[i] = matchInfo.BlueRobots[i].pos;
-            this.YellowRobotsPos[i] = matchInfo.YellowRobots[i].pos;
-        }
-        this.BallPos = matchInfo.Ball.pos;
-
-
-        switch (judgeResult.ResultType)
-        {
-            case ResultType.PenaltyKick:
-                JudgePenaltyPlacement(matchInfo, judgeResult);
-                break;
-            case ResultType.PlaceKick:
-                JudgePlacePlacement(matchInfo, judgeResult);
-                break;
         }
     }
 

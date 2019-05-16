@@ -7,16 +7,6 @@ using System.Linq;
 
 namespace Simuro5v5
 {
-    public enum GameState
-    {
-        NormalMatch = 0,
-        FreeBallTop = 1,
-        FreeBallBottom = 2,
-        PlaceKick = 3,
-        Penalty = 4,
-        GoalKick = 5,
-    }
-
     public enum Side
     {
         Yellow,
@@ -24,7 +14,7 @@ namespace Simuro5v5
         Nobody,
     };
 
-    public enum MatchState
+    public enum MatchPhase
     {
         FirstHalf,
         SecondHalf,
@@ -32,16 +22,26 @@ namespace Simuro5v5
         Penalty
     }
 
+    /// <summary>
+    /// 单拍信息
+    /// 包括：机器人和球的信息；比分；时间；比赛阶段（上下半场等）；裁判（包括本拍的判决信息）
+    /// 这个类的目标是用来表示完整的一拍信息，属于单拍的信息都应该放在这里，由于平台比赛由拍驱动，所以这个类在平台内大量使用。
+    /// </summary>
     public class MatchInfo : ICloneable
     {
+        // TODO 将这三者提取出来作为另外一个类EntityInfo，因为有许多地方只需要物体的信息，但是仍传递了整个MatchInfo
         public Robot[] BlueRobots { get; set; }
         public Robot[] YellowRobots { get; set; }
         public Ball Ball;
 
-        public MatchScore Score;
+        // 时间
         public int TickMatch;
-        public MatchState MatchState;
+        // 比分
+        public MatchScore Score;
+        // 比赛阶段：上下半场、加时、点球大战
+        public MatchPhase MatchPhase;
 
+        // 当前拍的裁判信息。含有裁判在*本拍*的一些状态
         public Referee Referee;
 
         public MatchInfo()
@@ -506,6 +506,21 @@ namespace Simuro5v5
                     return Side.Blue;
                 default:
                     return Side.Nobody;
+            }
+        }
+
+        public static MatchPhase NextPhase(this MatchPhase phase)
+        {
+            switch (phase)
+            {
+                case MatchPhase.FirstHalf:
+                    return MatchPhase.SecondHalf;
+                case MatchPhase.SecondHalf:
+                    return MatchPhase.OverTime;
+                case MatchPhase.OverTime:
+                    return MatchPhase.Penalty;
+                default:
+                    throw new ArgumentException("Penalty don't have next phase");
             }
         }
     }
