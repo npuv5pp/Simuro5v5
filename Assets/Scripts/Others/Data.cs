@@ -323,11 +323,7 @@ namespace Simuro5v5
         }
     }
     
-
-    public float VectoVecDis(Vector2D point1 , Vector2D point2)
-    {
-
-    }
+    
 
     public struct Vector2D
     {
