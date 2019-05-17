@@ -16,7 +16,7 @@ namespace Simuro5v5.Util
         private float RightX;
         private float TopY;
         private float BotY;
-        
+
         public UprightRectangle(float LeftX, float RightX, float TopY, float BotY)
         {
             this.LeftX = LeftX;
@@ -49,7 +49,7 @@ namespace Simuro5v5.Util
         // 1 --- 3
         // |  o  |
         // 4  -- 2
-        
+
         /// <summary>
         /// 通过正方形的两个对角点构造正方形
         /// </summary>
@@ -59,6 +59,29 @@ namespace Simuro5v5.Util
             Point2 = point2;
         }
 
+        /// <summary>
+        /// 通过机器人中心与半径以及角度来构造机器人正方形
+        /// </summary>
+        public Square(Vector2D robotPos, float angle)
+        {
+            float robotRadiu = (float)(Const.Robot.HRL * 1.414);
+            //角度规整
+            while (angle > 90 || angle < 0)
+            {
+                if (angle > 90)
+                {
+                    angle -= 90;
+                }
+                else
+                    angle += 90;
+            }
+            float point1x = (float)(robotPos.x + robotRadiu * Math.Cos(angle));
+            float point1y = (float)(robotPos.y + robotRadiu * Math.Sin(angle));
+            float point2x = (float)(robotPos.x - robotRadiu * Math.Cos(angle));
+            float point2y = (float)(robotPos.y - robotRadiu * Math.Sin(angle));
+            Point1 = new Vector2D(point1x, point1y);
+            Point2 = new Vector2D(point2x, point2y);
+        }
         /// <summary>
         /// 第一个对角点
         /// </summary>
@@ -74,7 +97,7 @@ namespace Simuro5v5.Util
 
         public Vector2D Point4 => (Point1 - Midpoint).Rotate(-Mathf.PI / 4)
                                   + Midpoint;
-        
+
         Vector2D Midpoint => (Point1 + Point2) / 2;
 
         List<(Vector2D, Vector2D)> Lines =>
@@ -83,7 +106,7 @@ namespace Simuro5v5.Util
                 (Point1, Point3), (Point1, Point4),
                 (Point3, Point2), (Point4, Point2),
             };
-        
+
 
         /// <summary>
         /// 判断两条直线 AB 与 CD 是否相交
@@ -117,6 +140,27 @@ namespace Simuro5v5.Util
             }
 
             return false;
+        }
+
+        public bool IsInCycle(Vector2D cenpos , float radiu)
+        {
+            if (Vector2D.Distance(Point1, cenpos) < radiu)
+            {
+                return false;
+            }
+            if (Vector2D.Distance(Point2, cenpos) < radiu)
+            {
+                return false;
+            }
+            if (Vector2D.Distance(Point3, cenpos) < radiu)
+            {
+                return false;
+            }
+            if (Vector2D.Distance(Point4, cenpos) < radiu)
+            {
+                return false;
+            }
+            return true;
         }
     }
 }

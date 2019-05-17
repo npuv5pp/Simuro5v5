@@ -322,6 +322,12 @@ namespace Simuro5v5
             }
         }
     }
+    
+
+    public float VectoVecDis(Vector2D point1 , Vector2D point2)
+    {
+
+    }
 
     public struct Vector2D
     {
@@ -381,6 +387,11 @@ namespace Simuro5v5
         public static Vector2D operator /(Vector2D vec, float v)
         {
             return new Vector2D(vec.x / v, vec.y / v);
+        }
+
+        public static float Distance (Vector2D lhs, Vector2D rsh)
+        {
+            return Vector2.Distance(lhs.GetUnityVector2(), rsh.GetUnityVector2());
         }
 
         /// <summary>
