@@ -102,8 +102,8 @@ public class Referee : ICloneable
     {
 #if UNITY_EDITOR
         // 编辑器中调试的时候将时间设置短一点
-        endOfHalfgametime = 500;
-        endOfOvergametime = 500;
+        endOfHalfgametime = 1000;
+        endOfOvergametime = 1000;
 #else
         endOfHalfgametime = 15000;
         endOfOvergametime = 9000;
@@ -887,13 +887,21 @@ public class Referee : ICloneable
             //蓝方执行点球时相关坐标
             PenaltyBallPos = new Vector2D(-72.5f, 0f);//点球坐标
             PenaltyDefenderGoaliePos = new Vector2D(-106f, 0f);//守门员坐标
-                                                               //黄方的安全区域点
-            PenaltyDefenderSafePos = new SafePos[5] { new SafePos(new Vector2D(5f, 6f)), new SafePos(new Vector2D(5f, 16f))
-            , new SafePos(new Vector2D(5f, 26f)), new SafePos(new Vector2D(5f, 36f)), new SafePos(new Vector2D(5f, 46f)) };
+
+            PenaltyDefenderSafePos = new SafePos[5] {  //黄方的安全区域点
+                new SafePos(new Vector2D(5f, 6f)),
+                new SafePos(new Vector2D(5f, 16f)),
+                new SafePos(new Vector2D(5f, 26f)),
+                new SafePos(new Vector2D(5f, 36f)),
+                new SafePos(new Vector2D(5f, 46f)) };
 
             //蓝方的安全区域点
-            PenaltyOffensiveSafePos = new SafePos[5] { new SafePos(new Vector2D(5f, -6f)), new SafePos(new Vector2D(5f, -16f))
-            , new SafePos(new Vector2D(5f, -26f)), new SafePos(new Vector2D(5f, -36f)), new SafePos(new Vector2D(5f, -46f)) };
+            PenaltyOffensiveSafePos = new SafePos[5] {
+                new SafePos(new Vector2D(5f, -6f)),
+                new SafePos(new Vector2D(5f, -16f)),
+                new SafePos(new Vector2D(5f, -26f)),
+                new SafePos(new Vector2D(5f, -36f)),
+                new SafePos(new Vector2D(5f, -46f)) };
 
             JudgeSatePosOverlap(PenaltyOffensiveSafePos, PenaltyDefenderSafePos, Side.Blue, Side.Yellow);
             GoalieId = FindGoalie(Side.Blue);
@@ -905,12 +913,20 @@ public class Referee : ICloneable
             PenaltyBallPos = new Vector2D(72.5f, 0f);//点球坐标
             PenaltyDefenderGoaliePos = new Vector2D(106f, 0f);//守门员坐标
                                                               //黄方的安全区域点
-            PenaltyDefenderSafePos = new SafePos[5] { new SafePos(new Vector2D(-5f, -6f)), new SafePos(new Vector2D(-5f, -16f))
-            , new SafePos(new Vector2D(5f, -26f)), new SafePos(new Vector2D(-5f, -36f)), new SafePos(new Vector2D(-5f, -46f)) };
+            PenaltyDefenderSafePos = new SafePos[5] {
+                new SafePos(new Vector2D(-5f, -6f)),
+                new SafePos(new Vector2D(-5f, -16f)),
+                new SafePos(new Vector2D(5f, -26f)),
+                new SafePos(new Vector2D(-5f, -36f)),
+                new SafePos(new Vector2D(-5f, -46f)) };
 
             //蓝方的安全区域点
-            PenaltyOffensiveSafePos = new SafePos[5] { new SafePos(new Vector2D(-5f, 6f)), new SafePos(new Vector2D(-5f, 16f))
-            , new SafePos(new Vector2D(-5f, 26f)), new SafePos(new Vector2D(-5f, 36f)), new SafePos(new Vector2D(-5f, 46f)) };
+            PenaltyOffensiveSafePos = new SafePos[5] {
+                new SafePos(new Vector2D(-5f, 6f)),
+                new SafePos(new Vector2D(-5f, 16f)),
+                new SafePos(new Vector2D(-5f, 26f)),
+                new SafePos(new Vector2D(-5f, 36f)),
+                new SafePos(new Vector2D(-5f, 46f)) };
 
             JudgeSatePosOverlap(PenaltyOffensiveSafePos, PenaltyDefenderSafePos, Side.Yellow, Side.Blue);
             GoalieId = FindGoalie(Side.Yellow);

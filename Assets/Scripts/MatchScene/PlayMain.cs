@@ -7,7 +7,35 @@ using Simuro5v5.Strategy;
 using Event = Simuro5v5.EventSystem.Event;
 
 /// <summary>
-/// 这个类用来维护比赛的状态，以及负责协调策略与场地
+/// 这个类绑定在Entity物体上，用来维护比赛的状态，以及负责协调策略与场地。<br>
+/// 
+/// 裁判的判定：
+/// 裁判共有3类判定结果：结束一个阶段（NextPhase和GameOver）、正常比赛（NormalMatch）以及摆位（xxxKick）；
+/// 另外要注意的是，裁判不会主动修改MatchInfo中的任何信息，所有信息由JudgeResult返回。<br>
+///
+/// 判定结果的执行：
+/// 结束一个阶段则结束一个阶段，并将时间设置为0；
+/// 正常比赛则从策略中获取轮速，并将时间加一，触发事件；
+/// 摆位则首先判断是否为进球引起的摆位（JudgeResult.WhoGoal），然后从策略中获取摆位信息，并将时间加一，触发事件。<br>
+/// 
+/// 进球：
+/// 进球会发生在摆位或者GameOver状态；
+/// 正常情况下进球会引起摆位，但是如果进入点球大战的“突然死亡”模式，有可能进球伴随着GameOver状态。<br>
+///
+/// 比赛阶段：
+/// 一场比赛最多分为4个阶段：上半场、下半场、加时、点球大战；<br>
+/// 每个阶段都由一个摆位开始，由NextPhase或者GameOver结束；
+/// 每个阶段结束后，不会清空比分，但会清空比赛时间，将比赛时间设置为0以使得下一拍的裁判得知这是一个新的阶段；
+/// 每个阶段运行期间可能产生正常比赛和摆位两种状态。<br>
+/// 
+/// 比赛时间：
+/// 实际的比赛时间从1开始；
+/// /// 指定为0表示切换到了新的阶段，不算做实际比赛时间；
+/// 能够使得时间增加一的判定结果有正常比赛和摆位两个;<br>
+/// 
+/// 事件的触发：
+/// 时间每增加一之后就会触发MatchInfoUpdate事件，时间重置为0时不会触发该事件；
+/// 摆位时会触发AutoPlacement事件。<br>
 /// </mmary>
 public class PlayMain : MonoBehaviour
 {
@@ -29,11 +57,9 @@ public class PlayMain : MonoBehaviour
     public MatchInfo GlobalMatchInfo { get; private set; }
     public ObjectManager ObjectManager { get; private set; }
 
-    public delegate void TimedPauseCallback();
-    bool TimedPausing { get; set; }
-    readonly object timedPausingLock = new object();
-
-    // 进入场景之后
+    /// <summary>
+    /// 进入场景之后。如果已经有实例在运行，立即销毁所绑定的Entity；否则激活已存在的单例
+    /// </summary>
     void OnEnable()
     {
         if (Singleton != null)
@@ -65,7 +91,6 @@ public class PlayMain : MonoBehaviour
         ObjectManager.RebindObject();
         ObjectManager.RebindMatchInfo(GlobalMatchInfo);
         Event.Register(Event.EventType0.PlaySceneExited, SceneExited);
-        // Event.Register(Event.EventType1.GetGoal, OnGetGoal);
 
         // 等待当前帧渲染完毕后暂停，确保还原后的场景显示到屏幕上
         yield return new WaitForEndOfFrame();
@@ -74,34 +99,6 @@ public class PlayMain : MonoBehaviour
 
     /// <summary>
     /// 维护比赛状态，根据裁判的判定结果执行不同的动作。<br>
-    /// 
-    /// 裁判的判定：
-    /// 裁判共有3类判定结果：结束一个阶段（NextPhase和GameOver）、正常比赛（NormalMatch）以及摆位（xxxKick）；
-    /// 另外要注意的是，裁判不会主动修改MatchInfo中的任何信息，所有信息由JudgeResult返回。<br>
-    ///
-    /// 判定结果的执行：
-    /// 结束一个阶段则结束一个阶段，并将时间设置为0；
-    /// 正常比赛则从策略中获取轮速，并将时间加一，触发事件；
-    /// 摆位则首先判断是否为进球引起的摆位（JudgeResult.WhoGoal），然后从策略中获取摆位信息，并将时间加一，触发事件。<br>
-    /// 
-    /// 进球：
-    /// 进球会发生在摆位或者GameOver状态；
-    /// 正常情况下进球会引起摆位，但是如果进入点球大战的“突然死亡”模式，有可能进球伴随着GameOver状态。<br>
-    ///
-    /// 比赛阶段：
-    /// 一场比赛最多分为4个阶段：上半场、下半场、加时、点球大战；<br>
-    /// 每个阶段都由一个摆位开始，由NextPhase或者GameOver结束；
-    /// 每个阶段结束后，不会清空比分，但会清空比赛时间，将比赛时间设置为0以使得下一拍的裁判得知这是一个新的阶段；
-    /// 每个阶段运行期间可能产生正常比赛和摆位两种状态。<br>
-    /// 
-    /// 比赛时间：
-    /// 实际的比赛时间从1开始；
-    /// 指定为0表示切换到了新的阶段，不算做实际比赛时间；
-    /// 能够使得时间增加一的判定结果有正常比赛和摆位两个;<br>
-    /// 
-    /// 事件的触发：
-    /// 时间每增加一之后就会触发MatchInfoUpdate事件，时间重置为0时不会触发该事件；
-    /// 摆位时会触发AutoPlacement事件。<br>
     /// </summary>
     public void InMatchLoop()
     {
@@ -173,6 +170,7 @@ public class PlayMain : MonoBehaviour
                 PauseForSeconds(2, () => { });
             }
 
+            // TODO 考虑连续出现摆位的情况
             if (GlobalMatchInfo.TickMatch > 0)
             {
                 PauseForSeconds(2, Callback);
@@ -237,9 +235,75 @@ public class PlayMain : MonoBehaviour
     }
 
     /// <summary>
-    /// 如果比赛开始则暂停比赛。
+    /// 是否正在被外部暂停。
+    /// </summary>
+    bool manualPausing;
+    
+    /// <summary>
+    /// 是否正在定时暂停。
+    /// </summary>
+    bool timedPausing;
+
+    /// <summary>
+    /// 如果比赛开始则暂停比赛。<br>
+    /// 
+    /// 暂停和继续的讨论：
+    /// 暂停和继续由Paused变量控制，有两种方式改变该变量：
+    /// 一种是配套使用的PauseMatch和ResumeMatch，另一种是PauseForSeconds的开始和结束。<br>
+    /// 其中，前一种方式提供给外部使用，调用时机不确定，不应对其作任何预测；后一种方式PlayMain自行使用。<br>
+    /// 要明确的几点：<br>
+    /// 1. PauseMatch会被用户使用，所以应该具有最高的权限，在任何情况下都应该成功暂停。
+    ///     即如果在已经启动的PauseForSeconds即将结束而准备继续比赛前，用户点了暂停（调用了PauseMatch），
+    ///     那么最终不应该继续比赛；<br>
+    /// 2. 为了保证PauseForSeconds暂停的效果，在等待时间内不应允许用户调用ResumeMatch（TODO: 后续可以考虑保存用户的继续请求）。<br>
+    /// 
+    /// TODO: 处理多个PauseForSeconds并行的情况。
     /// </summary>
     public void PauseMatch()
+    {
+        manualPausing = true;
+        PauseMatchClearly();
+    }
+
+    /// <summary>
+    /// 继续比赛。<br>
+    /// 如果正在定时暂停，则禁止。
+    /// </summary>
+    public void ResumeMatch()
+    {
+        if (!timedPausing)
+        {
+            ResumeMatchClearly();
+            manualPausing = false;
+        }
+    }
+
+    /// <summary>
+    /// 暂停<parmref name="sec">秒，然后执行<parmref name="callback">。<br>
+    /// </summary>
+    private void PauseForSeconds(int sec, Action callback)
+    {
+        IEnumerator _PauseCoroutine()
+        {
+            timedPausing = true;
+            PauseMatchClearly();
+            yield return new WaitForSecondsRealtime(sec);
+            callback();
+            // 外部没有主动暂停，则可以继续比赛
+            if (!manualPausing) ResumeMatchClearly();
+            timedPausing = false;
+        }
+
+        if (sec > 0)
+        {
+            StartCoroutine(_PauseCoroutine());
+        }
+    }
+
+    /// <summary>
+    /// 实际执行暂停操作，不维护暂停相关的状态。供内部使用<br>
+    /// </summary>
+    private void PauseMatchClearly()
     {
         if (Started)
         {
@@ -249,11 +313,11 @@ public class PlayMain : MonoBehaviour
     }
 
     /// <summary>
-    /// 继续比赛
+    /// 实际执行继续操作，不维护暂停相关的状态。供内部使用<br>
     /// </summary>
-    public void ResumeMatch()
+    private void ResumeMatchClearly()
     {
-        if (Started && !TimedPausing)  // 如果正在PauseForSecond，则不允许手动开始
+        if (Started)    // 比赛已经开始
         {
             Paused = false;
             ObjectManager.Resume();
@@ -301,17 +365,15 @@ public class PlayMain : MonoBehaviour
                 // 黄方后摆位
                 yellowInfo = StrategyManager.Yellow.GetPlacement(currMi.GetSide(Side.Yellow));
 
-                // 转换数据
-                if (GeneralConfig.EnableConvertYellowData)
-                    yellowInfo.ConvertToAnotherSide();
+                // 黄方策略认为自己是蓝方，所以返回数据之后需要转换
+                yellowInfo.ConvertToAnotherSide();
 
                 break;
             case Side.Yellow:
                 // 黄方先摆位
                 yellowInfo = StrategyManager.Yellow.GetPlacement(currMi.GetSide(Side.Yellow));
-                // 由于右攻假设，黄方返回的数据是其作为蓝方的数据，需要先将黄方数据转换
-                if (GeneralConfig.EnableConvertYellowData)
-                    yellowInfo.ConvertToAnotherSide();
+                // 由于右攻假设，黄方认为自己是蓝方，返回的数据是其作为蓝方的数据，需要转换
+                yellowInfo.ConvertToAnotherSide();
 
                 // 将黄方返回的数据同步到currMi
                 currMi.UpdateFrom(yellowInfo.Robots, Side.Yellow);
@@ -419,34 +481,6 @@ public class PlayMain : MonoBehaviour
             case Side.Yellow:
                 GlobalMatchInfo.Score.YellowScore++;
                 break;
-        }
-    }
-
-    /// <summary>
-    /// 暂停<parmref name="sec">秒，然后执行<parmref name="callback">。
-    /// </summary>
-    private void PauseForSeconds(int sec, TimedPauseCallback callback)
-    {
-        IEnumerator _PauseCoroutine()
-        {
-            yield return new WaitUntil(delegate ()
-            {
-                lock (timedPausingLock)
-                {
-                    return TimedPausing == false;
-                }
-            });
-            TimedPausing = true;
-            yield return new WaitForSecondsRealtime(sec);
-            TimedPausing = false;
-            ResumeMatch();
-            callback();
-        }
-
-        if (sec > 0)
-        {
-            PauseMatch();
-            StartCoroutine(_PauseCoroutine());
         }
     }
 
