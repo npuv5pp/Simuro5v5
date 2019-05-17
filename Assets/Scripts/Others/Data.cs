@@ -178,6 +178,12 @@ namespace Simuro5v5
             Ball = newBall;
         }
 
+        /// <summary>
+        /// 满足右攻假设，获取双方在*蓝方*视角下的SideInfo
+        /// 首先根据当前信息构造SideInfo，然后如果需要的是黄方数据，为了满足右攻假设，进行视角的转换
+        /// </summary>
+        /// <param name="side"></param>
+        /// <returns></returns>
         public SideInfo GetSide(Side side)
         {
             SideInfo si = new SideInfo
@@ -196,7 +202,7 @@ namespace Simuro5v5
             si.home = (Robot[])home.Clone();
             si.opp = (from rb in opp
                       select new OpponentRobot { pos = rb.pos, rotation = rb.rotation }).ToArray();
-            if (side == Side.Yellow) si.ConvertToOtherSide();
+            if (side == Side.Yellow) si.ConvertToAnotherSide();
             si.TickMatch = TickMatch;
             return si;
         }
@@ -206,6 +212,13 @@ namespace Simuro5v5
     {
         public int BlueScore;
         public int YellowScore;
+
+        public void Swap()
+        {
+            var tmp = BlueScore;
+            BlueScore = YellowScore;
+            YellowScore = tmp;
+        }
     }
 
     public class SideInfo
@@ -214,11 +227,10 @@ namespace Simuro5v5
         public OpponentRobot[] opp = new OpponentRobot[Const.RobotsPerTeam];
         public Ball currentBall;
         public int TickMatch;
-        public int TickRound;
 
         public SideInfo() { }
 
-        public void ConvertToOtherSide()
+        public void ConvertToAnotherSide()
         {
             float ht = Const.Field.Right + Const.Field.Left;
             float vt = Const.Field.Bottom + Const.Field.Top;
@@ -272,7 +284,7 @@ namespace Simuro5v5
             Ball.Normalize();
         }
 
-        public void ConvertToOtherSide()
+        public void ConvertToAnotherSide()
         {
             float ht = Const.Field.Right + Const.Field.Left;
             float vt = Const.Field.Bottom + Const.Field.Top;

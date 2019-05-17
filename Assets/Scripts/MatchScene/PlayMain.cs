@@ -129,8 +129,13 @@ public class PlayMain : MonoBehaviour
         }
         else if (judgeResult.ResultType == ResultType.NextPhase)
         {
-            // 上阶段结束
+            // 阶段结束
             Debug.Log("next phase");
+            if (GlobalMatchInfo.MatchPhase == MatchPhase.FirstHalf)
+            {
+                Debug.Log("switch role");
+                SwitchRole();
+            }
             GlobalMatchInfo.MatchPhase = GlobalMatchInfo.MatchPhase.NextPhase();
             GlobalMatchInfo.TickMatch = 0;      // 时间指定为0，使得下一拍的裁判得知新阶段的开始
         }
@@ -248,7 +253,7 @@ public class PlayMain : MonoBehaviour
     /// </summary>
     public void ResumeMatch()
     {
-        if (Started)
+        if (Started && !TimedPausing)  // 如果正在PauseForSecond，则不允许手动开始
         {
             Paused = false;
             ObjectManager.Resume();
@@ -256,18 +261,17 @@ public class PlayMain : MonoBehaviour
     }
 
     /// <summary>
-    /// 从策略中获取轮速并输入到场地中
+    /// 从策略中获取轮速并输入到场地中。
+    /// <remark>满足右攻假设。</remark>
     /// </summary>
     void UpdateWheelsToScene()
     {
-        WheelInfo wheelsBlue = StrategyManager.Blue.GetInstruction(GlobalMatchInfo.GetSide(Side.Blue));
+        WheelInfo wheelsBlue = StrategyManager.Blue.GetInstruction(
+            GlobalMatchInfo.GetSide(Side.Blue));
 
-        SideInfo yellow = GlobalMatchInfo.GetSide(Side.Yellow);
-        if (GeneralConfig.EnableConvertYellowData)
-        {
-            yellow.ConvertToOtherSide();
-        }
-        WheelInfo wheelsYellow = StrategyManager.Yellow.GetInstruction(yellow);
+        // GetSide(Yellow)返回的数据是将黄方当作蓝方的数据，已经完成转换
+        WheelInfo wheelsYellow = StrategyManager.Yellow.GetInstruction(
+            GlobalMatchInfo.GetSide(Side.Yellow));
 
         wheelsBlue.Normalize();     //轮速规整化
         wheelsYellow.Normalize();   //轮速规整化
@@ -278,6 +282,7 @@ public class PlayMain : MonoBehaviour
 
     /// <summary>
     /// 从策略中获取摆位信息并做检查和修正，之后输入到场地中。
+    /// <remark>满足右攻假设。</remark>
     /// </summary>
     /// <param name="judgeResult">摆位的原因信息</param>
     void UpdatePlacementToScene(JudgeResult judgeResult)
@@ -298,15 +303,15 @@ public class PlayMain : MonoBehaviour
 
                 // 转换数据
                 if (GeneralConfig.EnableConvertYellowData)
-                    yellowInfo.ConvertToOtherSide();
+                    yellowInfo.ConvertToAnotherSide();
 
                 break;
             case Side.Yellow:
                 // 黄方先摆位
                 yellowInfo = StrategyManager.Yellow.GetPlacement(currMi.GetSide(Side.Yellow));
-                // 由于右攻假设，需要先将黄方数据转换
+                // 由于右攻假设，黄方返回的数据是其作为蓝方的数据，需要先将黄方数据转换
                 if (GeneralConfig.EnableConvertYellowData)
-                    yellowInfo.ConvertToOtherSide();
+                    yellowInfo.ConvertToAnotherSide();
 
                 // 将黄方返回的数据同步到currMi
                 currMi.UpdateFrom(yellowInfo.Robots, Side.Yellow);
@@ -327,6 +332,16 @@ public class PlayMain : MonoBehaviour
         ObjectManager.SetBallPlacement(mi.Ball);
 
         ObjectManager.SetStill();
+    }
+
+    /// <summary>
+    /// 切换双方角色
+    /// 将策略双方调换，GlobalMatchInfo中的比分调换
+    /// </summary>
+    public void SwitchRole()
+    {
+        StrategyManager.SwitchRole();
+        GlobalMatchInfo.Score.Swap();
     }
 
     /// <summary>
@@ -412,27 +427,27 @@ public class PlayMain : MonoBehaviour
     /// </summary>
     private void PauseForSeconds(int sec, TimedPauseCallback callback)
     {
+        IEnumerator _PauseCoroutine()
+        {
+            yield return new WaitUntil(delegate ()
+            {
+                lock (timedPausingLock)
+                {
+                    return TimedPausing == false;
+                }
+            });
+            TimedPausing = true;
+            yield return new WaitForSecondsRealtime(sec);
+            TimedPausing = false;
+            ResumeMatch();
+            callback();
+        }
+
         if (sec > 0)
         {
             PauseMatch();
-            StartCoroutine(_PauseCoroutine(sec, callback));
+            StartCoroutine(_PauseCoroutine());
         }
-    }
-
-    IEnumerator _PauseCoroutine(float sec, TimedPauseCallback callback)
-    {
-        yield return new WaitUntil(delegate ()
-        {
-            lock (timedPausingLock)
-            {
-                return TimedPausing == false;
-            }
-        });
-        TimedPausing = true;
-        yield return new WaitForSecondsRealtime(sec);
-        ResumeMatch();
-        callback();
-        TimedPausing = false;
     }
 
     void SceneExited()

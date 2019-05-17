@@ -161,12 +161,36 @@ namespace Simuro5v5.Strategy
             Yellow = StrategyFactory.CreateYellow();
             return Yellow.Connect();
         }
+
+        /// <summary>
+        /// 调换双方策略
+        /// </summary>
+        public void SwitchRole()
+        {
+            if (!IsBlueReady)
+            {
+                throw new StrategyException(Side.Blue, "blue strategy is not ready");
+            }
+            if (!IsYellowReady)
+            {
+                throw new StrategyException(Side.Blue, "blue strategy is not ready");
+            }
+
+            var tmp = Blue;
+            Blue = Yellow;
+            Yellow = tmp;
+        }
     }
 
     [System.Serializable]
     public class StrategyException : System.Exception
     {
         public Side side;
+
+        public StrategyException(Side side, string message) : base(message)
+        {
+            this.side = side;
+        }
 
         public StrategyException(Side side, Exception innerException) : base(innerException.Message, innerException)
         {

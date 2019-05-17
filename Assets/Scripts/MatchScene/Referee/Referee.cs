@@ -100,8 +100,14 @@ public class Referee : ICloneable
 
     public Referee()
     {
+#if UNITY_EDITOR
+        // 编辑器中调试的时候将时间设置短一点
+        endOfHalfgametime = 500;
+        endOfOvergametime = 500;
+#else
         endOfHalfgametime = 15000;
         endOfOvergametime = 9000;
+#endif
         penaltySide = Side.Blue;
         penaltyLimitTime = 250;
         penaltyTime = 0;
