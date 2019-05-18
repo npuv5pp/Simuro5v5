@@ -8,99 +8,41 @@ using UnityEngine;
 
 namespace Simuro5v5.Util
 {
-    public class UprightRectangle
-    {
-        private Vector2D TopLeftPoint;
-        private Vector2D BotRightPoint;
-        private float LeftX;
-        private float RightX;
-        private float TopY;
-        private float BotY;
-
-        public UprightRectangle(float LeftX, float RightX, float TopY, float BotY)
-        {
-            this.LeftX = LeftX;
-            this.TopY = TopY;
-            this.RightX = RightX;
-            this.BotY = BotY;
-        }
-
-        public static UprightRectangle RobotSquare(Vector2D RobotPos)
-        {
-            float HRL = Const.Robot.HRL;
-            UprightRectangle robotsquare = new UprightRectangle(RobotPos.x - HRL, RobotPos.x + HRL, RobotPos.y + HRL, RobotPos.y - HRL);
-            return robotsquare;
-        }
-
-        public UprightRectangle(Vector2D TopLeftPoint, Vector2D BotRightPoint)
-        {
-            this.TopLeftPoint = TopLeftPoint;
-            this.BotRightPoint = BotRightPoint;
-        }
-
-        public bool PointIn(Vector2D Point)
-        {
-            return Point.x < RightX && Point.x > LeftX && Point.y > BotY && Point.y < TopY;
-        }
-    }
-
-    public class Square
+    public abstract class RectangleBase
     {
         // 1 --- 3
         // |  o  |
         // 4  -- 2
 
         /// <summary>
-        /// 通过正方形的两个对角点构造正方形
+        /// 和 Point2 构成对角线
         /// </summary>
-        public Square(Vector2D point1, Vector2D point2)
-        {
-            Point1 = point1;
-            Point2 = point2;
-        }
+        protected abstract Vector2D Point1 { get; }
+        
+        /// <summary>
+        /// 和 Point1 构成对角线
+        /// </summary>
+        protected abstract Vector2D Point2 { get; }
+        
+        /// <summary>
+        /// 和 Point4 构成对角线
+        /// </summary>
+        protected abstract Vector2D Point3 { get; }
+        
+        /// <summary>
+        /// 和 Point3 构成对角线
+        /// </summary>
+        protected abstract Vector2D Point4 { get; }
 
         /// <summary>
-        /// 通过机器人中心与半径以及角度来构造机器人正方形
+        /// 矩形中心点
         /// </summary>
-        public Square(Vector2D robotPos, float angle)
-        {
-            float robotRadiu = (float)(Const.Robot.HRL * 1.414);
-            //角度规整
-            while (angle > 90 || angle < 0)
-            {
-                if (angle > 90)
-                {
-                    angle -= 90;
-                }
-                else
-                    angle += 90;
-            }
-            float point1x = (float)(robotPos.x + robotRadiu * Math.Cos(angle));
-            float point1y = (float)(robotPos.y + robotRadiu * Math.Sin(angle));
-            float point2x = (float)(robotPos.x - robotRadiu * Math.Cos(angle));
-            float point2y = (float)(robotPos.y - robotRadiu * Math.Sin(angle));
-            Point1 = new Vector2D(point1x, point1y);
-            Point2 = new Vector2D(point2x, point2y);
-        }
+        protected virtual Vector2D Midpoint => (Point1 + Point2) / 2;
+        
         /// <summary>
-        /// 第一个对角点
+        /// 获取一个集合，表示这个矩形的边缘线
         /// </summary>
-        public Vector2D Point1 { get; }
-
-        /// <summary>
-        /// 第二个对角点
-        /// </summary>
-        public Vector2D Point2 { get; }
-
-        public Vector2D Point3 => (Point1 - Midpoint).Rotate(Mathf.PI / 4)
-                                  + Midpoint;
-
-        public Vector2D Point4 => (Point1 - Midpoint).Rotate(-Mathf.PI / 4)
-                                  + Midpoint;
-
-        Vector2D Midpoint => (Point1 + Point2) / 2;
-
-        List<(Vector2D, Vector2D)> Lines =>
+        protected virtual List<(Vector2D, Vector2D)> Lines =>
             new List<(Vector2D, Vector2D)>()
             {
                 (Point1, Point3), (Point1, Point4),
@@ -126,11 +68,12 @@ namespace Simuro5v5.Util
                    (ca * cb) * (da * db) <= 0;
         }
 
-        public bool IsCrossBy(Square rhs)
+        // TODO: Rename to `IsCrossedBy`
+        public bool IsCrossBy(RectangleBase rect)
         {
             foreach (var (a, b) in Lines)
             {
-                foreach (var (c, d) in rhs.Lines)
+                foreach (var (c, d) in rect.Lines)
                 {
                     if (LineCross(a, b, c, d))
                     {
@@ -142,21 +85,108 @@ namespace Simuro5v5.Util
             return false;
         }
 
-        public bool IsInCycle(Vector2D cenpos , float radiu)
+        public bool IsInRectangle(UprightRectangle area)
+            => area.PointIn(this.Midpoint) && !IsCrossBy(area);
+    }
+    
+    public class UprightRectangle : RectangleBase
+    {
+        private float LeftX { get; }
+        private float RightX { get; }
+        private float TopY { get; }
+        private float BotY { get; }
+
+        protected override Vector2D Point1 => new Vector2D(LeftX, TopY);
+        protected override Vector2D Point2 => new Vector2D(RightX, BotY);
+        protected override Vector2D Point3 => new Vector2D(RightX, TopY);
+        protected override Vector2D Point4 => new Vector2D(LeftX, BotY);
+
+        public UprightRectangle(float leftX, float rightX, float topY, float botY)
         {
-            if (Vector2D.Distance(Point1, cenpos) < radiu)
+            this.LeftX = leftX;
+            this.TopY = topY;
+            this.RightX = rightX;
+            this.BotY = botY;
+        }
+
+        public static UprightRectangle RobotSquare(Vector2D robotPosition)
+        {
+            float HRL = Const.Robot.HRL;
+            UprightRectangle robotSquare = new UprightRectangle(robotPosition.x - HRL, robotPosition.x + HRL, robotPosition.y + HRL, robotPosition.y - HRL);
+            return robotSquare;
+        }
+
+        public bool PointIn(Vector2D point)
+        {
+            return point.x < RightX && point.x > LeftX && point.y > BotY && point.y < TopY;
+        }
+    }
+
+    public class Square : RectangleBase
+    {
+        /// <summary>
+        /// 通过正方形的两个对角点构造正方形
+        /// </summary>
+        public Square(Vector2D point1, Vector2D point2)
+        {
+            Point1 = point1;
+            Point2 = point2;
+        }
+
+        /// <summary>
+        /// 通过机器人中心与半径以及角度来构造机器人正方形
+        /// </summary>
+        public Square(Vector2D robotPosition, float angle)
+        {
+            float robotRadius = (float)(Const.Robot.HRL * 1.414);
+            //角度规整
+            while (angle > 90 || angle < 0)
+            {
+                if (angle > 90)
+                {
+                    angle -= 90;
+                }
+                else
+                    angle += 90;
+            }
+            float point1X = (float)(robotPosition.x + robotRadius * Math.Cos(angle));
+            float point1Y = (float)(robotPosition.y + robotRadius * Math.Sin(angle));
+            float point2X = (float)(robotPosition.x - robotRadius * Math.Cos(angle));
+            float point2Y = (float)(robotPosition.y - robotRadius * Math.Sin(angle));
+            Point1 = new Vector2D(point1X, point1Y);
+            Point2 = new Vector2D(point2X, point2Y);
+        }
+        /// <summary>
+        /// 第一个对角点
+        /// </summary>
+        protected override Vector2D Point1 { get; }
+
+        /// <summary>
+        /// 第二个对角点
+        /// </summary>
+        protected override Vector2D Point2 { get; }
+
+        protected override Vector2D Point3 => (Point1 - Midpoint).Rotate(Mathf.PI / 4)
+                                  + Midpoint;
+
+        protected override Vector2D Point4 => (Point1 - Midpoint).Rotate(-Mathf.PI / 4)
+                                  + Midpoint;
+
+        public bool IsInCycle(Vector2D cenpos , float radius)
+        {
+            if (Vector2D.Distance(Point1, cenpos) < radius)
             {
                 return false;
             }
-            if (Vector2D.Distance(Point2, cenpos) < radiu)
+            if (Vector2D.Distance(Point2, cenpos) < radius)
             {
                 return false;
             }
-            if (Vector2D.Distance(Point3, cenpos) < radiu)
+            if (Vector2D.Distance(Point3, cenpos) < radius)
             {
                 return false;
             }
-            if (Vector2D.Distance(Point4, cenpos) < radiu)
+            if (Vector2D.Distance(Point4, cenpos) < radius)
             {
                 return false;
             }
