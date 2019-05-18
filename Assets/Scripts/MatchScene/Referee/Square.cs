@@ -68,8 +68,7 @@ namespace Simuro5v5.Util
                    (ca * cb) * (da * db) <= 0;
         }
 
-        // TODO: Rename to `IsCrossedBy`
-        public bool IsCrossBy(RectangleBase rect)
+        public bool IsCrossedBy(RectangleBase rect)
         {
             foreach (var (a, b) in Lines)
             {
@@ -86,7 +85,7 @@ namespace Simuro5v5.Util
         }
 
         public bool IsInRectangle(UprightRectangle area)
-            => area.PointIn(this.Midpoint) && !IsCrossBy(area);
+            => area.PointIn(this.Midpoint) && !IsCrossedBy(area);
     }
     
     public class UprightRectangle : RectangleBase
@@ -140,15 +139,16 @@ namespace Simuro5v5.Util
         {
             float robotRadius = (float)(Const.Robot.HRL * 1.414);
             //角度规整
-            while (angle > 90 || angle < 0)
+            while (angle > 45 || angle < -45)
             {
-                if (angle > 90)
+                if (angle > 45)
                 {
                     angle -= 90;
                 }
                 else
                     angle += 90;
             }
+            angle += 45;
             float point1X = (float)(robotPosition.x + robotRadius * Math.Cos(angle));
             float point1Y = (float)(robotPosition.y + robotRadius * Math.Sin(angle));
             float point2X = (float)(robotPosition.x - robotRadius * Math.Cos(angle));
@@ -176,21 +176,21 @@ namespace Simuro5v5.Util
         {
             if (Vector2D.Distance(Point1, cenpos) < radius)
             {
-                return false;
+                return true;
             }
             if (Vector2D.Distance(Point2, cenpos) < radius)
             {
-                return false;
+                return true;
             }
             if (Vector2D.Distance(Point3, cenpos) < radius)
             {
-                return false;
+                return true;
             }
             if (Vector2D.Distance(Point4, cenpos) < radius)
             {
-                return false;
+                return true;
             }
-            return true;
+            return false;
         }
     }
 }

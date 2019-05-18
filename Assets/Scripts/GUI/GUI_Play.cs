@@ -334,7 +334,8 @@ public class GUI_Play : MonoBehaviour
 
     void UpdateRefereeText()
     {
-        SetRefereeInfo(MatchInfo.Referee.savedJudge.ToRichText());
+        if (MatchInfo.Referee.savedJudge.ResultType != ResultType.NormalMatch)
+            SetRefereeInfo(MatchInfo.Referee.savedJudge.ToRichText());
     }
 
     void PushMenu(GameObject newMenu)

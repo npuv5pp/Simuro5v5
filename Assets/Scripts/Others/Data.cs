@@ -362,7 +362,7 @@ namespace Simuro5v5
 
         public static Vector2D operator +(Vector2D lhs, Vector2D rhs)
         {
-            return new Vector2D(lhs.x + rhs.y, lhs.x + rhs.y);
+            return new Vector2D(lhs.x + rhs.x, lhs.y + rhs.y);
         }
 
         public static Vector2D operator -(Vector2D vec)
