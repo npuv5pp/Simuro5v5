@@ -244,7 +244,7 @@ namespace Simuro5v5
                 yellowComponent[i].Revert(matchInfo.YellowRobots[i]);
             }
             ballComponent.Revert(matchInfo.Ball);
-            OutputMatchInfo?.UpdateFrom(matchInfo);
+            OutputMatchInfo?.UpdateFrom(matchInfo.BlueRobots, matchInfo.YellowRobots, matchInfo.Ball);
         }
 
         /// <summary>

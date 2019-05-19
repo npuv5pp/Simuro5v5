@@ -97,7 +97,6 @@ public class ControlRobot : MonoBehaviour
     public void SetPlacement(Robot robot)
     {
         // Note: 设置刚体的坐标，会在下一拍才会显示到屏幕上，应该直接设置物体的
-        Quaternion rot = new Quaternion();
         Vector3 pos = new Vector3
         {
             x = robot.pos.x,
@@ -105,13 +104,7 @@ public class ControlRobot : MonoBehaviour
             y = 0
         };
         transform.position = pos;
-        rot.eulerAngles = new Vector3
-        {
-            x = -90,
-            y = robot.rotation.FormatOld().FormatOld2Unity(),
-            z = 0,
-        };
-        transform.rotation = rot;
+        transform.rotation = Quaternion.Euler(-90, robot.rotation.FormatOld().FormatOld2Unity(), 0);
     }
 
     /// <summary>

@@ -18,12 +18,17 @@ using Simuro5v5.Strategy;
 
 public class GUI_Play : MonoBehaviour
 {
+    /// <summary>
+    /// 是否有菜单打开
+    /// </summary>
     bool MenuOpen => MenuStack.Count > 0;
 
     static DataRecorder recorder;
 
     PlayMain playMain;
     MatchInfo MatchInfo => playMain.GlobalMatchInfo;
+
+    public MouseDrag mouseDrag;
 
     // background object
     public GameObject menuBackground;
@@ -58,6 +63,8 @@ public class GUI_Play : MonoBehaviour
     public Text blueTeamName;
     public Text yellowTeamName;
 
+    public Toggle toggleManualPlacing;
+
     Stack<GameObject> MenuStack { get; set; }
 
     void Start()
@@ -75,125 +82,22 @@ public class GUI_Play : MonoBehaviour
         MenuStack = new Stack<GameObject>();
         PushMenu(menuMain);
 
-        if (recorder == null)
-        {
-            recorder = new DataRecorder();
-        }
+        if (recorder == null) recorder = new DataRecorder();
 
         blueInputField.text = $"127.0.0.1:{StrategyConfig.BlueStrategyPort}";
         yellowInputField.text = $"127.0.0.1:{StrategyConfig.YellowStrategyPort}";
     }
 
-    public void LoadMainScene()
-    {
-        Event.Send(Event.EventType0.PlaySceneExited);
-        SceneManager.LoadScene("MainScene");
-    }
-
-    public void LoadReplayScene()
-    {
-        GUI_Replay.Recorder = recorder;
-        Event.Send(Event.EventType0.PlaySceneExited);
-        SceneManager.LoadScene("GameScene_Replay");
-    }
-
-    /// <summary>
-    /// 停止比赛并尝试移除策略
-    /// </summary>
-    /// <param name="willNotifyStrategies">是否向策略发送通知，如果是由于策略出现错误需要停止比赛，可以指定为false。默认为true</param>
-    public void StopMatchAndRemoveStrategy(bool willNotifyStrategies=true)
-    {
-        AnimOutGame();
-        recorder.Stop();
-        recorder.Clear();
-
-        try
-        {
-            playMain.StopMatch(willNotifyStrategies);
-        }
-        catch (Exception e)
-        {
-            Debug.LogError(e.Message);
-            Win32Dialog.ShowMessageBox("通讯失败，强制卸载", "Remove Failed");
-        }
-        finally
-        {
-            playMain.RemoveStrategy();
-        }
-    }
-
-    /// <summary>
-    /// 尝试加载策略
-    /// </summary>
-    public void TryLoadStrategy()
-    {
-        string blue_ep, yellow_ep;
-        if (blueInputField.text.Trim() == "")
-            blue_ep = "127.0.0.1";
-        else
-            blue_ep = blueInputField.text;
-
-        if (yellowInputField.text.Trim() == "")
-            yellow_ep = "127.0.0.1";
-        else
-            yellow_ep = yellowInputField.text;
-
-        try
-        {
-            playMain.LoadStrategy(blue_ep, yellow_ep);
-            AnimInGame();
-        }
-        catch (StrategyException e)
-        {
-            Debug.LogError(e);
-            Win32Dialog.ShowMessageBox($"{(e.side == Side.Blue ? "蓝方" : "黄方")}策略连接失败", "Failed");
-            AnimOutGame();
-        }
-    }
-
-    public void OpenMenuStrategy()
-    {
-        PushMenu(menuStrategy);
-    }
-
-    public void CloseMenuAndResume()
-    {
-        PopMenu();
-        playMain.ResumeMatch();
-    }
-
-    public void PlayMainStartMatch()
-    {
-        if (recorder.IsRecording)
-        {
-            recorder.Stop();
-            recorder.Clear();
-        }
-        recorder.Start();
-        playMain.StartMatch();
-    }
-
-    int timeTick = 0;
-
     void FixedUpdate()
     {
-        timeTick++;
-        // 偶数拍，跳过
-        if (timeTick % 2 == 0) return;
-
-        playMain.ObjectManager.UpdateFromScene();
-
-        try
-        {
-            playMain.InMatchLoop();
-        }
-        catch (TimeoutException e)
+        // TODO 使用回调完成
+        var e = playMain.FatalException;
+        if (e != null)
         {
             Debug.LogError(e);
             Win32Dialog.ShowMessageBox("策略连接异常", "Strategy Connection");
-            // 退出比赛
             StopMatchAndRemoveStrategy(false);
-            throw;
+            playMain.FatalException = null;
         }
     }
 
@@ -217,6 +121,7 @@ public class GUI_Play : MonoBehaviour
                 resumeButton.Select();
             }
         }
+
         if (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Space))
         {
             // left clicked, pause
@@ -243,6 +148,10 @@ public class GUI_Play : MonoBehaviour
         UpdateStatusText();
         UpdateTeamname();
         UpdateAnim();
+
+        // 在手动摆位时不允许切换手动/自动摆位
+        toggleManualPlacing.interactable = !(playMain.manualPlaceEnabled && playMain.manualPlacing);
+        mouseDrag.dragEnabled = !MenuOpen && playMain.manualPlacing;
     }
 
     void UpdateAnim()
@@ -440,5 +349,123 @@ public class GUI_Play : MonoBehaviour
         topAnim.OutGame();
         refereeAnim.OutGame();
         cameraAnim.OutGame();
+    }
+
+    
+    // 以下为在编辑器中绑定的函数
+
+    public void LoadMainScene()
+    {
+        Event.Send(Event.EventType0.PlaySceneExited);
+        SceneManager.LoadScene("MainScene");
+    }
+
+    public void LoadReplayScene()
+    {
+        GUI_Replay.Recorder = recorder;
+        Event.Send(Event.EventType0.PlaySceneExited);
+        SceneManager.LoadScene("GameScene_Replay");
+    }
+
+    /// <summary>
+    /// 停止比赛并尝试移除策略
+    /// </summary>
+    /// <param name="willNotifyStrategies">是否向策略发送通知，如果是由于策略出现错误需要停止比赛，可以指定为false。默认为true</param>
+    public void StopMatchAndRemoveStrategy(bool willNotifyStrategies=true)
+    {
+        AnimOutGame();
+        recorder.Stop();
+        recorder.Clear();
+
+        try
+        {
+            playMain.StopMatch(willNotifyStrategies);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError(e.Message);
+            Win32Dialog.ShowMessageBox("通讯失败，强制卸载", "Remove Failed");
+        }
+        finally
+        {
+            playMain.RemoveStrategy();
+        }
+    }
+
+    /// <summary>
+    /// 尝试加载策略
+    /// </summary>
+    public void TryLoadStrategy()
+    {
+        string blue_ep, yellow_ep;
+        if (blueInputField.text.Trim() == "")
+            blue_ep = "127.0.0.1";
+        else
+            blue_ep = blueInputField.text;
+
+        if (yellowInputField.text.Trim() == "")
+            yellow_ep = "127.0.0.1";
+        else
+            yellow_ep = yellowInputField.text;
+
+        try
+        {
+            playMain.LoadStrategy(blue_ep, yellow_ep);
+            AnimInGame();
+        }
+        catch (StrategyException e)
+        {
+            Debug.LogError(e);
+            Win32Dialog.ShowMessageBox($"{(e.side == Side.Blue ? "蓝方" : "黄方")}策略连接失败", "Failed");
+            AnimOutGame();
+        }
+    }
+
+    public void OpenMenuStrategy()
+    {
+        PushMenu(menuStrategy);
+    }
+
+    public void CloseMenuAndResume()
+    {
+        if (playMain.Started)
+        {
+            PopMenu();
+            if (playMain.manualPlaceEnabled && playMain.manualPlacing)
+            {
+                playMain.EndManualPlace();
+            }
+            else
+            {
+                playMain.ResumeMatch();
+            }
+        }
+    }
+
+    public void PlayMainStartMatch()
+    {
+        if (recorder.IsRecording)
+        {
+            recorder.Stop();
+            recorder.Clear();
+        }
+        recorder.Start();
+        playMain.StartMatch();
+    }
+
+    /// <summary>
+    /// 结束摆位按钮按下
+    /// </summary>
+    public void EndPlaceClicked()
+    {
+        if (playMain.manualPlaceEnabled && playMain.manualPlacing)
+        {
+            playMain.EndManualPlace();
+        }
+    }
+
+    public void ManualPlaceToggleClicked()
+    {
+        playMain.manualPlaceEnabled = toggleManualPlacing.isOn;
     }
 }

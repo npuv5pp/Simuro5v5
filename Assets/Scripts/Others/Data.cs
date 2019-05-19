@@ -133,14 +133,33 @@ namespace Simuro5v5
             return info;
         }
 
+        /// <summary>
+        /// 更新MatchInfo中的所有信息
+        /// </summary>
+        /// <param name="matchInfo"></param>
         public void UpdateFrom(MatchInfo matchInfo)
         {
             BlueRobots = (Robot[])matchInfo.BlueRobots.Clone();
             YellowRobots = (Robot[])matchInfo.YellowRobots.Clone();
             Ball = matchInfo.Ball;
-            TickMatch = matchInfo.TickMatch;
+
             Score = matchInfo.Score;
-            Referee = matchInfo.Referee;
+            TickMatch = matchInfo.TickMatch;
+            MatchPhase = matchInfo.MatchPhase;
+            Referee = (Referee)matchInfo.Referee.Clone();
+        }
+
+        /// <summary>
+        /// 更新实体的状态，包括黄蓝方机器人和球
+        /// </summary>
+        /// <param name="blue"></param>
+        /// <param name="yellow"></param>
+        /// <param name="ball"></param>
+        public void UpdateFrom(Robot[] blue, Robot[] yellow, Ball ball)
+        {
+            BlueRobots = (Robot[])blue.Clone();
+            YellowRobots = (Robot[])yellow.Clone();
+            Ball = ball;
         }
 
         public void UpdateFrom(Robot[] robots, Side side)

@@ -81,8 +81,13 @@ public class PlayMain : MonoBehaviour
     IEnumerator Start()
     {
         ConfigManager.ReadConfigFile("config.json");
+
+        if (gameObject.name != "Entity")
+        {
+            throw new ArgumentException("PlayMain is not binding in an Entity");
+        }
         Singleton = gameObject;
-        DontDestroyOnLoad(GameObject.Find("/Entity"));
+        DontDestroyOnLoad(gameObject);
 
         StrategyManager = new StrategyManager();
         GlobalMatchInfo = MatchInfo.NewDefaultPreset();
@@ -97,15 +102,39 @@ public class PlayMain : MonoBehaviour
         ObjectManager.Pause();
     }
 
+    int timeTick = 0;
+    public Exception FatalException { get; set; }
+
+    private void FixedUpdate()
+    {
+        timeTick++;
+        // 偶数拍，跳过
+        if (timeTick % 2 == 0) return;
+
+        ObjectManager.UpdateFromScene();
+
+        try
+        {
+            InMatchLoop();
+        }
+        catch (TimeoutException e)
+        {
+            StopMatch(false);
+            FatalException = e;
+        }
+    }
+
     /// <summary>
     /// 维护比赛状态，根据裁判的判定结果执行不同的动作。<br>
     /// </summary>
     public void InMatchLoop()
     {
+        if (manualPlacing) throw new InvalidOperationException("manual placing");
         if (!LoadSucceed || !Started || Paused) return;
 
         /// 从裁判中获取下一拍的动作。
         JudgeResult judgeResult = GlobalMatchInfo.Referee.Judge(GlobalMatchInfo);
+        Debug.Log(GlobalMatchInfo.Referee.savedJudge.ResultType);
 
         if (judgeResult.ResultType == ResultType.GameOver)
         {
@@ -113,7 +142,8 @@ public class PlayMain : MonoBehaviour
             Debug.Log("Game Over");
 
             // 判断是否进球
-            switch(judgeResult.WhoGoal){
+            switch (judgeResult.WhoGoal)
+            {
                 case Side.Blue:
                     GlobalMatchInfo.Score.BlueScore++;
                     break;
@@ -159,27 +189,80 @@ public class PlayMain : MonoBehaviour
                     break;
             }
 
-            void Callback()
+            if (manualPlaceEnabled)
             {
-                UpdatePlacementToScene(judgeResult);
-                // 时间加一，触发事件
-                GlobalMatchInfo.TickMatch++;
-                Event.Send(Event.EventType1.MatchInfoUpdate, GlobalMatchInfo);
-                Event.Send(Event.EventType1.AutoPlacement, GlobalMatchInfo);
-
-                PauseForSeconds(2, () => { });
-            }
-
-            // TODO 考虑连续出现摆位的情况
-            if (GlobalMatchInfo.TickMatch > 0)
-            {
-                PauseForSeconds(2, Callback);
+                Debug.Log("manual placing");
+                ObjectManager.SetToDefault();
+                ObjectManager.SetStill();
+                BeginManualPlace();
             }
             else
             {
-                Callback();
+                Debug.Log("auto placing");
+                void Callback()
+                {
+                    UpdatePlacementToScene(judgeResult);
+                    // 时间加一，触发事件
+                    GlobalMatchInfo.TickMatch++;
+                    Event.Send(Event.EventType1.MatchInfoUpdate, GlobalMatchInfo);
+                    Event.Send(Event.EventType1.AutoPlacement, GlobalMatchInfo);
+
+                    PauseForSeconds(2, () => { });
+                }
+
+                // TODO 考虑连续出现摆位的情况
+                if (GlobalMatchInfo.TickMatch > 0)
+                {
+                    PauseForSeconds(2, Callback);
+                }
+                else
+                {
+                    Callback();
+                }
             }
         }
+    }
+
+    /// <summary>
+    /// 是否启用手动摆位的功能
+    /// </summary>
+    public bool manualPlaceEnabled = false;
+
+    bool _manualPlacing;
+    /// <summary>
+    /// 是否正在手动摆位。
+    /// 手动摆位已启用且正在处于手动摆位状态时为真；仅当手动摆位已经启动时可以设置。
+    /// </summary>
+    /// <value></value>
+    public bool manualPlacing
+    {
+        get
+        {
+            return manualPlaceEnabled && _manualPlacing;
+        }
+        private set
+        {
+            if (!manualPlaceEnabled) throw new InvalidOperationException("manual place disabled");
+            _manualPlacing = value;
+        }
+    }
+
+    public void BeginManualPlace()
+    {
+        if (!manualPlaceEnabled) throw new InvalidOperationException("manual place disabled");
+        PauseMatchClearly();
+        manualPlacing = true;
+        GlobalMatchInfo.TickMatch++;
+    }
+       
+    public void EndManualPlace()
+    {
+        if (!manualPlaceEnabled) throw new InvalidOperationException("manual place disabled");
+        GlobalMatchInfo.Referee.JudgeAutoPlacement(GlobalMatchInfo, GlobalMatchInfo.Referee.savedJudge);
+        Event.Send(Event.EventType1.MatchInfoUpdate, GlobalMatchInfo);
+        Event.Send(Event.EventType1.AutoPlacement, GlobalMatchInfo);
+        manualPlacing = false;
+        ResumeMatchClearly();
     }
 
     /// <summary>
@@ -217,13 +300,6 @@ public class PlayMain : MonoBehaviour
         Started = false;
         Paused = true;
 
-        // GlobalMatchInfo.Score = new MatchScore();
-        // GlobalMatchInfo.TickMatch = 0;
-        // GlobalMatchInfo.MatchPhase = MatchPhase.FirstHalf;
-        // GlobalMatchInfo.Referee = new Referee();
-
-        // ObjectManager.SetToDefault();
-        // ObjectManager.SetStill();
         ObjectManager.Pause();
 
         if (willNotifyStrategies)
@@ -237,7 +313,7 @@ public class PlayMain : MonoBehaviour
     /// <summary>
     /// 是否正在被外部暂停。
     /// </summary>
-    bool manualPausing;
+    bool externalPausing;
     
     /// <summary>
     /// 是否正在定时暂停。
@@ -261,7 +337,7 @@ public class PlayMain : MonoBehaviour
     /// </summary>
     public void PauseMatch()
     {
-        manualPausing = true;
+        externalPausing = true;
         PauseMatchClearly();
     }
 
@@ -271,10 +347,12 @@ public class PlayMain : MonoBehaviour
     /// </summary>
     public void ResumeMatch()
     {
+        if (manualPlacing) throw new InvalidOperationException("manual placing");
+
         if (!timedPausing)
         {
             ResumeMatchClearly();
-            manualPausing = false;
+            externalPausing = false;
         }
     }
 
@@ -290,7 +368,7 @@ public class PlayMain : MonoBehaviour
             yield return new WaitForSecondsRealtime(sec);
             callback();
             // 外部没有主动暂停，则可以继续比赛
-            if (!manualPausing) ResumeMatchClearly();
+            if (!externalPausing) ResumeMatchClearly();
             timedPausing = false;
         }
 
@@ -299,6 +377,14 @@ public class PlayMain : MonoBehaviour
             StartCoroutine(_PauseCoroutine());
         }
     }
+
+    // public void PauseUntil(Func<bool> func, Action callback)
+    // {
+    //     IEnumerator func()
+    //     {
+    //         yield return new WaitUntil()
+    //     }
+    // }
 
     /// <summary>
     /// 实际执行暂停操作，不维护暂停相关的状态。供内部使用<br>
@@ -424,23 +510,10 @@ public class PlayMain : MonoBehaviour
         };
         StrategyManager.StrategyFactory = factory;
 
-        try
-        {
-            StrategyManager.ConnectBlue();
-        }
-        catch (Exception e)
-        {
-            throw new StrategyException(Side.Blue, e);
-        }
-
-        try
-        {
-            StrategyManager.ConnectYellow();
-        }
-        catch (Exception e)
-        {
-            throw new StrategyException(Side.Yellow, e);
-        }
+        if (!StrategyManager.ConnectBlue())
+            throw new StrategyException(Side.Blue, "Connect Failed");
+        if (!StrategyManager.ConnectYellow())
+            throw new StrategyException(Side.Yellow, "Connect Failed");
 
         return true;
     }
