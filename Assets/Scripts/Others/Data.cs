@@ -380,6 +380,24 @@ namespace Simuro5v5
             return lhs.x * rhs.x + lhs.y * rhs.y;
         }
 
+        public static bool operator ==(Vector2D lsh, Vector2D rhs)
+        {
+            if (lsh.x == rhs.x && lsh.y == rhs.y)
+            {
+                return true;
+            }
+            else return false;
+        }
+
+        public static bool operator !=(Vector2D lsh,Vector2D rhs)
+        {
+            if (lsh.x != rhs.x || lsh.y != rhs.y)
+            {
+                return true;
+            }
+            else return false;
+        }
+
         public static Vector2D operator /(Vector2D vec, float v)
         {
             return new Vector2D(vec.x / v, vec.y / v);
