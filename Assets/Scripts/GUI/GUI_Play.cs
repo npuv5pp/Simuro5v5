@@ -70,6 +70,7 @@ public class GUI_Play : MonoBehaviour
     void Start()
     {
         playMain = PlayMain.Singleton.GetComponent<PlayMain>();
+        toggleManualPlacing.isOn = playMain.manualPlaceEnabled;
 
         UpdateAnim();
         UpdateTimeText();

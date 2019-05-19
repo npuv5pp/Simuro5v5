@@ -8,7 +8,8 @@ namespace Simuro5v5
         public readonly static int RobotsPerTeam = 5;
         public readonly static int MaxWheelVelocity = 125;
         public readonly static int MinWheelVelocity = -125;
-        public readonly static float Zeit = (1.0f / 50.0f);                 // 模拟频率的倒数，即一拍的时间
+        public readonly static float FixedDeltaTime = (1.0f / 66.0f / 2f);  // 模拟频率的倒数，即一拍的时间
+        public readonly static int TickPerSecond = 66;
         public readonly static float TimeScale = 1.0f;                      // 默认时间流速
         public readonly static float inch2cm = 2.54f;                       // 英寸转化成厘米
         public readonly static float cm2inch = 1.0f / 2.54f;                // 厘米转化成英寸
@@ -32,7 +33,7 @@ namespace Simuro5v5
             public readonly static float DoubleZeroDragFactor = DragFactor * 8;
 
             // angular
-            public readonly static float TorqueFactor = 300;
+            public readonly static float TorqueFactor = 325;
             public readonly static float AngularDragFactor = 1300;
             public readonly static float DoubleZeroAngularDragFactor = AngularDragFactor * 1;
 

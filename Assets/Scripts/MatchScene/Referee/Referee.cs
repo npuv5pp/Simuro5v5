@@ -108,17 +108,17 @@ public class Referee : ICloneable
     {
 #if UNITY_EDITOR
         // 编辑器中调试的时候将时间设置短一点
-        endOfHalfgametime = 1000;
-        endOfOvergametime = 1000;
+        endOfHalfgametime = 20 * Const.TickPerSecond;
+        endOfOvergametime = 20 * Const.TickPerSecond;
 #else
-        endOfHalfgametime = 15000;
-        endOfOvergametime = 9000;
+        endOfHalfgametime = 5 * 60 * Const.TickPerSecond;
+        endOfOvergametime = 5 * 60 * Const.TickPerSecond;
 #endif
         penaltySide = Side.Blue;
-        penaltyLimitTime = 250;
+        penaltyLimitTime = 5 * Const.TickPerSecond;
         penaltyTime = 0;
         standoffTime = 0;
-        maxStandoffTime = 500;
+        maxStandoffTime = 10 * Const.TickPerSecond;
 
         BlueRobotsPos = new Vector2D[Const.RobotsPerTeam];
         YellowRobotsPos = new Vector2D[Const.RobotsPerTeam];

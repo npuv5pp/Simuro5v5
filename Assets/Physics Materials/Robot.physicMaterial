@@ -9,6 +9,6 @@ PhysicMaterial:
   m_Name: Robot
   dynamicFriction: 0
   staticFriction: 0
-  bounciness: 0.1
+  bounciness: 0.03
   frictionCombine: 0
   bounceCombine: 0

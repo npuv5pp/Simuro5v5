@@ -43,25 +43,14 @@ public class ParameterTest : MonoBehaviour
         // TODO 零减速
         forward_force = -transform.up * (LeftVelocity + RightVelocity) * ForwardFactor;
         if (LeftVelocity == 0 && RightVelocity == 0)
-        {
             forward_drag = rb.velocity * -Drag * 5;
-        }
         else
-        {
             forward_drag = rb.velocity * -Drag;
-        }
+
         rb.AddForce(forward_force + forward_drag);
 
         torque = Vector3.up * (LeftVelocity - RightVelocity) * TorqueFactor;
         angular_drag = rb.angularVelocity * -AngularDrag;
-        if (LeftVelocity == 0 && RightVelocity == 0)
-        {
-            angular_drag = rb.angularVelocity * -AngularDrag * 20;
-        }
-        else
-        {
-            angular_drag = rb.angularVelocity * -AngularDrag;
-        }
         rb.AddTorque(torque + angular_drag);
 
         OutputData();
@@ -76,5 +65,25 @@ public class ParameterTest : MonoBehaviour
     private void OnDestroy()
     {
         fs.Close();
+    }
+
+    void InitParameter()
+    {
+        rb.mass = Const.Robot.Mass;
+        rb.drag = rb.angularDrag = 0;
+        rb.useGravity = true;
+        rb.isKinematic = false;
+        rb.interpolation = RigidbodyInterpolation.None;
+        rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+        rb.constraints = RigidbodyConstraints.FreezePositionY |
+            RigidbodyConstraints.FreezeRotationX |
+            RigidbodyConstraints.FreezeRotationY;
+        rb.maxAngularVelocity = Const.Robot.maxAngularVelocity;
+
+        ForwardFactor = Const.Robot.ForwardForceFactor;
+        TorqueFactor = Const.Robot.TorqueFactor;
+        Drag = Const.Robot.DragFactor;
+        AngularDrag = Const.Robot.AngularDragFactor;
+        DoubleZeroDrag = Const.Robot.DoubleZeroDragFactor;
     }
 }

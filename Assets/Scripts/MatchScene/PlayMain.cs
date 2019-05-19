@@ -80,12 +80,10 @@ public class PlayMain : MonoBehaviour
 
     IEnumerator Start()
     {
+        Time.fixedDeltaTime = Const.FixedDeltaTime;
         ConfigManager.ReadConfigFile("config.json");
 
-        if (gameObject.name != "Entity")
-        {
-            throw new ArgumentException("PlayMain is not binding in an Entity");
-        }
+        if (gameObject.name != "Entity") throw new ArgumentException("PlayMain is not binding in an Entity");
         Singleton = gameObject;
         DontDestroyOnLoad(gameObject);
 
@@ -134,7 +132,6 @@ public class PlayMain : MonoBehaviour
 
         /// 从裁判中获取下一拍的动作。
         JudgeResult judgeResult = GlobalMatchInfo.Referee.Judge(GlobalMatchInfo);
-        Debug.Log(GlobalMatchInfo.Referee.savedJudge.ResultType);
 
         if (judgeResult.ResultType == ResultType.GameOver)
         {
@@ -253,13 +250,18 @@ public class PlayMain : MonoBehaviour
         PauseMatchClearly();
         manualPlacing = true;
         GlobalMatchInfo.TickMatch++;
+        Event.Send(Event.EventType1.MatchInfoUpdate, GlobalMatchInfo);
     }
        
     public void EndManualPlace()
     {
         if (!manualPlaceEnabled) throw new InvalidOperationException("manual place disabled");
         GlobalMatchInfo.Referee.JudgeAutoPlacement(GlobalMatchInfo, GlobalMatchInfo.Referee.savedJudge);
-        Event.Send(Event.EventType1.MatchInfoUpdate, GlobalMatchInfo);
+        ObjectManager.SetBluePlacement(GlobalMatchInfo.BlueRobots);
+        ObjectManager.SetYellowPlacement(GlobalMatchInfo.YellowRobots);
+        ObjectManager.SetBallPlacement(GlobalMatchInfo.Ball);
+        ObjectManager.SetStill();
+
         Event.Send(Event.EventType1.AutoPlacement, GlobalMatchInfo);
         manualPlacing = false;
         ResumeMatchClearly();

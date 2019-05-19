@@ -55,27 +55,16 @@ public class ControlRobot : MonoBehaviour
         }
 
         forward_force = -transform.up * (LeftVelocity + RightVelocity) * ForwardFactor;
+
+        // 双零减速
         if (LeftVelocity == 0 && RightVelocity == 0)
-        {
-            // 双减速
             forward_drag = rb.velocity * -DoubleZeroDrag;
-        }
         else
-        {
             forward_drag = rb.velocity * -Drag;
-        }
         rb.AddForce(forward_force + forward_drag);
 
         torque = Vector3.up * (LeftVelocity - RightVelocity) * TorqueFactor;
-        if (LeftVelocity == 0 && RightVelocity == 0)
-        {
-            // 双减速
-            angular_drag = rb.angularVelocity * -DoubleZeroAngularDrag;
-        }
-        else
-        {
-            angular_drag = rb.angularVelocity * -AngularDrag;
-        }
+        angular_drag = rb.angularVelocity * -AngularDrag;
         rb.AddTorque(torque + angular_drag);
     }
 
