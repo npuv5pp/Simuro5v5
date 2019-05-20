@@ -1,4 +1,7 @@
 # 简介
+
+![screenshot](./Documents/screenshot.png)
+
 这个平台使用了全新的策略加载方式，但同时提供了兼容旧平台的DLL方式。旧平台DLL策略的包装器的可以在[这个仓库](https://github.com/npuv5pp/V5DLLAdapter)找到。
 
 我们对旧平台DLL的接口函数做了一些小的修改，实例代码参见[这个仓库](https://github.com/npuv5pp/DLLStrategy)。

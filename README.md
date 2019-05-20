@@ -1,6 +1,9 @@
 [中文文档](https://github.com/npuv5pp/Simuro5v5/blob/master/README_ZH.md)
 
 # Introduction
+
+![screenshot](./Documents/screenshot.png)
+
 This platform uses a new strategy loading method, but also provides a DLL way compatible with the old platform. The wrapper for the old platform DLL strategy can be found in [this repository](https://github.com/npuv5pp/V5DLLAdapter).
 
 We made some modifications to the interface functions of the old platform DLL. See the [this repository](https://github.com/npuv5pp/DLLStrategy) for example code.
