@@ -612,6 +612,7 @@ public class Referee : ICloneable
             {
                 if (goalieBlueId != -1 && JudgeCollision(BlueObject[goalieBlueId], YellowObject[i]))
                 {
+                    Debug.LogError($"Goalie: {goalieBlueId}, Collision: {i}");
                     judgeResult = new JudgeResult
                     {
                         ResultType = ResultType.GoalKick,
@@ -658,6 +659,7 @@ public class Referee : ICloneable
             {
                 if (goalieYellowId != -1 && JudgeCollision(YellowObject[goalieYellowId], BlueObject[i]))
                 {
+                    Debug.LogError($"Goalie: {goalieYellowId}, Collision: {i}");
                     judgeResult = new JudgeResult
                     {
                         ResultType = ResultType.GoalKick,
