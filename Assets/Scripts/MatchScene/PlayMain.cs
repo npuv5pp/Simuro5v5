@@ -186,11 +186,10 @@ public class PlayMain : MonoBehaviour
                     break;
             }
 
+            // 手动摆位
             if (manualPlaceEnabled)
             {
                 Debug.Log("manual placing");
-                ObjectManager.SetToDefault();
-                ObjectManager.SetStill();
                 BeginManualPlace();
             }
             else
@@ -244,6 +243,10 @@ public class PlayMain : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 开始手动摆位。<br>
+    /// 会暂停运行，直到EndManualPlace被调用。<br>
+    /// </summary>
     public void BeginManualPlace()
     {
         if (!manualPlaceEnabled) throw new InvalidOperationException("manual place disabled");
@@ -251,8 +254,21 @@ public class PlayMain : MonoBehaviour
         manualPlacing = true;
         GlobalMatchInfo.TickMatch++;
         Event.Send(Event.EventType1.MatchInfoUpdate, GlobalMatchInfo);
+
+        IEnumerator func()
+        {
+            yield return new WaitForSecondsRealtime(2);
+            ObjectManager.SetToDefault();
+            ObjectManager.SetStill();
+        }
+
+        StartCoroutine(func());
     }
-       
+
+    /// <summary>
+    /// 结束手动摆位。<br>
+    /// 裁判合法化摆位，继续比赛<br>
+    /// </summary>
     public void EndManualPlace()
     {
         if (!manualPlaceEnabled) throw new InvalidOperationException("manual place disabled");

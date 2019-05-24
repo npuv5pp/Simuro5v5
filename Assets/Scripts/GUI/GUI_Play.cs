@@ -25,6 +25,11 @@ public class GUI_Play : MonoBehaviour
 
     static DataRecorder recorder;
 
+    /// <summary>
+    /// 保存上次非正常比赛的判定结果
+    /// </summary>
+    static JudgeResult? savedAbnormalJudge;
+
     PlayMain playMain;
     MatchInfo MatchInfo => playMain.GlobalMatchInfo;
 
@@ -130,7 +135,7 @@ public class GUI_Play : MonoBehaviour
             {
                 if (playMain.Started)
                 {
-                    if (playMain.Paused)
+                    if (playMain.Paused && !playMain.manualPlacing)
                     {
                         playMain.ResumeMatch();
                     }
@@ -151,7 +156,7 @@ public class GUI_Play : MonoBehaviour
         UpdateAnim();
 
         // 在手动摆位时不允许切换手动/自动摆位
-        toggleManualPlacing.interactable = !(playMain.manualPlaceEnabled && playMain.manualPlacing);
+        toggleManualPlacing.interactable = !playMain.manualPlacing;
         mouseDrag.dragEnabled = !MenuOpen && playMain.manualPlacing;
     }
 
@@ -245,7 +250,10 @@ public class GUI_Play : MonoBehaviour
     void UpdateRefereeText()
     {
         if (MatchInfo.Referee.savedJudge.ResultType != ResultType.NormalMatch)
-            SetRefereeInfo(MatchInfo.Referee.savedJudge.ToRichText());
+            savedAbnormalJudge = MatchInfo.Referee.savedJudge;
+
+        if (savedAbnormalJudge != null)
+            SetRefereeInfo(savedAbnormalJudge?.ToRichText());
     }
 
     void PushMenu(GameObject newMenu)
