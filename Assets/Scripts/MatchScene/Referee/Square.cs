@@ -1,9 +1,6 @@
-﻿using Simuro5v5;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Windows.Forms;
 using UnityEngine;
 
 namespace Simuro5v5.Util
@@ -43,10 +40,10 @@ namespace Simuro5v5.Util
         /// 获取一个集合，表示这个矩形的边缘线
         /// </summary>
         protected virtual List<(Vector2D, Vector2D)> Lines =>
-            new List<(Vector2D, Vector2D)>()
+            new List<(Vector2D, Vector2D)>
             {
                 (Point1, Point3), (Point1, Point4),
-                (Point3, Point2), (Point4, Point2),
+                (Point3, Point2), (Point4, Point2)
             };
 
 
@@ -85,7 +82,17 @@ namespace Simuro5v5.Util
         }
 
         public bool IsInRectangle(UprightRectangle area)
-            => area.PointIn(this.Midpoint) && !IsCrossedBy(area);
+            => area.PointIn(Midpoint) && !IsCrossedBy(area);
+
+        public bool ContainsPoint(Vector2D p)
+        {
+            var a = Point1 - p;
+            var b = Point2 - p;
+            var c = Point3 - p;
+            var d = Point4 - p;
+            var area = a.Cross(b) + b.Cross(c) + c.Cross(d) + d.Cross(a);
+            return Math.Abs(area) > 1e-2;
+        }
     }
     
     public class UprightRectangle : RectangleBase
@@ -102,17 +109,10 @@ namespace Simuro5v5.Util
 
         public UprightRectangle(float leftX, float rightX, float topY, float botY)
         {
-            this.LeftX = leftX;
-            this.TopY = topY;
-            this.RightX = rightX;
-            this.BotY = botY;
-        }
-
-        public static UprightRectangle RobotSquare(Vector2D robotPosition)
-        {
-            float HRL = Const.Robot.HRL;
-            UprightRectangle robotSquare = new UprightRectangle(robotPosition.x - HRL, robotPosition.x + HRL, robotPosition.y + HRL, robotPosition.y - HRL);
-            return robotSquare;
+            LeftX = leftX;
+            TopY = topY;
+            RightX = rightX;
+            BotY = botY;
         }
 
         public bool PointIn(Vector2D point)
@@ -135,9 +135,9 @@ namespace Simuro5v5.Util
         /// <summary>
         /// 通过机器人中心与半径以及角度来构造机器人正方形
         /// </summary>
-        public Square(Vector2D robotPosition, float angle)
+        public Square(Vector2D robotPosition, float angle, float HRL = Const.Robot.HRL)
         {
-            float robotRadius = (float)(Const.Robot.HRL * 1.414);
+            float robotRadius = (float)(HRL * 1.414);
             //角度规整
             while (angle > 45 || angle < -45)
             {
@@ -172,25 +172,33 @@ namespace Simuro5v5.Util
         protected override Vector2D Point4 => (Point1 - Midpoint).Rotate(-Mathf.PI / 4)
                                   + Midpoint;
 
-        public bool IsInCycle(Vector2D cenpos , float radius)
+        public bool IsInCycle(Vector2D centralPosition , float radius)
         {
-            if (Vector2D.Distance(Point1, cenpos) < radius)
+            if (Vector2D.Distance(Point1, centralPosition) < radius)
             {
                 return true;
             }
-            if (Vector2D.Distance(Point2, cenpos) < radius)
+            if (Vector2D.Distance(Point2, centralPosition) < radius)
             {
                 return true;
             }
-            if (Vector2D.Distance(Point3, cenpos) < radius)
+            if (Vector2D.Distance(Point3, centralPosition) < radius)
             {
                 return true;
             }
-            if (Vector2D.Distance(Point4, cenpos) < radius)
+            if (Vector2D.Distance(Point4, centralPosition) < radius)
             {
                 return true;
             }
             return false;
+        }
+
+        public bool OverlapWithCircle(Vector2D center, float radius = Const.Ball.HBL)
+        {
+            var line = Point1 - Point3;
+            var angle = Mathf.Acos(- line.x / Mathf.Sqrt(line * line));
+            var newSqare = new Square(this.Midpoint, angle, Const.Robot.HRL + radius);
+            return newSqare.ContainsPoint(center);
         }
     }
 }

@@ -4,6 +4,7 @@ using Simuro5v5.Strategy;
 using System.Collections.Generic;
 using System;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace Simuro5v5
 {
@@ -401,25 +402,27 @@ namespace Simuro5v5
 
         public static bool operator ==(Vector2D lsh, Vector2D rhs)
         {
-            if (lsh.x == rhs.x && lsh.y == rhs.y)
-            {
-                return true;
-            }
-            else return false;
+            throw new NotSupportedException($"Only operator != is used.");
         }
 
         public static bool operator !=(Vector2D lsh,Vector2D rhs)
         {
-            if (lsh.x != rhs.x || lsh.y != rhs.y)
+            if (Math.Abs(lsh.x - rhs.x) > 0.1 || Math.Abs(lsh.y - rhs.y) > 0.1)
             {
                 return true;
             }
-            else return false;
+
+            return false;
         }
 
         public static Vector2D operator /(Vector2D vec, float v)
         {
             return new Vector2D(vec.x / v, vec.y / v);
+        }
+
+        public float Cross(Vector2D rhs)
+        {
+            return x * rhs.y - y * rhs.x;
         }
 
         public static float Distance (Vector2D lhs, Vector2D rsh)

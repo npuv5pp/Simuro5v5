@@ -38,7 +38,7 @@ namespace Simuro5v5
             public readonly static float DoubleZeroAngularDragFactor = AngularDragFactor * 1;
 
             public readonly static float RL = 7.8670658f;                   // 机器人边长         // 有舍入误差
-            public readonly static float HRL = 3.9335329f;                  // 机器人半边长       // 有舍入误差
+            public const float HRL = 3.9335329f;                  // 机器人半边长       // 有舍入误差
             public readonly static float maxVelocity = 125.0f;              // 机器人最大线速度
             public readonly static float maxAngularVelocity = float.MaxValue; // 机器人最大角速度，角度制
             //public readonly static float maxAngularVelocity = 4024.07121363f; // 机器人最大角速度，角度制
@@ -49,9 +49,6 @@ namespace Simuro5v5
             public readonly static float k1Dym = -0.0007292f;               // 修正引擎角速度非线性规律的参数
             public readonly static float k2Dym = 1.0f;                      // 修正引擎角速度非线性规律的参数
             public readonly static float range = 0.001f;                    // 重整角度阈值
-            public readonly static float kf1 = Mathf.Exp(-1.0f / 15.71f);   // 直线运动一般情况下加速度系数，0.93833
-            public readonly static float kf2 = Mathf.Exp(-1.0f / 0.9231f);  // 直线运动零减速情况下加速度系数，0.338475
-            public readonly static float kt1 = Mathf.Exp(-1.0f / 3.096f);   // 转角时角加速度系数，0.723976
             public readonly static float r = 0.53461992f;                   // 小车对z轴的惯性半径
             public readonly static float r2 = 0.56057f;                     // 小车对z轴的惯性半径2
             public readonly static float dyF = 0.1486f;                     // 小车的动摩擦因数
@@ -64,7 +61,7 @@ namespace Simuro5v5
             public readonly static float mass = 2;
 
             public readonly static float BL = 5.043424f;                    // 球的直径
-            public readonly static float HBL = 2.521712f;                   // 球的半径
+            public const float HBL = 2.521712f;                   // 球的半径
             public readonly static float dyF = 1.0f;                        // 球的动摩擦因数
             public readonly static float stF = dyF;                         // 球的静摩擦因数
             public readonly static float bonc = 0.8f;                       // 球的弹性系数
