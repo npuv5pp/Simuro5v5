@@ -24,7 +24,6 @@ namespace Simuro5v5.Config
         public static int YellowStrategyPort { get; set; }
 
         public static int ConnectTimeout { get; set; }
-        public static bool UseUdp { get; set; }
 
         static StrategyConfig()
         {
@@ -32,18 +31,15 @@ namespace Simuro5v5.Config
             YellowStrategyPort = 20001;
 
             ConnectTimeout = 3000;
-            UseUdp = false;
         }
     }
 
     [ConfigGroup]
     public static class GeneralConfig
     {
-        public static bool EnableConvertYellowData { get; set; }
 
         static GeneralConfig()
         {
-            EnableConvertYellowData = true;
         }
     }
 
