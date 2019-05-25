@@ -403,10 +403,16 @@ public class PlayMain : MonoBehaviour
             timedPausing = true;
             PauseMatchClearly();
             yield return new WaitForSecondsRealtime(sec);
-            callback();
+            try
+            {
+                callback();
+            }
+            finally
+            {
+                timedPausing = false;
+            }
             // 外部没有主动暂停，则可以继续比赛
             if (!externalPausing) ResumeMatchClearly();
-            timedPausing = false;
         }
 
         if (sec > 0)
