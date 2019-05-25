@@ -162,7 +162,8 @@ namespace Simuro5v5.Strategy
             var rv = new V5RPC.Proto.JudgeResultEvent
             {
                 OffensiveTeam = result.Actor.ToProto(),
-                Type = result.ResultType.ToProto()
+                Type = result.ResultType.ToProto(),
+                Reason = result.Reason
             };
             return rv;
         }

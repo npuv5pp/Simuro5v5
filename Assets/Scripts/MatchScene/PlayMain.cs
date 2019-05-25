@@ -193,6 +193,14 @@ public class PlayMain : MonoBehaviour
                     break;
             }
 
+            StrategyManager.Blue.OnJudgeResult(judgeResult);
+            StrategyManager.Yellow.OnJudgeResult(new JudgeResult
+            {
+                Actor = judgeResult.Actor.ToAnother(),
+                ResultType = judgeResult.ResultType,
+                Reason = judgeResult.Reason
+            });
+
             // 手动摆位
             if (manualPlaceEnabled)
             {
@@ -202,6 +210,7 @@ public class PlayMain : MonoBehaviour
             else
             {
                 Debug.Log("auto placing");
+
                 void Callback()
                 {
                     UpdatePlacementToScene(judgeResult);
@@ -405,14 +414,6 @@ public class PlayMain : MonoBehaviour
             StartCoroutine(_PauseCoroutine());
         }
     }
-
-    // public void PauseUntil(Func<bool> func, Action callback)
-    // {
-    //     IEnumerator func()
-    //     {
-    //         yield return new WaitUntil()
-    //     }
-    // }
 
     /// <summary>
     /// 实际执行暂停操作，不维护暂停相关的状态。供内部使用<br>
