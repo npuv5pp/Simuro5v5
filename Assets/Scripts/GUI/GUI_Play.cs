@@ -238,7 +238,8 @@ public class GUI_Play : MonoBehaviour
 
     void UpdateTimeText()
     {
-        SetTimeText(MatchInfo.TickMatch);
+        // SetTimeText($"{MatchInfo.TickPhase}-{MatchInfo.TickMatch}");
+        SetTimeText(MatchInfo.TickPhase.ToString());
     }
 
     void UpdateScoreText()
@@ -315,9 +316,9 @@ public class GUI_Play : MonoBehaviour
         yellowScoreText.text = i.ToString();
     }
 
-    void SetTimeText(int i)
+    void SetTimeText(string str)
     {
-        timeText.text = i.ToString();
+        timeText.text = str;
     }
 
     void SetRefereeInfo(string info)

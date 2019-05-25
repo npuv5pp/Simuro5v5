@@ -37,6 +37,7 @@ namespace Simuro5v5
 
         // 时间
         public int TickMatch;
+        public int TickPhase;
         // 比分
         public MatchScore Score;
         // 比赛阶段：上下半场、加时、点球大战

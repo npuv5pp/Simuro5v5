@@ -237,7 +237,7 @@ public class Referee : ICloneable
         //点球大战状态
         else
         {
-            if (matchInfo.TickMatch == 0)
+            if (matchInfo.TickPhase == 0)
             {
                 return new JudgeResult
                 {
@@ -461,7 +461,7 @@ public class Referee : ICloneable
     private bool JudgePlace(ref JudgeResult judgeResult)
     {
         //首拍，执行开球
-        if (matchInfo.TickMatch == 0)
+        if (matchInfo.TickPhase == 0)
         {
             string matchState;
             switch (matchInfo.MatchPhase)
@@ -517,7 +517,7 @@ public class Referee : ICloneable
     private bool JudgePenalty(ref JudgeResult judgeResult)
     {
         //考虑进入点球大战中，且首拍为0.进行点球
-        if (matchInfo.MatchPhase == MatchPhase.Penalty && matchInfo.TickMatch == 0)
+        if (matchInfo.MatchPhase == MatchPhase.Penalty && matchInfo.TickPhase == 0)
         {
             judgeResult = new JudgeResult
             {
