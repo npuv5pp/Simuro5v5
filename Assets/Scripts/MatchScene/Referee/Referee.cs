@@ -4,6 +4,7 @@ using System.Text;
 using Newtonsoft.Json;
 using Simuro5v5;
 using UnityEngine;
+using NUnit.Framework;
 using Event = Simuro5v5.EventSystem.Event;
 using Simuro5v5.Util;
 
@@ -1718,4 +1719,44 @@ public class Referee : ICloneable
     }
 }
 
+namespace TestReferee
+{
+    [TestFixture]
+    public class TestPlacement
+    {
+        [Test]
+        public void TestPenaltyKick()
+        {
+            var referee = new Referee();
+            var matchInfo = new MatchInfo()
+            {
+                Ball = new Ball() { pos = new Vector2D(0, 0) },
+                BlueRobots = new Robot[]
+                {
+                new Robot() { pos = new Vector2D(0, 0) },
+                new Robot() { pos = new Vector2D(0, 0) },
+                new Robot() { pos = new Vector2D(0, 0) },
+                new Robot() { pos = new Vector2D(0, 0) },
+                new Robot() { pos = new Vector2D(0, 0) },
+                },
+                YellowRobots = new Robot[]
+                {
+                new Robot() { pos = new Vector2D(0, 0) },
+                new Robot() { pos = new Vector2D(0, 0) },
+                new Robot() { pos = new Vector2D(0, 0) },
+                new Robot() { pos = new Vector2D(0, 0) },
+                new Robot() { pos = new Vector2D(0, 0) },
+                },
+            };
+            var judgeResult = new JudgeResult()
+            {
+                Actor = Side.Blue,
+                ResultType = ResultType.PenaltyKick,
+            };
 
+            referee.JudgeAutoPlacement(matchInfo, judgeResult);
+
+            Assert.AreEqual(new Vector2D(-72.5f, 0f), matchInfo.Ball.pos);
+        }
+    }
+}

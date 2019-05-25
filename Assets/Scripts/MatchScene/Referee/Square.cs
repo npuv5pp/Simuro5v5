@@ -207,11 +207,18 @@ namespace Simuro5v5.Util
     public class SquareTest
     {
         [Test]
-        public void TestSquare()
+        public void TestSquareContainsPoint()
         {
             Square square1 = new Square(new Vector2D(0, 0), new Vector2D(1, 1));
-            Square square2 = new Square(new Vector2D(0.9f, 0.5f), new Vector2D(1.9f, 0.5f));
+            Square square2 = new Square(new Vector2D(1, 0.5f), new Vector2D(2, 0.5f));
             Assert.IsTrue(square1.ContainsPoint(new Vector2D(0.5f, 0.5f)));
+        }
+
+        [Test]
+        public void TestSquareIsCrossBy()
+        {
+            Square square1 = new Square(new Vector2D(0, 0), new Vector2D(1, 1));
+            Square square2 = new Square(new Vector2D(1, 0.5f), new Vector2D(2, 0.5f));
             Assert.IsTrue(square1.IsCrossedBy(square2));
         }
     }
