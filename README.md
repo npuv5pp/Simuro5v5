@@ -37,7 +37,7 @@ In the game scene, you can call the menu at any time by right-clicking or by pre
 You can control replay by keyboard:
 
 | Key       | Function                             |
-|-----------|--------------------------------------|
+| --------- | ------------------------------------ |
 | `↑` `↓`   | Adjust playback speed                |
 | `←` `→`   | Control progress                     |
 | `SEC`     | Pause or continue                    |
@@ -61,7 +61,7 @@ For specific documents, please refer to [referee documents](https://github.com/n
 
 # Right attack hypothesis
 
-The platform supports the right-attack hypothesis, which means that no matter which side the strategy is loaded, you can think of yourself as the blue side (on the right side of the venue). The function platform is enabled by default. To close it, modify the `EnableConvertYellowData` field in the config.json file in the root directory of the platform to `false`.
+The platform supports the right-attack hypothesis, which means that no matter which side the strategy is loaded, you can think of yourself as the blue side (on the right side of the venue). 
 
 # Credits
 
