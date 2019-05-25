@@ -34,7 +34,7 @@ using Event = Simuro5v5.EventSystem.Event;
 /// 实际的比赛时间从1开始；指定为0表示切换到了新的阶段，不算做实际比赛时间；<br>
 /// 
 /// 事件的触发：
-/// 时间递增一时，触发MatchInfoUpdate事件；摆位后会触发AutoPlacement事件。
+/// 场地进行有效更新（摆位或物理引擎带轮速运行一拍）时，触发MatchInfoUpdate事件；摆位后会触发AutoPlacement事件。
 /// 对事件的处理以“使得外部可以以其记录整个比赛进程”为准<br>
 /// </mmary>
 public class PlayMain : MonoBehaviour
@@ -56,6 +56,8 @@ public class PlayMain : MonoBehaviour
     public StrategyManager StrategyManager { get; private set; }
     public MatchInfo GlobalMatchInfo { get; private set; }
     public ObjectManager ObjectManager { get; private set; }
+
+    public Action OnNextPhase;
 
     /// <summary>
     /// 进入场景之后。如果已经有实例在运行，立即销毁所绑定的Entity；否则激活已存在的单例
@@ -124,24 +126,31 @@ public class PlayMain : MonoBehaviour
 
     /// <summary>
     /// 维护比赛状态，根据裁判的判定结果执行不同的动作。<br>
+    /// 完整的一拍有三个步骤：
+    /// 时间递增、更新输入（轮速或摆位）---> 物理引擎运行 ---> 触发事件。<br>
+    /// 这个函数会在每次“物理引擎运行”结束被调用，因此，一是需要处理上一拍的运行结果，二是作下一拍（本拍）的准备。<br>
     /// </summary>
     public void InMatchLoop()
     {
         if (manualPlacing) throw new InvalidOperationException("manual placing");
         if (!LoadSucceed || !Started || Paused) return;
 
-        /// 从裁判中获取下一拍的动作。
-        JudgeResult judgeResult = GlobalMatchInfo.Referee.Judge(GlobalMatchInfo);
-
-        // 先以当前的状态发送事件。
-        // 时间加一，触发事件。
-        GlobalMatchInfo.TickMatch++;
-        GlobalMatchInfo.TickPhase++;
-        // 如果现在是整场比赛的第一拍，当前的状态无意义，不用触发事件
-        if (GlobalMatchInfo.TickMatch != 0)
+        // 触发事件，作为上一拍的结束
+        // 如果现在是阶段的第一拍，上一拍无意义，不用触发事件
+        if (GlobalMatchInfo.TickPhase != 0)
             Event.Send(Event.EventType1.MatchInfoUpdate, GlobalMatchInfo);
 
-        // 执行下一拍的动作
+        /* 之前处理上一拍 */
+        /* 之后为本拍做准备 */
+
+        // 从裁判中获取下一拍的动作。
+        JudgeResult judgeResult = GlobalMatchInfo.Referee.Judge(GlobalMatchInfo);
+
+        // 时间加一
+        GlobalMatchInfo.TickMatch++;
+        GlobalMatchInfo.TickPhase++;
+
+        // 执行动作，更新输入
         if (judgeResult.ResultType == ResultType.GameOver)
         {
             // 整场比赛结束
@@ -163,6 +172,7 @@ public class PlayMain : MonoBehaviour
         else if (judgeResult.ResultType == ResultType.NextPhase)
         {
             // 阶段结束
+            // 这之后的物理引擎运行的一拍无意义，不用触发事件
             Debug.Log("next phase");
             if (GlobalMatchInfo.MatchPhase == MatchPhase.FirstHalf)
             {
@@ -171,15 +181,16 @@ public class PlayMain : MonoBehaviour
             }
             GlobalMatchInfo.MatchPhase = GlobalMatchInfo.MatchPhase.NextPhase();
             GlobalMatchInfo.TickPhase = 0;      // 时间指定为0，使得下一拍的裁判得知新阶段的开始
+            OnNextPhase();
         }
         else if (judgeResult.ResultType == ResultType.NormalMatch)
         {
-            // 正常比赛
+            // 正常比赛，输入轮速
             UpdateWheelsToScene();
         }
         else
         {
-            // 摆位
+            // 摆位，输入摆位信息
             Debug.Log("placing...");
 
             // 判断是否进球
@@ -214,18 +225,14 @@ public class PlayMain : MonoBehaviour
                 void Callback()
                 {
                     UpdatePlacementToScene(judgeResult);
-                    // 摆位算作一拍
-                    GlobalMatchInfo.TickMatch++;
-                    GlobalMatchInfo.TickPhase++;
-                    // 触发事件
-                    Event.Send(Event.EventType1.MatchInfoUpdate, GlobalMatchInfo);
+                    ObjectManager.SetStill();
                     Event.Send(Event.EventType1.AutoPlacement, GlobalMatchInfo);
 
                     PauseForSeconds(2, () => { });
                 }
 
                 // TODO 考虑连续出现摆位的情况
-                if (GlobalMatchInfo.TickMatch > 0)
+                if (GlobalMatchInfo.TickMatch > 1)
                 {
                     PauseForSeconds(2, Callback);
                 }
@@ -291,11 +298,6 @@ public class PlayMain : MonoBehaviour
         ObjectManager.SetBallPlacement(GlobalMatchInfo.Ball);
         ObjectManager.SetStill();
 
-        // 摆位算作一拍
-        GlobalMatchInfo.TickMatch++;
-        GlobalMatchInfo.TickPhase++;
-        // 触发事件
-        Event.Send(Event.EventType1.MatchInfoUpdate, GlobalMatchInfo);
         Event.Send(Event.EventType1.AutoPlacement, GlobalMatchInfo);
         manualPlacing = false;
         ResumeMatchClearly();
@@ -513,8 +515,6 @@ public class PlayMain : MonoBehaviour
         ObjectManager.SetBluePlacement(mi.BlueRobots);
         ObjectManager.SetYellowPlacement(mi.YellowRobots);
         ObjectManager.SetBallPlacement(mi.Ball);
-
-        ObjectManager.SetStill();
     }
 
     /// <summary>

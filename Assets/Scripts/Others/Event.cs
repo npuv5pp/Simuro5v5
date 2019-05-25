@@ -80,25 +80,16 @@ namespace Simuro5v5.EventSystem
         {
             // 事件名称                 // 传入参数
             MatchInfoUpdate,            // 更新后的赛场信息
-            GetGoal,                       // 进球
-            RefereeLogUpdate,                  // 更新比赛状态信息
-
+            AutoPlacement,
             MatchStart,
             MatchStop,
-            AutoPlacement,
-
-            StrategyBlueLoaded,         // IStrategy策略实例
-            StrategyYellowLoaded,       // IStrategy策略实例
-            StrategyBlueFreed,
-            StrategyYellowFreed,
         }
 
         /// <summary>
-        /// 参数数量为1的事件类型；
+        /// 参数数量为2的事件类型；
         /// </summary>
         public enum EventType2
         {
-            WheelSetUpdate,
         }
 
         /// <summary>
