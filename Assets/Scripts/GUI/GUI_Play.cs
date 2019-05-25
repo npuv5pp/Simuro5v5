@@ -60,6 +60,7 @@ public class GUI_Play : MonoBehaviour
     public AnimControl refereeAnim;
     public AnimControl cameraAnim;
     public AnimControl topAnim;
+    public PhaseSwitchAnimControl phaseSwitchAnim;
 
     // other ui items
     public TMP_Text blueScoreText;
@@ -80,6 +81,9 @@ public class GUI_Play : MonoBehaviour
         playMain = PlayMain.Singleton.GetComponent<PlayMain>();
         toggleManualPlacing.isOn = playMain.manualPlaceEnabled;
 
+        playMain.OnNextPhase += PhaseSwitched;
+        playMain.OnMatchStart += OnMatchStart;
+
         UpdateAnim();
         UpdateTimeText();
         UpdateScoreText();
@@ -95,6 +99,16 @@ public class GUI_Play : MonoBehaviour
 
         blueInputField.text = $"127.0.0.1:{StrategyConfig.BlueStrategyPort}";
         yellowInputField.text = $"127.0.0.1:{StrategyConfig.YellowStrategyPort}";
+    }
+
+    void OnMatchStart()
+    {
+        phaseSwitchAnim.Notify(playMain.GlobalMatchInfo.MatchPhase);
+    }
+
+    void PhaseSwitched()
+    {
+        phaseSwitchAnim.Notify(playMain.GlobalMatchInfo.MatchPhase);
     }
 
     void FixedUpdate()
@@ -480,5 +494,11 @@ public class GUI_Play : MonoBehaviour
     public void ManualPlaceToggleClicked()
     {
         playMain.manualPlaceEnabled = toggleManualPlacing.isOn;
+    }
+
+    void OnDestroy()
+    {
+        playMain.OnNextPhase -= PhaseSwitched;
+        playMain.OnMatchStart -= OnMatchStart;
     }
 }

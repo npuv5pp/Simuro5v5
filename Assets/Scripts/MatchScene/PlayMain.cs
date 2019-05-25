@@ -58,6 +58,7 @@ public class PlayMain : MonoBehaviour
     public ObjectManager ObjectManager { get; private set; }
 
     public Action OnNextPhase;
+    public Action OnMatchStart;
 
     /// <summary>
     /// 进入场景之后。如果已经有实例在运行，立即销毁所绑定的Entity；否则激活已存在的单例
@@ -326,6 +327,7 @@ public class PlayMain : MonoBehaviour
         Started = true;
         Paused = true;
         Event.Send(Event.EventType1.MatchStart, GlobalMatchInfo);
+        OnMatchStart();
     }
 
     /// <summary>
