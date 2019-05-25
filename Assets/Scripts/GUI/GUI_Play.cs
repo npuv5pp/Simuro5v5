@@ -14,7 +14,10 @@ using Simuro5v5.Config;
 using TMPro;
 using Event = Simuro5v5.EventSystem.Event;
 using System;
+using System.Collections;
+using System.Linq;
 using Simuro5v5.Strategy;
+using UnityEngine.TestTools;
 
 public class GUI_Play : MonoBehaviour
 {
@@ -23,7 +26,7 @@ public class GUI_Play : MonoBehaviour
     /// </summary>
     bool MenuOpen => MenuStack.Count > 0;
 
-    static DataRecorder recorder;
+    internal static DataRecorder recorder;
 
     /// <summary>
     /// 保存上次非正常比赛的判定结果

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using NUnit.Framework;
 using UnityEngine;
 
 namespace Simuro5v5.Util
@@ -87,8 +88,8 @@ namespace Simuro5v5.Util
         public bool ContainsPoint(Vector2D p)
         {
             var a = Point1 - p;
-            var b = Point2 - p;
-            var c = Point3 - p;
+            var b = Point3 - p;
+            var c = Point2 - p;
             var d = Point4 - p;
             var area = a.Cross(b) + b.Cross(c) + c.Cross(d) + d.Cross(a);
             return Math.Abs(area) > 1e-2;
@@ -166,10 +167,10 @@ namespace Simuro5v5.Util
         /// </summary>
         protected override Vector2D Point2 { get; }
 
-        protected override Vector2D Point3 => (Point1 - Midpoint).Rotate(Mathf.PI / 4)
+        protected override Vector2D Point3 => (Point1 - Midpoint).Rotate(Mathf.PI / 2)
                                   + Midpoint;
 
-        protected override Vector2D Point4 => (Point1 - Midpoint).Rotate(-Mathf.PI / 4)
+        protected override Vector2D Point4 => (Point1 - Midpoint).Rotate(-Mathf.PI / 2)
                                   + Midpoint;
 
         public bool IsInCycle(Vector2D centralPosition , float radius)
@@ -197,8 +198,21 @@ namespace Simuro5v5.Util
         {
             var line = Point1 - Point3;
             var angle = Mathf.Acos(- line.x / Mathf.Sqrt(line * line));
-            var newSqare = new Square(this.Midpoint, angle, Const.Robot.HRL + radius);
-            return newSqare.ContainsPoint(center);
+            var newSquare = new Square(this.Midpoint, angle, Const.Robot.HRL + radius);
+            return newSquare.ContainsPoint(center);
+        }
+    }
+
+    [TestFixture]
+    public class SquareTest
+    {
+        [Test]
+        public void TestSquare()
+        {
+            Square square1 = new Square(new Vector2D(0, 0), new Vector2D(1, 1));
+            Square square2 = new Square(new Vector2D(0.9f, 0.5f), new Vector2D(1.9f, 0.5f));
+            Assert.IsTrue(square1.ContainsPoint(new Vector2D(0.5f, 0.5f)));
+            Assert.IsTrue(square1.IsCrossedBy(square2));
         }
     }
 }
