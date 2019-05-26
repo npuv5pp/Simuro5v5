@@ -175,6 +175,9 @@ public class Referee : ICloneable
     /// <param name="judgeResult">上次摆位的信息</param>
     public void JudgeAutoPlacement(MatchInfo matchInfo, JudgeResult judgeResult)
     {
+        this.blueRobots = matchInfo.BlueRobots;
+        this.yellowRobots = matchInfo.YellowRobots;
+
         for (int i = 0; i < Const.RobotsPerTeam; i++)
         {
             this.BlueRobotsPos[i] = matchInfo.BlueRobots[i].pos;
