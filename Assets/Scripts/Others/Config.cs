@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using UnityEngine;
 
-/// <summary>
-/// 平台运行时的配置
-/// </summary>
+// 平台运行时的配置
 namespace Simuro5v5.Config
 {
     /// <summary>
@@ -37,10 +36,6 @@ namespace Simuro5v5.Config
     [ConfigGroup]
     public static class GeneralConfig
     {
-
-        static GeneralConfig()
-        {
-        }
     }
 
     public static class ConfigManager
@@ -51,31 +46,31 @@ namespace Simuro5v5.Config
             typeof(StrategyConfig),
         };
 
-        private static readonly string defaultConfigJson = ToJson();
+        private static readonly string DefaultConfigJson = ToJson();
 
-        public static void ReadConfigFile(string configpath)
+        public static void ReadConfigFile(string configPath)
         {
-            if (File.Exists(configpath))
+            if (File.Exists(configPath))
             {
                 try
                 {
-                    FromFile(configpath);
+                    FromFile(configPath);
                 }
                 catch (Exception ex)
                 {
-                    Debug.LogWarning("Reseting to default config. Invalid config file: " + ex.Message);
+                    Debug.LogWarning("Resetting to default config. Invalid config file: " + ex.Message);
                     ResetToDefault();
                 }
             }
             // 无论如何重新写回文件，可以修正文件中缺失的键
-            ToFile(configpath);
+            ToFile(configPath);
         }
 
         public static void ResetToDefault()
         {
-            if (defaultConfigJson != null)
+            if (DefaultConfigJson != null)
             {
-                FromJson(defaultConfigJson);
+                FromJson(DefaultConfigJson);
             }
             else
             {
@@ -85,10 +80,10 @@ namespace Simuro5v5.Config
 
         public static void ToFile(string path)
         {
-            using (var filestream = File.Create(path))
+            using (var fileStream = File.Create(path))
             {
                 var bs = System.Text.Encoding.UTF8.GetBytes(ToJson());
-                filestream.Write(bs, 0, bs.Length);
+                fileStream.Write(bs, 0, bs.Length);
             }
         }
 
@@ -96,9 +91,9 @@ namespace Simuro5v5.Config
         {
             Dictionary<string, object> configDict = new Dictionary<string, object>();
 
-            foreach (var configtype in PlatformConfig)
+            foreach (var configType in PlatformConfig)
             {
-                configDict[configtype.Name] = TypeToDict(configtype);
+                configDict[configType.Name] = TypeToDict(configType);
             }
             return JsonConvert.SerializeObject(configDict, Formatting.Indented);
         }
@@ -114,13 +109,12 @@ namespace Simuro5v5.Config
             Dictionary<string, object> dict = JsonConvert.
                 DeserializeObject<Dictionary<string, object>>(json);
 
-            foreach (var configtype in PlatformConfig)
+            foreach (var configType in PlatformConfig)
             {
-                var jobj = dict[configtype.Name] as Newtonsoft.Json.Linq.JObject;
-                if (jobj != null)
+                if (dict[configType.Name] is JObject jObj)
                 {
-                    var d = jobj.ToObject<Dictionary<string, object>>();
-                    DictToType(d, configtype);
+                    var d = jObj.ToObject<Dictionary<string, object>>();
+                    DictToType(d, configType);
                 }
             }
         }
@@ -130,28 +124,26 @@ namespace Simuro5v5.Config
             foreach (var p in type.GetProperties())
             {
                 object obj = p.GetValue(null, null);
-                Type objtype = obj.GetType();
-                if (dict.ContainsKey(p.Name))
+                Type objType = obj.GetType();
+                if (!dict.ContainsKey(p.Name)) continue;
+                if (HasConfigAttribute(obj))
                 {
-                    if (HasConfigAttribute(obj))
+                    var d = ((Newtonsoft.Json.Linq.JObject)dict[p.Name]).ToObject<Dictionary<string, object>>();
+                    DictToType(d, objType);
+                }
+                else
+                {
+                    try
                     {
-                        var d = ((Newtonsoft.Json.Linq.JObject)dict[p.Name]).ToObject<Dictionary<string, object>>();
-                        DictToType(d, objtype);
-                    }
-                    else
-                    {
-                        try
+                        object val = dict[p.Name];
+                        if (val is long)
                         {
-                            object val = dict[p.Name];
-                            if (val.GetType() == typeof(System.Int64))
-                            {
-                                val = Convert.ToInt32(val);
-                            }
-                            p.SetValue(null, val, null);
+                            val = Convert.ToInt32(val);
                         }
-                        catch
-                        { }
+                        p.SetValue(null, val, null);
                     }
+                    catch
+                    { }
                 }
             }
         }
@@ -162,19 +154,19 @@ namespace Simuro5v5.Config
             Dictionary<string, object> dict = new Dictionary<string, object>();
             foreach (var p in t.GetProperties())
             {
+                // TODO: 为什么要对 null 调用？
                 object obj = p.GetValue(null, null);
-                Type objtype = obj.GetType();
-                if (obj == null)
+                if (obj != null)
                 {
-                    continue;
-                }
-                else if (HasConfigAttribute(obj))
-                {
-                    dict[objtype.Name] = TypeToDict(objtype);
-                }
-                else
-                {
-                    dict[p.Name] = obj;
+                    if (HasConfigAttribute(obj))
+                    {
+                        Type objType = obj.GetType();
+                        dict[objType.Name] = TypeToDict(objType);
+                    }
+                    else
+                    {
+                        dict[p.Name] = obj;
+                    }
                 }
             }
             return dict;
@@ -185,7 +177,7 @@ namespace Simuro5v5.Config
         {
             foreach (object attr in obj.GetType().GetCustomAttributes(false))
             {
-                if (typeof(ConfigGroupAttribute).IsInstanceOfType(attr))
+                if (attr is ConfigGroupAttribute)
                 {
                     return true;
                 }

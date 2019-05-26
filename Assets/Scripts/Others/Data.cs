@@ -112,10 +112,14 @@ namespace Simuro5v5
             info.Ball.angularVelocity = 0;
             info.Ball.linearVelocity = Vector2D.Zero;
             //x, y, rotation
-            var yellowData = new float[,]
-            { { -102.5f, 0, 90 }, { -81.2f, 48, 0 }, { -81.2f, -48, 0 }, { -29.8f, 48, 0 }, { -29.8f, -48, 0 } };
-            var blueData = new float[,]
-            { { 102.5f, 0, -90 }, { 81.2f, -48, 180 }, { 81.2f, 48, 180 }, { 29.8f, -48, 180 }, { 29.8f, 48, 180 } };
+            var yellowData = new[,]
+            {
+                {-102.5f, 0, 90}, {-81.2f, 48, 0}, {-81.2f, -48, 0}, {-29.8f, 48, 0}, {-29.8f, -48, 0}
+            };
+            var blueData = new[,]
+            {
+                {102.5f, 0, -90}, {81.2f, -48, 180}, {81.2f, 48, 180}, {29.8f, -48, 180}, {29.8f, 48, 180}
+            };
             Robot InitRobot(Robot rb, float[,] data, int elem)
             {
                 rb.pos.x = data[elem, 0];
@@ -401,14 +405,9 @@ namespace Simuro5v5
             return lhs.x * rhs.x + lhs.y * rhs.y;
         }
 
-        public static bool operator ==(Vector2D lsh, Vector2D rhs)
+        public bool IsNotNear(Vector2D rhs)
         {
-            throw new NotSupportedException($"Only operator != is used.");
-        }
-
-        public static bool operator !=(Vector2D lsh,Vector2D rhs)
-        {
-            if (Math.Abs(lsh.x - rhs.x) > 0.1 || Math.Abs(lsh.y - rhs.y) > 0.1)
+            if (Math.Abs(this.x - rhs.x) > 0.1 || Math.Abs(this.y - rhs.y) > 0.1)
             {
                 return true;
             }

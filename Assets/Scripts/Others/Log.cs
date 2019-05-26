@@ -34,10 +34,7 @@ namespace Simuro5v5
                     AutoFlush = true
                 };
 
-                Event.Register(Event.EventType0.PlatformExiting, delegate ()
-                {
-                    Close();
-                });
+                Event.Register(Event.EventType0.PlatformExiting, Close);
             }
             catch (Exception ex)
             {

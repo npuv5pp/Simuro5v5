@@ -1477,7 +1477,7 @@ public class Referee : ICloneable
             FreeOffensivePosSquare[OffensiveFreeId].Pos = FreeOffensivePos;
         }
         //如果在争球半场内，但是没有规范位置，则放置摆位点
-        if (FreeOffensivePosSquare[OffensiveFreeId].Pos != FreeOffensivePos)
+        if (FreeOffensivePosSquare[OffensiveFreeId].Pos.IsNotNear(FreeOffensivePos))
         {
             FreeOffensivePosSquare[OffensiveFreeId].Pos = FreeOffensivePos;
         }
