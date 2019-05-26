@@ -186,6 +186,7 @@ public class Referee : ICloneable
             BlueRobotSquare[i] = new Square(BlueRobotsPos[i], matchInfo.BlueRobots[i].rotation);
             YellowRobotSquare[i] = new Square(YellowRobotsPos[i], matchInfo.YellowRobots[i].rotation);
         }
+        //该情况一般只用于门球情况，进攻方自定义球的坐标
         this.BallPos = matchInfo.Ball.pos;
 
         switch (judgeResult.ResultType)
@@ -1263,7 +1264,7 @@ public class Referee : ICloneable
         else
         {
             GoalieBallPos = new Vector2D(-98f, 20f);
-
+            
             GoaliePosSafeSquare = new RobotPosSquare[3]{
                 new RobotPosSquare(new Vector2D(-105,0)),
                 new RobotPosSquare(new Vector2D (-105,-12)),
@@ -1295,12 +1296,19 @@ public class Referee : ICloneable
         if (GoalieId == -1)
         {
             GoalieId = 0;
-            GoalieOffensivePosSquare[GoalieId].Pos = GoaliePosSafeSquare[0].Pos;
+            GoalieOffensivePosSquare[GoalieId].GetNewPosSquare(GoaliePosSafeSquare[0].Pos);
             GoaliePosSafeSquare[0].occupy = true;
         }
         //下一步对守门员与球判断有没有重叠
-        //TODO
-
+        for(int i = 0; i<3;i++)
+        {
+            if (GoalieOffensivePosSquare[GoalieId].square.ContainsPoint(BallPos))
+            {
+                GoalieOffensivePosSquare[GoalieId].GetNewPosSquare(GoaliePosSafeSquare[i].Pos);
+            }
+            else
+                break;
+        }
         //对进攻方摆位判断
         for (int i = 0; i < Const.RobotsPerTeam; i++)
         {
@@ -1388,7 +1396,7 @@ public class Referee : ICloneable
                 new RobotPosSquare(new Vector2D(10f, 50f)),
                 new RobotPosSquare(new Vector2D(10f, 35f)),
                 new RobotPosSquare(new Vector2D(10f, 20f))};
-            UpdateOffAndDefInfo(FreeDefenderSafePosSquare, FreeOffensiveSafePosSquare, Side.Yellow);
+            UpdateOffAndDefInfo(FreeDefenderPosSquare, FreeOffensivePosSquare, Side.Yellow);
         }
         else if (judgeResult.ResultType == ResultType.FreeKickLeftBot)
         {
@@ -1417,7 +1425,7 @@ public class Referee : ICloneable
                 new RobotPosSquare(new Vector2D(10f, -50f)),
                 new RobotPosSquare(new Vector2D(10f, -35f)),
                 new RobotPosSquare(new Vector2D(10f, -20f))};
-            UpdateOffAndDefInfo(FreeDefenderSafePosSquare, FreeOffensiveSafePosSquare, Side.Yellow);
+            UpdateOffAndDefInfo(FreeDefenderPosSquare, FreeOffensivePosSquare, Side.Yellow);
         }
         else if (judgeResult.ResultType == ResultType.FreeKickRightTop)
         {
@@ -1446,7 +1454,7 @@ public class Referee : ICloneable
                 new RobotPosSquare(new Vector2D(-10f, 50f)),
                 new RobotPosSquare(new Vector2D(-10f, 35f)),
                 new RobotPosSquare(new Vector2D(-10f, 20f))};
-            UpdateOffAndDefInfo(FreeDefenderSafePosSquare, FreeOffensiveSafePosSquare, Side.Blue);
+            UpdateOffAndDefInfo(FreeDefenderPosSquare, FreeOffensivePosSquare, Side.Blue);
         }
         else
         {
@@ -1475,7 +1483,7 @@ public class Referee : ICloneable
                 new RobotPosSquare(new Vector2D(-10f, -50f)),
                 new RobotPosSquare(new Vector2D(-10f, -35f)),
                 new RobotPosSquare(new Vector2D(-10f, -20f))};
-            UpdateOffAndDefInfo(FreeDefenderSafePosSquare, FreeOffensiveSafePosSquare, Side.Blue);
+            UpdateOffAndDefInfo(FreeDefenderPosSquare, FreeOffensivePosSquare, Side.Blue);
         }
         //先对球进行摆位
         BallPos = FreeBallPos;
@@ -1582,8 +1590,7 @@ public class Referee : ICloneable
         {
             if (!robotsSafePosSquares[i].occupy)
             {
-                robotPosSquare.Pos = robotsSafePosSquares[i].Pos;
-                robotPosSquare.square = new Square(robotPosSquare.Pos);
+                robotPosSquare.GetNewPosSquare(robotsSafePosSquares[i].Pos);
                 robotsSafePosSquares[i].occupy = true;
                 break;
             }
@@ -1742,7 +1749,7 @@ namespace TestReferee
     public class TestPlacement
     {
         [Test]
-        public void TestPenaltyPlacement()
+        public void TestPenaltyPlacement1()
         {
             var referee = new Referee();
             var matchInfo = new MatchInfo()
@@ -1774,6 +1781,42 @@ namespace TestReferee
             referee.JudgeAutoPlacement(matchInfo, judgeResult);
 
             Assert.AreEqual(new Vector2D(-50f, 0f), matchInfo.BlueRobots[0].pos);
+        }
+
+        [Test]
+        public void TestPenaltyPlacement2()
+        {
+            var referee = new Referee();
+            var matchInfo = new MatchInfo()
+            {
+                Ball = new Ball() { pos = new Vector2D(0, 0) },
+                BlueRobots = new Robot[]
+                {
+                    //没有球员在守门员内
+                new Robot() { pos = new Vector2D(100, 50) },
+                new Robot() { pos = new Vector2D(0, 0) },
+                new Robot() { pos = new Vector2D(0, 0) },
+                new Robot() { pos = new Vector2D(0, 0) },
+                new Robot() { pos = new Vector2D(0, 0) },
+                },
+                YellowRobots = new Robot[]
+                {
+                new Robot() { pos = new Vector2D(0, 0) },
+                new Robot() { pos = new Vector2D(0, 0) },
+                new Robot() { pos = new Vector2D(0, 0) },
+                new Robot() { pos = new Vector2D(0, 0) },
+                new Robot() { pos = new Vector2D(0, 0) },
+                },
+            };
+            var judgeResult = new JudgeResult()
+            {
+                Actor = Side.Yellow,
+                ResultType = ResultType.PenaltyKick,
+            };
+            //该情况测试 点球摆位时，与球重叠后把球员移开
+            referee.JudgeAutoPlacement(matchInfo, judgeResult);
+
+            Assert.AreEqual(new Vector2D(106f, 0f), matchInfo.BlueRobots[0].pos);
         }
 
         [Test]
@@ -1810,6 +1853,43 @@ namespace TestReferee
             referee.JudgeAutoPlacement(matchInfo, judgeResult);
 
             Assert.AreEqual(new Vector2D(0, 12), matchInfo.BlueRobots[0].pos);
+        }
+
+
+        [Test]
+        public void TestFreePlacement()
+        {
+            var referee = new Referee();
+            var matchInfo = new MatchInfo()
+            {
+                Ball = new Ball() { pos = new Vector2D(0, 0) },
+                BlueRobots = new Robot[]
+                {
+                    //测试机器人0号与球重叠
+                new Robot() { pos = new Vector2D(0f, 0f) },
+                new Robot() { pos = new Vector2D(30, 0) },
+                new Robot() { pos = new Vector2D(40, 0) },
+                new Robot() { pos = new Vector2D(50, 0) },
+                new Robot() { pos = new Vector2D(60, 0) },
+                },
+                YellowRobots = new Robot[]
+                {
+                new Robot() { pos = new Vector2D(-10, 0) },
+                new Robot() { pos = new Vector2D(-20, 0) },
+                new Robot() { pos = new Vector2D(-30, 0) },
+                new Robot() { pos = new Vector2D(-40, 0) },
+                new Robot() { pos = new Vector2D(-50, 0) },
+                },
+            };
+            var judgeResult = new JudgeResult()
+            {
+                Actor = Side.Blue,
+                ResultType = ResultType.FreeKickLeftBot,
+            };
+            //该情况测试 开球摆位时，与球重叠后把球员移开
+            referee.JudgeAutoPlacement(matchInfo, judgeResult);
+
+            Assert.AreEqual(new Vector2D(-25f, -60f), matchInfo.BlueRobots[0].pos);
         }
     }
 
