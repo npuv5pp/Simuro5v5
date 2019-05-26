@@ -211,6 +211,11 @@ namespace Simuro5v5.Util
         {
             Square square1 = new Square(new Vector2D(0, 0), new Vector2D(1, 1));
             Assert.IsTrue(square1.ContainsPoint(new Vector2D(0.5f, 0.5f)));
+            Assert.IsTrue(square1.ContainsPoint(new Vector2D(0.01f, 0.99f)));
+            
+            Square square2 = new Square(new Vector2D(0, 1), new Vector2D(2, 1));
+            Assert.IsTrue(square2.ContainsPoint(new Vector2D(1, 1)));
+            Assert.IsTrue(square2.ContainsPoint(new Vector2D(0.01f, 1)));
         }
 
         [Test]
