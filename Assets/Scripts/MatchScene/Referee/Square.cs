@@ -87,12 +87,10 @@ namespace Simuro5v5.Util
 
         public bool ContainsPoint(Vector2D p)
         {
-            var a = Point1 - p;
-            var b = Point3 - p;
-            var c = Point2 - p;
-            var d = Point4 - p;
-            var area = a.Cross(b) + b.Cross(c) + c.Cross(d) + d.Cross(a);
-            return Math.Abs(area) > 1e-2;
+            return (Point3 - Point1).Cross(p - Point1) >= 0
+                   && (Point2 - Point3).Cross(p - Point3) >= 0
+                   && (Point4 - Point2).Cross(p - Point2) >= 0
+                   && (Point1 - Point4).Cross(p - Point4) >= 0;
         }
     }
     
@@ -212,10 +210,14 @@ namespace Simuro5v5.Util
             Square square1 = new Square(new Vector2D(0, 0), new Vector2D(1, 1));
             Assert.IsTrue(square1.ContainsPoint(new Vector2D(0.5f, 0.5f)));
             Assert.IsTrue(square1.ContainsPoint(new Vector2D(0.01f, 0.99f)));
+            Assert.IsFalse(square1.ContainsPoint(new Vector2D(0, -0.01f)));
+            Assert.IsFalse(square1.ContainsPoint(new Vector2D(0.5f, 1.01f)));
             
             Square square2 = new Square(new Vector2D(0, 1), new Vector2D(2, 1));
             Assert.IsTrue(square2.ContainsPoint(new Vector2D(1, 1)));
             Assert.IsTrue(square2.ContainsPoint(new Vector2D(0.01f, 1)));
+            Assert.IsTrue(square2.ContainsPoint(new Vector2D(0.5f, 1.01f)));
+            Assert.IsFalse(square2.ContainsPoint(new Vector2D(1.5f,  0.499f)));
         }
 
         [Test]
