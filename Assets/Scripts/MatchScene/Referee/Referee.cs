@@ -175,6 +175,7 @@ public class Referee : ICloneable
     /// <param name="judgeResult">上次摆位的信息</param>
     public void JudgeAutoPlacement(MatchInfo matchInfo, JudgeResult judgeResult)
     {
+        this.matchInfo = matchInfo;
         this.blueRobots = matchInfo.BlueRobots;
         this.yellowRobots = matchInfo.YellowRobots;
 
@@ -190,19 +191,19 @@ public class Referee : ICloneable
         switch (judgeResult.ResultType)
         {
             case ResultType.PenaltyKick:
-                JudgePenaltyPlacement(matchInfo, judgeResult);
+                JudgePenaltyPlacement(judgeResult);
                 break;
             case ResultType.PlaceKick:
-                JudgePlacePlacement(matchInfo, judgeResult);
+                JudgePlacePlacement(judgeResult);
                 break;
             case ResultType.GoalKick:
-                JudgeGoaliePlacement(matchInfo, judgeResult);
+                JudgeGoaliePlacement(judgeResult);
                 break;
             case ResultType.FreeKickLeftBot:
             case ResultType.FreeKickLeftTop:
             case ResultType.FreeKickRightBot:
             case ResultType.FreeKickRightTop:
-                JudgeFreePlacement(matchInfo, judgeResult);
+                JudgeFreePlacement(judgeResult);
                 break;
         }
     }
@@ -902,7 +903,7 @@ public class Referee : ICloneable
         }
     }
 
-    private void JudgePenaltyPlacement(MatchInfo matchInfo, JudgeResult judgeResult)
+    private void JudgePenaltyPlacement(JudgeResult judgeResult)
     {
         Vector2D PenaltyBallPos;//点球坐标
         Vector2D PenaltyDefenderGoaliePos;//守门员坐标
@@ -1038,6 +1039,11 @@ public class Referee : ICloneable
             attackRobotID = 1;
             PenaltyOffensivePosSquare[1].Pos = PenaltyAttakcPos;
         }
+        //对进攻球员与球检测，不能重叠
+        if (PenaltyOffensivePosSquare[attackRobotID].square.ContainsPoint(BallPos))
+        {
+            PenaltyOffensivePosSquare[attackRobotID].Pos = PenaltyAttakcPos;
+        }
         //再对进攻方进行检测
         for (int i = 0; i < Const.RobotsPerTeam; i++)
         {
@@ -1084,7 +1090,7 @@ public class Referee : ICloneable
 
     }
 
-    private void JudgePlacePlacement(MatchInfo matchInfo, JudgeResult judgeResult)
+    private void JudgePlacePlacement(JudgeResult judgeResult)
     {
         Vector2D PlaceBallPos = new Vector2D(0, 0);//开球坐标
         //防守方的安全区域点
@@ -1206,7 +1212,7 @@ public class Referee : ICloneable
         }
     }
 
-    private void JudgeGoaliePlacement(MatchInfo matchInfo, JudgeResult judgeResult)
+    private void JudgeGoaliePlacement(JudgeResult judgeResult)
     {
         //下面是默认的球的坐标
         Vector2D GoalieBallPos;
@@ -1325,7 +1331,7 @@ public class Referee : ICloneable
 
     }
 
-    private void JudgeFreePlacement(MatchInfo matchInfo, JudgeResult judgeResult)
+    private void JudgeFreePlacement(JudgeResult judgeResult)
     {
         //下面是默认的球的坐标
         Vector2D FreeBallPos;
@@ -1570,6 +1576,7 @@ public class Referee : ICloneable
             if (!robotsSafePosSquares[i].occupy)
             {
                 robotPosSquare.Pos = robotsSafePosSquares[i].Pos;
+                robotPosSquare.square = new Square(robotPosSquare.Pos);
                 robotsSafePosSquares[i].occupy = true;
                 break;
             }
@@ -1728,7 +1735,7 @@ namespace TestReferee
     public class TestPlacement
     {
         [Test]
-        public void TestPenaltyKick()
+        public void TestPenaltyPlace()
         {
             var referee = new Referee();
             var matchInfo = new MatchInfo()
@@ -1736,7 +1743,7 @@ namespace TestReferee
                 Ball = new Ball() { pos = new Vector2D(0, 0) },
                 BlueRobots = new Robot[]
                 {
-                new Robot() { pos = new Vector2D(0, 0) },
+                new Robot() { pos = new Vector2D(-72.5f, 0f) },
                 new Robot() { pos = new Vector2D(0, 0) },
                 new Robot() { pos = new Vector2D(0, 0) },
                 new Robot() { pos = new Vector2D(0, 0) },
@@ -1756,10 +1763,10 @@ namespace TestReferee
                 Actor = Side.Blue,
                 ResultType = ResultType.PenaltyKick,
             };
-
+            //该情况测试 点球摆位时，与球重叠后把球员移开
             referee.JudgeAutoPlacement(matchInfo, judgeResult);
 
-            Assert.AreEqual(new Vector2D(-72.5f, 0f), matchInfo.Ball.pos);
+            Assert.AreEqual(new Vector2D(-50f, 0f), matchInfo.BlueRobots[0].pos);
         }
     }
 }
