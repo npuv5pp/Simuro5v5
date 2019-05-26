@@ -371,6 +371,7 @@ public class Referee : ICloneable
         }
 
     }
+
     private bool JudgePenaltyGoal(ref JudgeResult judgeResult)
     {
         //若比赛超过五轮后，采用“突然死亡法”，先进球者先获胜
@@ -706,6 +707,7 @@ public class Referee : ICloneable
         return false;
 
     }
+
     private bool JudgeFree(ref JudgeResult judgeResult)
     {
         if (matchInfo.Ball.linearVelocity.GetUnityVector2().magnitude < 5)
@@ -1146,7 +1148,6 @@ public class Referee : ICloneable
         //寻找开球球员
         for (int i = 0; i < Const.RobotsPerTeam; i++)
         {
-            //GOTO 不能和球重叠也不符合情况
             if (PlaceOffensivePosSquare[i].square.IsInCycle(new Vector2D(0, 0), 25))
             {
                 PlaceAttackId = i;
@@ -1159,6 +1160,12 @@ public class Referee : ICloneable
             PlaceAttackId = 1;
             PlaceOffensivePosSquare[PlaceAttackId].Pos = PlaceOffensivePos;
         }
+        //再检测开球球员是否与球重叠
+        if(PlaceOffensivePosSquare[PlaceAttackId].square.ContainsPoint(BallPos))
+        {
+            PlaceOffensivePosSquare[PlaceAttackId].Pos = PlaceOffensivePos;
+        }
+
         //先对进攻方摆位判断
         for (int i = 0; i < Const.RobotsPerTeam; i++)
         {
@@ -1735,7 +1742,7 @@ namespace TestReferee
     public class TestPlacement
     {
         [Test]
-        public void TestPenaltyPlace()
+        public void TestPenaltyPlacement()
         {
             var referee = new Referee();
             var matchInfo = new MatchInfo()
@@ -1768,5 +1775,43 @@ namespace TestReferee
 
             Assert.AreEqual(new Vector2D(-50f, 0f), matchInfo.BlueRobots[0].pos);
         }
+
+        [Test]
+        public void TestPlacePlacement()
+        {
+            var referee = new Referee();
+            var matchInfo = new MatchInfo()
+            {
+                Ball = new Ball() { pos = new Vector2D(0, 0) },
+                BlueRobots = new Robot[]
+                {
+                    //测试机器人0号与球重叠
+                new Robot() { pos = new Vector2D(0f, 0f) },
+                new Robot() { pos = new Vector2D(30, 0) },
+                new Robot() { pos = new Vector2D(40, 0) },
+                new Robot() { pos = new Vector2D(50, 0) },
+                new Robot() { pos = new Vector2D(60, 0) },
+                },
+                YellowRobots = new Robot[]
+                {
+                new Robot() { pos = new Vector2D(-10, 0) },
+                new Robot() { pos = new Vector2D(-20, 0) },
+                new Robot() { pos = new Vector2D(-30, 0) },
+                new Robot() { pos = new Vector2D(-40, 0) },
+                new Robot() { pos = new Vector2D(-50, 0) },
+                },
+            };
+            var judgeResult = new JudgeResult()
+            {
+                Actor = Side.Blue,
+                ResultType = ResultType.PlaceKick,
+            };
+            //该情况测试 开球摆位时，与球重叠后把球员移开
+            referee.JudgeAutoPlacement(matchInfo, judgeResult);
+
+            Assert.AreEqual(new Vector2D(0, 12), matchInfo.BlueRobots[0].pos);
+        }
     }
+
+
 }
