@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 using System.Windows.Forms;
 using NUnit.Framework;
 using UnityEngine;
@@ -15,22 +16,22 @@ namespace Simuro5v5.Util
         /// <summary>
         /// 和 Point2 构成对角线
         /// </summary>
-        protected abstract Vector2D Point1 { get; }
+        public abstract Vector2D Point1 { get; }
         
         /// <summary>
         /// 和 Point1 构成对角线
         /// </summary>
-        protected abstract Vector2D Point2 { get; }
+        public abstract Vector2D Point2 { get; }
         
         /// <summary>
         /// 和 Point4 构成对角线
         /// </summary>
-        protected abstract Vector2D Point3 { get; }
+        public abstract Vector2D Point3 { get; }
         
         /// <summary>
         /// 和 Point3 构成对角线
         /// </summary>
-        protected abstract Vector2D Point4 { get; }
+        public abstract Vector2D Point4 { get; }
 
         /// <summary>
         /// 矩形中心点
@@ -82,9 +83,6 @@ namespace Simuro5v5.Util
             return false;
         }
 
-        public bool IsInRectangle(UprightRectangle area)
-            => area.PointIn(Midpoint) && !IsCrossedBy(area);
-
         public bool ContainsPoint(Vector2D p)
         {
             return (Point3 - Point1).Cross(p - Point1) >= 0
@@ -101,10 +99,10 @@ namespace Simuro5v5.Util
         private float TopY { get; }
         private float BotY { get; }
 
-        protected override Vector2D Point1 => new Vector2D(LeftX, TopY);
-        protected override Vector2D Point2 => new Vector2D(RightX, BotY);
-        protected override Vector2D Point3 => new Vector2D(RightX, TopY);
-        protected override Vector2D Point4 => new Vector2D(LeftX, BotY);
+        public override Vector2D Point1 => new Vector2D(LeftX, TopY);
+        public override Vector2D Point2 => new Vector2D(RightX, BotY);
+        public override Vector2D Point3 => new Vector2D(RightX, TopY);
+        public override Vector2D Point4 => new Vector2D(LeftX, BotY);
 
         public UprightRectangle(float leftX, float rightX, float topY, float botY)
         {
@@ -158,17 +156,17 @@ namespace Simuro5v5.Util
         /// <summary>
         /// 第一个对角点
         /// </summary>
-        protected override Vector2D Point1 { get; }
+        public override Vector2D Point1 { get; }
 
         /// <summary>
         /// 第二个对角点
         /// </summary>
-        protected override Vector2D Point2 { get; }
+        public override Vector2D Point2 { get; }
 
-        protected override Vector2D Point3 => (Point1 - Midpoint).Rotate(Mathf.PI / 2)
+        public override Vector2D Point3 => (Point1 - Midpoint).Rotate(Mathf.PI / 2)
                                   + Midpoint;
 
-        protected override Vector2D Point4 => (Point1 - Midpoint).Rotate(-Mathf.PI / 2)
+        public override Vector2D Point4 => (Point1 - Midpoint).Rotate(-Mathf.PI / 2)
                                   + Midpoint;
 
         public bool IsInCycle(Vector2D centralPosition , float radius)
@@ -199,6 +197,20 @@ namespace Simuro5v5.Util
             var newSquare = new Square(Midpoint, angle, Const.Robot.HRL + radius);
             return newSquare.ContainsPoint(center);
         }
+
+        /// <summary>
+        /// 测试是否在完全在一个矩形区域内部
+        /// </summary>
+        /// <param name="area">待判断的矩形区域</param>
+        /// <returns></returns>
+        public bool IsInRectangle(UprightRectangle area)
+        {
+            float width = Vector2D.Distance(Point1, Point3);
+            float outer = Mathf.Max(
+                Vector2D.Distance(area.Point1, area.Point3),
+                Vector2D.Distance(area.Point1, area.Point4));
+            return area.PointIn(Midpoint) && !IsCrossedBy(area) && width < outer;
+        }
     }
 
     [TestFixture]
@@ -207,13 +219,13 @@ namespace Simuro5v5.Util
         [Test]
         public void TestContainsPoint()
         {
-            Square square1 = new Square(new Vector2D(0, 0), new Vector2D(1, 1));
+            var square1 = new Square(new Vector2D(0, 0), new Vector2D(1, 1));
             Assert.IsTrue(square1.ContainsPoint(new Vector2D(0.5f, 0.5f)));
             Assert.IsTrue(square1.ContainsPoint(new Vector2D(0.01f, 0.99f)));
             Assert.IsFalse(square1.ContainsPoint(new Vector2D(0, -0.01f)));
             Assert.IsFalse(square1.ContainsPoint(new Vector2D(0.5f, 1.01f)));
             
-            Square square2 = new Square(new Vector2D(0, 1), new Vector2D(2, 1));
+            var square2 = new Square(new Vector2D(0, 1), new Vector2D(2, 1));
             Assert.IsTrue(square2.ContainsPoint(new Vector2D(1, 1)));
             Assert.IsTrue(square2.ContainsPoint(new Vector2D(0.01f, 1)));
             Assert.IsTrue(square2.ContainsPoint(new Vector2D(0.5f, 1.01f)));
@@ -223,9 +235,45 @@ namespace Simuro5v5.Util
         [Test]
         public void TestIsCrossBy()
         {
-            Square square1 = new Square(new Vector2D(0, 0), new Vector2D(1, 1));
-            Square square2 = new Square(new Vector2D(1, 0.5f), new Vector2D(2, 0.5f));
+            var square1 = new Square(new Vector2D(0, 0), new Vector2D(1, 1));
+            var square2 = new Square(new Vector2D(1, 0.5f), new Vector2D(2, 0.5f));
             Assert.IsTrue(square1.IsCrossedBy(square2));
+            
+            var square3 = new Square(new Vector2D(0.2f, 0.2f), new Vector2D(0.8f, 0.8f));
+            Assert.IsFalse(square1.IsCrossedBy(square3));
         }
+
+        [Test]
+        public void TestPointIn()
+        {
+            var square = new Square(new Vector2D(0, -1), new Vector2D(0, 1));
+            Assert.IsTrue(square.ContainsPoint(new Vector2D(0, -0.99f)));
+            Assert.IsTrue(square.ContainsPoint(new Vector2D(0, 0.99f)));
+            Assert.IsTrue(square.ContainsPoint(new Vector2D(0.5f, 0.499f)));
+            Assert.IsFalse(square.ContainsPoint(new Vector2D(1.01f, 0)));
+            Assert.IsFalse(square.ContainsPoint(new Vector2D(-1.01f, 0)));
+        }
+    }
+
+    [TestFixture]
+    class SquareTest
+    {
+        [Test]
+        public void TestIsInRectangle()
+        {
+            var rectangle = new UprightRectangle(0, 2, 2, 0);
+            var square1 = new Square(new Vector2D(0.01f, 0.01f), new Vector2D(0.99f, 0.99f));
+            Assert.IsTrue(square1.IsInRectangle(rectangle));
+            
+            var square2 = new Square(new Vector2D(0.5f, 0.01f), new Vector2D(0.5f, 0.99f));
+            Assert.IsTrue(square2.IsInRectangle(rectangle));
+            
+            var square3 = new Square(new Vector2D(0, 0), new Vector2D(-1, 1));
+            Assert.IsFalse(square3.IsInRectangle(rectangle));
+            
+            var square4 = new Square(new Vector2D(-1, -1), new Vector2D(3, 3));
+            Assert.IsFalse(square4.IsInRectangle(rectangle));
+        }
+        
     }
 }
