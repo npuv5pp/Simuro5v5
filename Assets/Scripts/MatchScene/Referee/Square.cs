@@ -83,7 +83,7 @@ namespace Simuro5v5.Util
             return false;
         }
 
-        public bool ContainsPoint(Vector2D p)
+        public virtual bool ContainsPoint(Vector2D p)
         {
             return (Point3 - Point1).Cross(p - Point1) >= 0
                    && (Point2 - Point3).Cross(p - Point3) >= 0
@@ -112,7 +112,7 @@ namespace Simuro5v5.Util
             BotY = botY;
         }
 
-        public bool PointIn(Vector2D point)
+        public override bool ContainsPoint(Vector2D point)
         {
             return point.x < RightX && point.x > LeftX && point.y > BotY && point.y < TopY;
         }
@@ -209,7 +209,7 @@ namespace Simuro5v5.Util
             float outer = Mathf.Max(
                 Vector2D.Distance(area.Point1, area.Point3),
                 Vector2D.Distance(area.Point1, area.Point4));
-            return area.PointIn(Midpoint) && !IsCrossedBy(area) && width < outer;
+            return area.ContainsPoint(Midpoint) && !IsCrossedBy(area) && width < outer;
         }
     }
 

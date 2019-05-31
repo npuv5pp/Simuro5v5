@@ -291,7 +291,7 @@ public class Referee : ICloneable
         {
             for (int i = 0; i < Const.RobotsPerTeam; i++)
             {
-                if (blueSmallState.PointIn(blueRobots[i].pos))
+                if (blueSmallState.ContainsPoint(blueRobots[i].pos))
                 {
                     id = i;
                 }
@@ -301,7 +301,7 @@ public class Referee : ICloneable
         {
             for (int i = 0; i < Const.RobotsPerTeam; i++)
             {
-                if (yellowSmallState.PointIn(yellowRobots[i].pos))
+                if (yellowSmallState.ContainsPoint(yellowRobots[i].pos))
                 {
                     id = i;
                 }
@@ -376,7 +376,7 @@ public class Referee : ICloneable
     private bool JudgePenaltyGoal(ref JudgeResult judgeResult)
     {
         //若比赛超过五轮后，采用“突然死亡法”，先进球者先获胜
-        if (yellowGoalState.PointIn(matchInfo.Ball.pos))
+        if (yellowGoalState.ContainsPoint(matchInfo.Ball.pos))
         {
             //点球大战超过五轮后，进球直接胜利
             if (penaltyOfNum > 5)
@@ -402,7 +402,7 @@ public class Referee : ICloneable
             judgeResult.WhoGoal = Side.Blue;
             return true;
         }
-        else if (blueGoalState.PointIn(matchInfo.Ball.pos))
+        else if (blueGoalState.ContainsPoint(matchInfo.Ball.pos))
         {
             //点球大战超过五轮后，进球直接胜利
             if (penaltyOfNum > 5)
@@ -496,7 +496,7 @@ public class Referee : ICloneable
 
         }
         //进球
-        if (yellowGoalState.PointIn(matchInfo.Ball.pos))
+        if (yellowGoalState.ContainsPoint(matchInfo.Ball.pos))
         {
             judgeResult = new JudgeResult
             {
@@ -507,7 +507,7 @@ public class Referee : ICloneable
             judgeResult.WhoGoal = Side.Blue;
             return true;
         }
-        if (blueGoalState.PointIn(matchInfo.Ball.pos))
+        if (blueGoalState.ContainsPoint(matchInfo.Ball.pos))
         {
             judgeResult = new JudgeResult
             {
@@ -540,11 +540,11 @@ public class Referee : ICloneable
             int bigStateNum = 0;
             for (int i = 0; i < 4; i++)
             {
-                if (blueBigState.PointIn(blueRobots[i].pos))
+                if (blueBigState.ContainsPoint(blueRobots[i].pos))
                 {
                     bigStateNum++;
                 }
-                if (blueSmallState.PointIn(blueRobots[i].pos))
+                if (blueSmallState.ContainsPoint(blueRobots[i].pos))
                 {
                     smallStateNum++;
                 }
@@ -576,11 +576,11 @@ public class Referee : ICloneable
             int bigStateNum = 0;
             for (int i = 0; i < 4; i++)
             {
-                if (yellowBigState.PointIn(yellowRobots[i].pos))
+                if (yellowBigState.ContainsPoint(yellowRobots[i].pos))
                 {
                     bigStateNum++;
                 }
-                if (yellowSmallState.PointIn(yellowRobots[i].pos))
+                if (yellowSmallState.ContainsPoint(yellowRobots[i].pos))
                 {
                     smallStateNum++;
                 }
@@ -611,7 +611,7 @@ public class Referee : ICloneable
 
     private bool JudgeGoalie(ref JudgeResult judgeResult)
     {
-        if (blueBigState.PointIn(matchInfo.Ball.pos))
+        if (blueBigState.ContainsPoint(matchInfo.Ball.pos))
         {
             int smallStateNum = 0;
             int bigStateNum = 0;
@@ -628,11 +628,11 @@ public class Referee : ICloneable
                     };
                     return true;
                 }
-                if (blueBigState.PointIn(yellowRobots[i].pos))
+                if (blueBigState.ContainsPoint(yellowRobots[i].pos))
                 {
                     bigStateNum++;
                 }
-                if (blueSmallState.PointIn(yellowRobots[i].pos))
+                if (blueSmallState.ContainsPoint(yellowRobots[i].pos))
                 {
                     smallStateNum++;
                 }
@@ -658,7 +658,7 @@ public class Referee : ICloneable
                 return true;
             }
         }
-        else if (yellowBigState.PointIn(matchInfo.Ball.pos))
+        else if (yellowBigState.ContainsPoint(matchInfo.Ball.pos))
         {
             int smallStateNum = 0;
             int bigStateNum = 0;
@@ -675,11 +675,11 @@ public class Referee : ICloneable
                     };
                     return true;
                 }
-                if (yellowBigState.PointIn(blueRobots[i].pos))
+                if (yellowBigState.ContainsPoint(blueRobots[i].pos))
                 {
                     bigStateNum++;
                 }
-                if (yellowSmallState.PointIn(blueRobots[i].pos))
+                if (yellowSmallState.ContainsPoint(blueRobots[i].pos))
                 {
                     smallStateNum++;
                 }
@@ -1288,7 +1288,7 @@ public class Referee : ICloneable
             GoalieId = FindGoalie(Side.Yellow);
         }
         //先对球进行摆位判断
-        if (!offensiveSmallState.PointIn(BallPos))
+        if (!offensiveSmallState.ContainsPoint(BallPos))
         {
             BallPos = GoalieBallPos;
         }
@@ -1558,7 +1558,7 @@ public class Referee : ICloneable
                 {
                     if (i == GoalieId) continue;
                 }
-                if (FreeState.PointIn(blueRobots[i].pos))
+                if (FreeState.ContainsPoint(blueRobots[i].pos))
                 {
                     FreeRobotId = i;
                     return FreeRobotId;
@@ -1573,7 +1573,7 @@ public class Referee : ICloneable
                 {
                     if (i == GoalieId) continue;
                 }
-                if (FreeState.PointIn(yellowRobots[i].pos))
+                if (FreeState.ContainsPoint(yellowRobots[i].pos))
                 {
                     FreeRobotId = i;
                     return FreeRobotId;
