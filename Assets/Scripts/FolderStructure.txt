@@ -1,0 +1,20 @@
+与场景无关的脚本放置在General目录下，场景相关的放在Scene目录下；
+在General目录及各场景目录（如Scene/Play）下，根据脚本功能分为不同的子目录，常用的目录有UI、Camera、Entity等，其他的根据需要自行添加，如Play场景的Referee、Strategy。
+
+.
+├─General           各场景都会用到
+│  ├─Entity             物体控制
+│  │  ├─Ball                球控制
+│  │  ├─Robot               机器人控制
+│  │  └─Wheel               轮控制
+│  └─UI                 通用的UI
+└─Scene             各场景独自使用
+    ├─Main              主场景
+    │  └─UI                 UI
+    ├─Play              Play场景
+    │  ├─Referee            裁判
+    │  ├─Strategy           策略
+    │  └─UI                 UI
+    └─Replay            Replay场景
+        ├─Camera            相机
+        └─UI                UI
