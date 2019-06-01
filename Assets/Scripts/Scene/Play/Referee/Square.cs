@@ -132,24 +132,25 @@ namespace Simuro5v5.Util
         /// <summary>
         /// 通过机器人中心与半径以及角度来构造机器人正方形
         /// </summary>
-        public Square(Vector2D robotPosition, float angle = 0, float HRL = Const.Robot.HRL)
+        public Square(Vector2D robotPosition, float angleInDegree = 0, float HRL = Const.Robot.HRL)
         {
-            float robotRadius = (float)(HRL * 1.414);
+            float robotRadius = (float) (HRL * 1.414);
+            
             //角度规整
-            while (angle > 45 || angle < -45)
+            while (angleInDegree > 45)
             {
-                if (angle > 45)
-                {
-                    angle -= 90;
-                }
-                else
-                    angle += 90;
+                angleInDegree -= 90;
             }
-            angle += 45;
-            float point1X = (float)(robotPosition.x + robotRadius * Math.Cos(angle));
-            float point1Y = (float)(robotPosition.y + robotRadius * Math.Sin(angle));
-            float point2X = (float)(robotPosition.x - robotRadius * Math.Cos(angle));
-            float point2Y = (float)(robotPosition.y - robotRadius * Math.Sin(angle));
+            while (angleInDegree < -45)
+            {
+                angleInDegree += 90;
+            }
+            angleInDegree += 45;
+            
+            float point1X = robotPosition.x + robotRadius * Mathf.Cos(angleInDegree * Mathf.PI / 180);
+            float point1Y = robotPosition.y + robotRadius * Mathf.Sin(angleInDegree * Mathf.PI / 180);
+            float point2X = robotPosition.x - robotRadius * Mathf.Cos(angleInDegree * Mathf.PI / 180);
+            float point2Y = robotPosition.y - robotRadius * Mathf.Sin(angleInDegree * Mathf.PI / 180);
             Point1 = new Vector2D(point1X, point1Y);
             Point2 = new Vector2D(point2X, point2Y);
         }
@@ -169,7 +170,7 @@ namespace Simuro5v5.Util
         public override Vector2D Point4 => (Point1 - Midpoint).Rotate(-Mathf.PI / 2)
                                   + Midpoint;
 
-        public bool IsInCycle(Vector2D centralPosition , float radius)
+        public bool IsInCycle(Vector2D centralPosition, float radius)
         {
             if (Vector2D.Distance(Point1, centralPosition) < radius)
             {
@@ -193,8 +194,8 @@ namespace Simuro5v5.Util
         public bool OverlapWithCircle(Vector2D center, float radius = Const.Ball.HBL)
         {
             var line = Point1 - Point3;
-            var angle = Mathf.Acos(- line.x / Mathf.Sqrt(line * line));
-            var newSquare = new Square(Midpoint, angle, Const.Robot.HRL + radius);
+            var angleInDegree = Mathf.Acos(- line.x / Mathf.Sqrt(line * line)) * Mathf.PI;
+            var newSquare = new Square(Midpoint, angleInDegree, Const.Robot.HRL + radius);
             return newSquare.ContainsPoint(center);
         }
 
@@ -230,6 +231,13 @@ namespace Simuro5v5.Util
             Assert.IsTrue(square2.ContainsPoint(new Vector2D(0.01f, 1)));
             Assert.IsTrue(square2.ContainsPoint(new Vector2D(0.5f, 1.01f)));
             Assert.IsFalse(square2.ContainsPoint(new Vector2D(1.5f,  0.499f)));
+            
+            var square3 = new Square(new Vector2D(0, -1), new Vector2D(0, 1));
+            Assert.IsTrue(square3.ContainsPoint(new Vector2D(0, -0.99f)));
+            Assert.IsTrue(square3.ContainsPoint(new Vector2D(0, 0.99f)));
+            Assert.IsTrue(square3.ContainsPoint(new Vector2D(0.5f, 0.499f)));
+            Assert.IsFalse(square3.ContainsPoint(new Vector2D(1.01f, 0)));
+            Assert.IsFalse(square3.ContainsPoint(new Vector2D(-1.01f, 0)));
         }
 
         [Test]
@@ -242,16 +250,18 @@ namespace Simuro5v5.Util
             var square3 = new Square(new Vector2D(0.2f, 0.2f), new Vector2D(0.8f, 0.8f));
             Assert.IsFalse(square1.IsCrossedBy(square3));
         }
+    }
 
+    [TestFixture]
+    class UprightRectangleTest
+    {
         [Test]
-        public void TestPointIn()
+        public void TestContainsPoint()
         {
-            var square = new Square(new Vector2D(0, -1), new Vector2D(0, 1));
-            Assert.IsTrue(square.ContainsPoint(new Vector2D(0, -0.99f)));
-            Assert.IsTrue(square.ContainsPoint(new Vector2D(0, 0.99f)));
-            Assert.IsTrue(square.ContainsPoint(new Vector2D(0.5f, 0.499f)));
-            Assert.IsFalse(square.ContainsPoint(new Vector2D(1.01f, 0)));
-            Assert.IsFalse(square.ContainsPoint(new Vector2D(-1.01f, 0)));
+            var rect = new UprightRectangle(0, 1, 1, 0);
+            Assert.IsTrue(rect.ContainsPoint(new Vector2D(0.1f, 0.1f)));
+            Assert.IsTrue(rect.ContainsPoint(new Vector2D(0.5f, 0.99f)));
+            Assert.IsFalse(rect.ContainsPoint(new Vector2D(0.5f, 1.01f)));
         }
     }
 
@@ -274,6 +284,21 @@ namespace Simuro5v5.Util
             var square4 = new Square(new Vector2D(-1, -1), new Vector2D(3, 3));
             Assert.IsFalse(square4.IsInRectangle(rectangle));
         }
-        
+
+        [Test]
+        public void TestCtor()
+        {
+            var square1 = new Square(new Vector2D(0, 0), 0, 1);
+            Assert.IsFalse(square1.Point1.IsNotNear(new Vector2D(1, 1)));
+            Assert.IsFalse(square1.Point2.IsNotNear(new Vector2D(-1, -1)));
+
+            float sqrt2 = Mathf.Sqrt(2);
+            var square2 = new Square(new Vector2D(0, 0), 45, sqrt2 / 2);
+            var square3 = new Square(new Vector2D(0, 0), 45 + 360, sqrt2 / 2);
+            var square4 = new Square(new Vector2D(0, 0), 45 - 360, sqrt2 / 2);
+            Assert.IsFalse(square2.Point1.IsNotNear(new Vector2D(0, 1)));
+            Assert.IsFalse(square3.Point1.IsNotNear(new Vector2D(0, 1)));
+            Assert.IsFalse(square4.Point1.IsNotNear(new Vector2D(1, 0)));
+        }
     }
 }
