@@ -15,21 +15,24 @@ using TMPro;
 using Simuro5v5;
 using UnityEditor;
 using UnityEngine.EventSystems;
-using Debug = System.Diagnostics.Debug;
 
 public class GUI_Replay : MonoBehaviour
 {
-    public Slider Slider;
-    public DataBoard DataBoard;
     public GameObject Entity;
-    public TMP_Text DataName;
-    public TMP_Dropdown SpeedDropdown;
-    public StateBoard StateBoard;
-    public JudgeBoard JudgeBoard;
     public Image PauseButtonImage;
     public Sprite PauseButtonPaused;
     public Sprite PauseButtonNonPaused;
-    public TextMeshProUGUI tickText;
+
+    // controls
+    public Slider Slider;
+    public DataBoard DataBoard;
+    public TMP_Dropdown SpeedDropdown;
+
+    // state text
+    public TMP_Text DataTag;
+    public TMP_Text tickText;
+    public TMP_Text PhaseText;
+    public TMP_Text JudgeResultText;
 
     public static DataRecorder Recorder { get; set; }
     private ObjectManager ObjectManager { get; set; }
@@ -68,7 +71,7 @@ public class GUI_Replay : MonoBehaviour
 
     void Update()
     {
-        DataName.SetText(Recorder.Name);
+        DataTag.SetText(Recorder.Name);
         PauseButtonImage.sprite = Paused ? PauseButtonPaused : PauseButtonNonPaused;
 
         if (Input.GetKeyDown(KeyCode.Space))
@@ -125,23 +128,39 @@ public class GUI_Replay : MonoBehaviour
     /// <summary>
     /// 渲染一拍的数据到场景中，包括：机器人和球的坐标，数据板
     /// </summary>
-    void Render(DataRecorder.RecordData d)
+    void Render(DataRecorder.RecordData data)
     {
-        if (!(d is DataRecorder.RecordData data))
-        {
-            return;
-        }
+        ObjectManager.RevertScene(data.matchInfo);
+        tickText.text = $"{data.matchInfo.TickMatch}/{Recorder.DataLength}";
+        JudgeResultText.text = data.matchInfo.Referee.savedJudge.ToRichText();
+        RenderPhaseText(data.matchInfo.MatchPhase);
+    }
 
-        if (data.matchInfo != null)
+    void RenderPhaseText(MatchPhase mp)
+    {
+        switch (mp)
         {
-            ObjectManager.RevertScene(data.matchInfo);
-            //DataBoard.Render(data.matchInfo);
+            case MatchPhase.FirstHalf:
+                {
+                    PhaseText.text = "First Half";
+                    break;
+                }
+            case MatchPhase.SecondHalf:
+                {
+                    PhaseText.text = "Second Half";
+                    break;
+                }
+            case MatchPhase.OverTime:
+                {
+                    PhaseText.text = "Over Time";
+                    break;
+                }
+            case MatchPhase.Penalty:
+                {
+                    PhaseText.text = "Penalty Shootout";
+                    break;
+                }
         }
-
-        StateBoard.Render(data.type);
-        Debug.Assert(data.matchInfo != null, "data.matchInfo != null");
-        JudgeBoard.Render(data.matchInfo.Referee.savedJudge);
-        tickText.text = $"{data.matchInfo.TickMatch}/{GUI_Replay.Recorder.DataLength}";
     }
 
     /// <summary>

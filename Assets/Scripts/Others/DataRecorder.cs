@@ -84,7 +84,7 @@ namespace Simuro5v5
             Event.Register(Event.EventType1.MatchInfoUpdate, RecordMatchInfo);
             //Event.Register(Event.EventType1.MatchStart, RecordNewMatch);
             //Event.Register(Event.EventType1.RoundStart, RecordNewRound);
-            Event.Register(Event.EventType1.AutoPlacement, RecordAutoPlacement);
+            //Event.Register(Event.EventType1.AutoPlacement, RecordAutoPlacement);
         }
 
         /// <summary>
