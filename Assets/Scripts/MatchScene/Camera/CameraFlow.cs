@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public enum CameraState
 {
@@ -43,9 +44,8 @@ public class CameraFlow : MonoBehaviour
                 break;
 
             case CameraState.LocateObject:
-                transform.position = Vector3.SmoothDamp(transform.position, target.position + offset, ref velocity, 0.3f * Time.timeScale);
-                Scale();
-                Rotate();
+                transform.position = Vector3.SmoothDamp(transform.position,
+                    target.position + offset, ref velocity, 0.3f * Time.timeScale);
                 transform.LookAt(target);
                 break;
 
@@ -130,7 +130,7 @@ public class CameraFlow : MonoBehaviour
             {
                 return true;
             }
-            
+
         }
         if (Input.GetKeyDown(KeyCode.Alpha3))
         {
@@ -263,7 +263,7 @@ public class CameraFlow : MonoBehaviour
 
     private void OverLooking()
     {
-        transform.position = Vector3.SmoothDamp(transform.position, InitialPosition, ref velocity, 0.3f *Time.timeScale);
+        transform.position = Vector3.SmoothDamp(transform.position, InitialPosition, ref velocity, 0.3f * Time.timeScale);
         //transform.position = InitialPosition;
         transform.rotation = InitialRotation;
     }
@@ -328,17 +328,21 @@ public class CameraFlow : MonoBehaviour
                 z = target.rotation.eulerAngles.z,
             };
             transform.rotation = rot;
-           // transform.position = target.position;
-           // transform.rotation = target.rotation;
+            // transform.position = target.position;
+            // transform.rotation = target.rotation;
         }
     }
 
-    //缩放
-    private void Scale()
+    /// <summary>
+    /// 鼠标滑轮滑动时，缩放
+    /// </summary>
+    public void Scale(BaseEventData data)
     {
+        if (CameraState != CameraState.LocateObject) return;
 
+        var pe = (PointerEventData)data;
         float dis = offset.magnitude;
-        dis += Input.GetAxis("Mouse ScrollWheel") * -50;
+        dis += pe.scrollDelta.y * -50;
         Vector3 targetPlusOffset = target.position + offset.normalized * dis;
         if (targetPlusOffset.y > MinLocate && targetPlusOffset.y < MaxLocate)
         {
@@ -346,18 +350,23 @@ public class CameraFlow : MonoBehaviour
         }
     }
 
-    private void Rotate()
+    /// <summary>
+    /// 鼠标右键拖动时，旋转视角
+    /// </summary>
+    public void Rotate(BaseEventData data)
     {
-        if (Input.GetMouseButton(1))
+        if (CameraState != CameraState.LocateObject) return;
+
+        var pe = (PointerEventData)data;
+        if (pe.dragging && pe.button == PointerEventData.InputButton.Right)
         {
-            angle += Input.GetAxis("Mouse X") * 0.8f;
+            angle += pe.delta.x * -0.1f;
             float y = offset.y;
             float x = Mathf.Cos(angle) * y;
             float z = Mathf.Sin(angle) * y;
             offset.x = -x;
             offset.z = -z;
             transform.position = target.position + offset;
-
         }
     }
 
@@ -368,11 +377,11 @@ public class CameraFlow : MonoBehaviour
 
     public void ChangeLocateObject()
     {
-        if(CameraState == CameraState.LocateObject)
+        if (CameraState == CameraState.LocateObject)
         {
             CameraState = CameraState.OverLooking;
         }
-        else 
+        else
         {
             CameraState = CameraState.LocateObject;
         }
