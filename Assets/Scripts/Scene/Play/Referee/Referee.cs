@@ -1,12 +1,13 @@
 ﻿using System;
-using System.Collections;
-using System.Text;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 using Simuro5v5;
 using UnityEngine;
 using NUnit.Framework;
-using Event = Simuro5v5.EventSystem.Event;
 using Simuro5v5.Util;
+using UnityEngine.SceneManagement;
+using UnityEngine.TestTools;
+using System.Collections;
 
 /// <summary>
 /// 裁判根据比赛规则对场地信息进行判断。
@@ -882,13 +883,15 @@ public class Referee : ICloneable
     /// <returns></returns>
     private bool JudgeCollision(GameObject object1, GameObject object2)
     {
-        ArrayList touchObject = object1.GetComponent<BoxColliderEvent>().TouchObject;
+        List<GameObject> touchObject = object1.GetComponent<BoxColliderEvent>().TouchObject;
         if (touchObject.IndexOf(object2) == -1)
         {
+            touchObject.Clear();
             return false;
         }
         else
         {
+            touchObject.Clear();
             return true;
         }
     }
@@ -1513,7 +1516,7 @@ public class Referee : ICloneable
             //1.除了进攻球员在争球区域内 2. 未在球场内 3. 与自身队伍球员重叠
             if (FreeOffensivePosSquare[i].square.IsInRectangle(FreeState)
                 || !FreeOffensivePosSquare[i].square.IsInRectangle(stadiumState)
-                || RobotCrossByRobots(FreeOffensivePosSquare[i], FreeOffensivePosSquare, true))
+                || RobotCrossByRobots(FreeOffensivePosSquare[i], FreeOffensivePosSquare, true,i))
             {
                 ChangeRobotSafePos(ref FreeOffensivePosSquare[i], FreeOffensiveSafePosSquare);
             }
@@ -1537,7 +1540,7 @@ public class Referee : ICloneable
             //1.除了进攻球员在争球区域内 2. 未在球场内 3. 与自身队伍球员重叠 4.与地方球员重叠
             if (FreeDefenderPosSquare[i].square.IsInRectangle(FreeState)
                 || !FreeDefenderPosSquare[i].square.IsInRectangle(stadiumState)
-                || RobotCrossByRobots(FreeDefenderPosSquare[i], FreeDefenderPosSquare, true)
+                || RobotCrossByRobots(FreeDefenderPosSquare[i], FreeDefenderPosSquare, true,i)
                 || RobotCrossByRobots(FreeDefenderPosSquare[i],FreeOffensiveSafePosSquare))
             {
                 ChangeRobotSafePos(ref FreeDefenderPosSquare[i], FreeDefenderSafePosSquare);
@@ -1901,7 +1904,17 @@ namespace TestReferee
 
             Assert.AreEqual(new Vector2D(-25f, -60f), matchInfo.BlueRobots[0].pos);
         }
-    }
 
+        [UnityTest]
+        public IEnumerator TestScene()
+        {
+            SceneManager.LoadScene("RefereePlaceTest");
+            ObjectManager o = new ObjectManager();
+            o.RebindObject();
+            o.RevertScene(new MatchInfo());
+            while (true)
+                yield return null;
+        }
+    }
 
 }

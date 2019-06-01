@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class BoxColliderEvent : MonoBehaviour {
 
-    public ArrayList TouchObject = new ArrayList();
+    public List<GameObject> TouchObject = new List<GameObject>();
 
     // 碰撞开始
     void OnCollisionEnter(Collision collision)
