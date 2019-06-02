@@ -5,33 +5,48 @@ using UnityEngine;
 
 public class RefereeTestMain : MonoBehaviour
 {
-    MouseDrag mouseDrag;
-    ObjectManager objectManager;
+    public GameObject entity;
+    public MouseDrag mouseDrag;
 
-    MatchInfo matchInfo = new MatchInfo();
+    ObjectManager objectManager;
+    MatchInfo matchInfo;
 
     void Start()
     {
-        mouseDrag = GetComponent<MouseDrag>();
+        matchInfo = new MatchInfo();
         objectManager = new ObjectManager();
-        objectManager.RebindObject();
+        objectManager.RebindObject(entity);
         objectManager.RebindMatchInfo(matchInfo);
+        objectManager.DisablePhysics();
+        mouseDrag.dragEnabled = true;
     }
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            mouseDrag.dragEnabled = !mouseDrag.dragEnabled;
-            Debug.Log(mouseDrag.dragEnabled);
-        }
+        
     }
 
-    public void BluePenalty()
+    public void PenaltyBluePlace()
     {
         objectManager.UpdateFromScene();
-        // judge
+        JudgeResult judgeResult = new JudgeResult
+        {
+            Actor = Side.Blue,
+            ResultType = ResultType.PenaltyKick
+        };
+        matchInfo.Referee.JudgeAutoPlacement(matchInfo, judgeResult);
+        objectManager.RevertScene(matchInfo);
+    }
 
+    public void PenaltyYellowPlace()
+    {
+        objectManager.UpdateFromScene();
+        JudgeResult judgeResult = new JudgeResult
+        {
+            Actor = Side.Yellow,
+            ResultType = ResultType.PenaltyKick
+        };
+        matchInfo.Referee.JudgeAutoPlacement(matchInfo, judgeResult);
         objectManager.RevertScene(matchInfo);
     }
 }

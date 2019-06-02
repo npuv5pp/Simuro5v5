@@ -186,20 +186,13 @@ namespace Simuro5v5
 
             for (int i = 0; i < Const.RobotsPerTeam; i++)
             {
-                BlueRobots[i].UpdateFromRigidbody(blue[i].GetComponent<Rigidbody>());
-                YellowRobots[i].UpdateFromRigidbody(yellow[i].GetComponent<Rigidbody>());
+                BlueRobots[i].UpdateFromTransform(blue[i].transform);
+                YellowRobots[i].UpdateFromTransform(yellow[i].transform);
             }
-            Rigidbody ballTemp = ball.GetComponent<Rigidbody>();
             Ball newBall = new Ball
             {
-                mass = ballTemp.mass,
-                pos = { x = ballTemp.position.x, y = ballTemp.position.z },
-                linearVelocity = { x = ballTemp.velocity.x, y = ballTemp.velocity.z },
-                angularVelocity = ballTemp.angularVelocity.y
+                pos = { x = ball.transform.position.x, y = ball.transform.position.z },
             };
-            //newBall.angularVelocity.x = ballTemp.angularVelocity.x;
-            //newBall.angularVelocity.y = ballTemp.angularVelocity.z;
-            //newBall.angularVelocity.z = ballTemp.angularVelocity.y;
             Ball = newBall;
         }
 
@@ -489,6 +482,13 @@ namespace Simuro5v5
             this.linearVelocity.x = rb.velocity.x;
             this.linearVelocity.y = rb.velocity.z;
             this.angularVelocity = rb.angularVelocity.y;
+        }
+
+        public void UpdateFromTransform(Transform transform)
+        {
+            pos.x = transform.position.x;
+            pos.y = transform.position.z;
+            rotation = transform.rotation.eulerAngles.y.FormatUnity2Old().FormatOld();
         }
     }
 

@@ -14,4 +14,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/GameScene_Replay.unity
     guid: 47c03773087b3ff44bcefd6806550a92
+  - enabled: 1
+    path: Assets/Scenes/RefereePlaceTest.unity
+    guid: a55bfee4aabc31244aa84ed738ab27c6
   m_configObjects: {}
