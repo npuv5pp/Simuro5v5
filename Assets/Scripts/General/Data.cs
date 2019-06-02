@@ -425,9 +425,9 @@ namespace Simuro5v5
             return x * rhs.y - y * rhs.x;
         }
 
-        public static float Distance (Vector2D lhs, Vector2D rsh)
+        public static float Distance (Vector2D lhs, Vector2D rhs)
         {
-            return Vector2.Distance(lhs.GetUnityVector2(), rsh.GetUnityVector2());
+            return Vector2.Distance(lhs.GetUnityVector2(), rhs.GetUnityVector2());
         }
 
         /// <summary>

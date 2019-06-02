@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Security.Cryptography.X509Certificates;
-using System.Windows.Forms;
+﻿using System.Collections.Generic;
 using NUnit.Framework;
 using UnityEngine;
 
@@ -172,30 +169,18 @@ namespace Simuro5v5.Util
 
         public bool IsInCycle(Vector2D centralPosition, float radius)
         {
-            if (Vector2D.Distance(Point1, centralPosition) < radius)
-            {
-                return true;
-            }
-            if (Vector2D.Distance(Point2, centralPosition) < radius)
-            {
-                return true;
-            }
-            if (Vector2D.Distance(Point3, centralPosition) < radius)
-            {
-                return true;
-            }
-            if (Vector2D.Distance(Point4, centralPosition) < radius)
-            {
-                return true;
-            }
-            return false;
+            return Vector2D.Distance(Point1, centralPosition) < radius ||
+                   Vector2D.Distance(Point2, centralPosition) < radius ||
+                   Vector2D.Distance(Point3, centralPosition) < radius ||
+                   Vector2D.Distance(Point4, centralPosition) < radius;
         }
 
         public bool OverlapWithCircle(Vector2D center, float radius = Const.Ball.HBL)
         {
             var line = Point1 - Point3;
-            var angleInDegree = Mathf.Acos(- line.x / Mathf.Sqrt(line * line)) * Mathf.PI;
-            var newSquare = new Square(Midpoint, angleInDegree, Const.Robot.HRL + radius);
+            float hrl2 = Vector2D.Distance(Point1, Point3);
+            var angleInDegree = Mathf.Acos(- line.x / hrl2) * Mathf.PI;
+            var newSquare = new Square(Midpoint, angleInDegree,  hrl2 / 2 + radius);
             return newSquare.ContainsPoint(center);
         }
 
@@ -299,6 +284,16 @@ namespace Simuro5v5.Util
             Assert.IsFalse(square2.Point1.IsNotNear(new Vector2D(0, 1)));
             Assert.IsFalse(square3.Point1.IsNotNear(new Vector2D(0, 1)));
             Assert.IsFalse(square4.Point1.IsNotNear(new Vector2D(1, 0)));
+        }
+
+        [Test]
+        public void TestOverlapWithCircle()
+        {
+            var square = new Square(new Vector2D(-1, -1), new Vector2D(1, 1));
+            Assert.IsTrue(square.OverlapWithCircle(Vector2D.Zero, 1.42f));
+            Assert.IsTrue(square.OverlapWithCircle(Vector2D.Zero, 1.4f));
+            Assert.IsTrue(square.OverlapWithCircle(new Vector2D(1, 0), 1.4f));
+            Assert.IsFalse(square.OverlapWithCircle(new Vector2D(2, 0), 0.9f));
         }
     }
 }
