@@ -226,6 +226,9 @@ namespace Simuro5v5
         {
             for (int i = 0; i < 5; i++)
             {
+                // 轮速清空
+                SetBlueWheels(new WheelInfo());
+                SetYellowWheels(new WheelInfo());
                 blueComponent[i].SetStill();
                 yellowComponent[i].SetStill();
             }
