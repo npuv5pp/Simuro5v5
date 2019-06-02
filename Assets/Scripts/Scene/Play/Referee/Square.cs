@@ -167,14 +167,6 @@ namespace Simuro5v5.Util
         public override Vector2D Point4 => (Point1 - Midpoint).Rotate(-Mathf.PI / 2)
                                   + Midpoint;
 
-        public bool IsInCycle(Vector2D centralPosition, float radius)
-        {
-            return Vector2D.Distance(Point1, centralPosition) < radius ||
-                   Vector2D.Distance(Point2, centralPosition) < radius ||
-                   Vector2D.Distance(Point3, centralPosition) < radius ||
-                   Vector2D.Distance(Point4, centralPosition) < radius;
-        }
-
         public bool OverlapWithCircle(Vector2D center, float radius = Const.Ball.HBL)
         {
             var line = Point1 - Point3;

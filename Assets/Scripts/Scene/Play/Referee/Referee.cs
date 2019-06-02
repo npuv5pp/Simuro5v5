@@ -1150,7 +1150,7 @@ public class Referee : ICloneable
         //寻找开球球员
         for (int i = 0; i < Const.RobotsPerTeam; i++)
         {
-            if (PlaceOffensivePosSquare[i].square.IsInCycle(new Vector2D(0, 0), 25))
+            if (PlaceOffensivePosSquare[i].square.OverlapWithCircle(new Vector2D(0, 0), 25))
             {
                 PlaceAttackId = i;
                 break;
@@ -1174,7 +1174,7 @@ public class Referee : ICloneable
             if (i == PlaceAttackId) continue;
             //两种不规范情况：
             //1.不能再进入开球圆区域 2. 不能进入防守方半场 3.未在球场内
-            if (PlaceOffensivePosSquare[i].square.IsInCycle(new Vector2D(0, 0), 25)
+            if (PlaceOffensivePosSquare[i].square.OverlapWithCircle(new Vector2D(0, 0), 25)
                 || PlaceOffensivePosSquare[i].square.IsInRectangle(defenderHalfState)
                 || !PlaceOffensivePosSquare[i].square.IsInRectangle(stadiumState))
             {
@@ -1195,7 +1195,7 @@ public class Referee : ICloneable
         {
             //三种不规范情况
             //1.进入开球圆区域内 2.不能进入进攻方半场 3.未在球场内
-            if (PlaceDefenderPosSquare[i].square.IsInCycle(new Vector2D(0, 0), 25)
+            if (PlaceDefenderPosSquare[i].square.OverlapWithCircle(new Vector2D(0, 0), 25)
                 || PlaceDefenderPosSquare[i].square.IsInRectangle(offensiveHalfState)
                 || !PlaceDefenderPosSquare[i].square.IsInRectangle(stadiumState))
             {
