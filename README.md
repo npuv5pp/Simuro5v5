@@ -40,7 +40,7 @@ You can control replay by keyboard:
 |-----------------------------|--------------------------------------|
 | <kbd>↑</kbd> <kbd>↓</kbd>   | Adjust playback speed                |
 | <kbd>←</kbd> <kbd>→</kbd>   | Control progress                     |
-| <kbd>SEC</kbd>              | Pause or continue                    |
+| <kbd>SPC</kbd>              | Pause or continue                    |
 | <kbd>1</kbd> ~ <kbd>5</kbd> | Track the blue side robots No. 1~5   |
 | <kbd>6</kbd> ~ <kbd>0</kbd> | Track the yellow side robots No. 1~5 |
 | <kbd>-</kbd>                | Track the ball                       |
