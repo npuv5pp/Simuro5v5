@@ -36,17 +36,17 @@ In the game scene, you can call the menu at any time by right-clicking or by pre
 
 You can control replay by keyboard:
 
-| Key       | Function                             |
-| --------- | ------------------------------------ |
-| `↑` `↓`   | Adjust playback speed                |
-| `←` `→`   | Control progress                     |
-| `SEC`     | Pause or continue                    |
-| `1` ~ `5` | Track the blue side robots No. 1~5   |
-| `6` ~ `0` | Track the yellow side robots No. 1~5 |
-| `-`       | Track the ball                       |
-| `K`       | Forward first person perspective     |
-| `L`       | Backward first person perspective    |
-| `X`       | Switch to top view                   |
+| Key                         | Function                             |
+|-----------------------------|--------------------------------------|
+| <kbd>↑</kbd> <kbd>↓</kbd>   | Adjust playback speed                |
+| <kbd>←</kbd> <kbd>→</kbd>   | Control progress                     |
+| <kbd>SEC</kbd>              | Pause or continue                    |
+| <kbd>1</kbd> ~ <kbd>5</kbd> | Track the blue side robots No. 1~5   |
+| <kbd>6</kbd> ~ <kbd>0</kbd> | Track the yellow side robots No. 1~5 |
+| <kbd>-</kbd>                | Track the ball                       |
+| <kbd>K</kbd>                | Forward first person perspective     |
+| <kbd>L</kbd>                | Backward first person perspective    |
+| <kbd>X</kbd>                | Switch to top view                   |
 
 You can also control the playback process by mouse control, click the button, or use the mouse wheel to slide the bottom of the screen to control the playback progress. The mouse wheel slides on the rate drop-down box on the right to adjust the rate.
 
