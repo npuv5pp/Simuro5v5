@@ -167,13 +167,22 @@ namespace Simuro5v5.Util
         public override Vector2D Point4 => (Point1 - Midpoint).Rotate(-Mathf.PI / 2)
                                   + Midpoint;
 
+        /// <summary>
+        /// 判断正方形是否与园相交
+        /// <br />
+        /// TODO: 这个实现是不完整的
+        /// </summary>
         public bool OverlapWithCircle(Vector2D center, float radius = Const.Ball.HBL)
         {
-            var line = Point1 - Point3;
-            float hrl2 = Vector2D.Distance(Point1, Point3);
-            var angleInDegree = Mathf.Acos(- line.x / hrl2) * Mathf.PI;
-            var newSquare = new Square(Midpoint, angleInDegree,  hrl2 / 2 + radius);
-            return newSquare.ContainsPoint(center);
+            foreach (var point in new[] {Point1, Point2, Point3, Point4})
+            {
+                if (Vector2D.Distance(point, center) < radius)
+                {
+                    return true;
+                }
+            }
+
+            return ContainsPoint(center);
         }
 
         /// <summary>
