@@ -1,9 +1,13 @@
-﻿using Simuro5v5;
+﻿using Newtonsoft.Json;
+using Simuro5v5;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
+using System.IO;
 using Random = System.Random;
+using System;
+using SFB;
 
 public class RefereeTestMain : MonoBehaviour
 {
@@ -13,6 +17,11 @@ public class RefereeTestMain : MonoBehaviour
     ObjectManager objectManager;
     MatchInfo matchInfo;
     MatchInfo preMatchInfo;
+
+    public RefereeTestMain()
+    {
+
+    }
 
     void Start()
     {
@@ -29,7 +38,7 @@ public class RefereeTestMain : MonoBehaviour
         
     }
 
-    private MatchInfo RandomMatchInfo()
+    public MatchInfo RandomMatchInfo()
     {
         Random rd = new Random();
         var matchInfo = new MatchInfo()
@@ -55,34 +64,45 @@ public class RefereeTestMain : MonoBehaviour
         return matchInfo;
     }
 
-    public void TestAuto()
+    //自测时发现错误，导出到文件中
+    public void ExportFail()
     {
-        int testtimes = 10;
-        int NeedChange = 0;
-        for(int i = 0;i<testtimes;i++)
+        objectManager.UpdateFromScene();
+        string path = StandaloneFileBrowser.SaveFilePanel(
+            "Export Fail Record",
+            "H:\\V5++\\UnityProject\\Bug\\",
+            $"{DateTime.Now:yyyy-MM-dd_hhmmss}" + "--" ,
+            "json");
+
+        // if save file panel cancelled
+        if (string.IsNullOrEmpty(path))
         {
-            bool IsNeedChange = false;
-            objectManager.RevertScene(RandomMatchInfo());
-            PenaltyBluePlace();
-            objectManager.UpdateFromScene();
-            JudgeResult judgeResult = new JudgeResult
-            {
-                Actor = Side.Blue,
-                ResultType = ResultType.PenaltyKick
-            };
-            matchInfo.Referee.JudgeAutoPlacement(matchInfo, judgeResult,IsNeedChange);
-            if(IsNeedChange)
-            {
-                NeedChange++;
-                Debug.Log(i + "次测试错误");
-            }
-            else
-            {
-                Debug.Log(i+ "次测试正确");
-            }
-            
+            return;
         }
-        Debug.Log("错误率为：" + NeedChange / testtimes);
+        string failInfo = JsonConvert.SerializeObject(matchInfo);
+        File.WriteAllText(path, failInfo);
+
+    }
+
+    //将文件导入场景中
+    public void ImportFail()
+    {
+        string[] path = StandaloneFileBrowser.OpenFilePanel(
+            "Import Fail Dacord",
+            "H:\\V5++\\UnityProject\\Bug\\",
+            "json",
+            false);
+
+        // if open file panel cancelled
+        if (path.Length == 0)
+        {
+            return;
+        }
+
+        string json = File.ReadAllText(path[0]);
+        matchInfo = JsonConvert.DeserializeObject<MatchInfo>(json);
+        objectManager.RevertScene(matchInfo);
+
     }
 
     public void RandomPlace()
@@ -160,6 +180,77 @@ public class RefereeTestMain : MonoBehaviour
         {
             Actor = Side.Yellow,
             ResultType = ResultType.PlaceKick
+        };
+        matchInfo.Referee.JudgeAutoPlacement(matchInfo, judgeResult);
+        objectManager.RevertScene(matchInfo);
+    }
+
+    public void GoalieBluePlace()
+    {
+        objectManager.UpdateFromScene();
+        JudgeResult judgeResult = new JudgeResult
+        {
+            Actor = Side.Blue,
+            ResultType = ResultType.GoalKick
+        };
+        matchInfo.Referee.JudgeAutoPlacement(matchInfo, judgeResult);
+        objectManager.RevertScene(matchInfo);
+    }
+
+    public void GoalieYellowPlace()
+    {
+        objectManager.UpdateFromScene();
+        JudgeResult judgeResult = new JudgeResult
+        {
+            Actor = Side.Yellow,
+            ResultType = ResultType.GoalKick
+        };
+        matchInfo.Referee.JudgeAutoPlacement(matchInfo, judgeResult);
+        objectManager.RevertScene(matchInfo);
+    }
+
+    public void FreeLeftBotPlace()
+    {
+        objectManager.UpdateFromScene();
+        JudgeResult judgeResult = new JudgeResult
+        {
+            Actor = Side.Yellow,
+            ResultType = ResultType.FreeKickLeftBot
+        };
+        matchInfo.Referee.JudgeAutoPlacement(matchInfo, judgeResult);
+        objectManager.RevertScene(matchInfo);
+    }
+
+    public void FreeLeftTopPlace()
+    {
+        objectManager.UpdateFromScene();
+        JudgeResult judgeResult = new JudgeResult
+        {
+            Actor = Side.Yellow,
+            ResultType = ResultType.FreeKickLeftTop
+        };
+        matchInfo.Referee.JudgeAutoPlacement(matchInfo, judgeResult);
+        objectManager.RevertScene(matchInfo);
+    }
+    public void FreeRiBotPlace()
+    {
+        objectManager.UpdateFromScene();
+        JudgeResult judgeResult = new JudgeResult
+        {
+            Actor = Side.Blue,
+            ResultType = ResultType.FreeKickRightBot
+        };
+        matchInfo.Referee.JudgeAutoPlacement(matchInfo, judgeResult);
+        objectManager.RevertScene(matchInfo);
+    }
+
+    public void FreeRiTopPlace()
+    {
+        objectManager.UpdateFromScene();
+        JudgeResult judgeResult = new JudgeResult
+        {
+            Actor = Side.Blue,
+            ResultType = ResultType.FreeKickRightTop
         };
         matchInfo.Referee.JudgeAutoPlacement(matchInfo, judgeResult);
         objectManager.RevertScene(matchInfo);
