@@ -26,13 +26,13 @@ Start V5DLLAdapter.exe, then click Browse, load your strategy, fill in the port 
 
 ## Run
 
-Open Simuro5v5.exe. Here the right mouse button can open or close the menu, left button to confirm. Go to Game -> Strategy, click the Begin button, and wait until the animation plays, your strategy will load successfully. If you find that there is no response after clicking Begin, maybe your DLL is having problems, please make sure all interface functions are implemented.
+Open Simuro5v5.exe. Here the right mouse button can open or close the menu, left button to confirm. Go to Game -> Strategy, click the Begin button, and wait until the animation plays, your strategy will load successfully. If you find that there is no response after clicking `Begin`, maybe your DLL is having problems, please make sure all interface functions are implemented.
 
-During the game, you can use the space bar to pause.
+During the game, you can use <kbd>SPC</kbd> to pause.
 
 ## Replay
 
-In the game scene, you can call the menu at any time by right-clicking or by pressing `ESC`. At any time, you can click the Replay button to enter the playback scene, where you can see your most recent game playback.
+In the game scene, you can call the menu at any time by right-clicking or by pressing <kbd>ESC</kbd>. At any time, you can click the Replay button to enter the playback scene, where you can see your most recent game playback.
 
 You can control replay by keyboard:
 
@@ -57,7 +57,7 @@ The strategy playback data can be exported and imported via the Export/Import bu
 # Automatic Referee
 This platform adopts a new ruling method, relies on automatic referee judgment, and outputs the ruling result below the platform.
 
-For specific documents, please refer to [referee documents](https://github.com/npuv5pp/Simuro5v5/blob/master/Documents/Referee.md)
+For specific documents, please refer to [referee documents](./Documents/Referee.md)
 
 # Right attack hypothesis
 
