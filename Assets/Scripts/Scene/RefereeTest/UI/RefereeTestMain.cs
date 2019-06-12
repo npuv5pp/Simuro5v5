@@ -35,7 +35,7 @@ public class RefereeTestMain : MonoBehaviour
 
     void Update()
     {
-        
+
     }
 
     public MatchInfo RandomMatchInfo()
@@ -71,7 +71,7 @@ public class RefereeTestMain : MonoBehaviour
         string path = StandaloneFileBrowser.SaveFilePanel(
             "Export Fail Record",
             "H:\\V5++\\UnityProject\\Bug\\",
-            $"{DateTime.Now:yyyy-MM-dd_hhmmss}" + "--" ,
+            $"{DateTime.Now:yyyy-MM-dd_hhmmss}" + "--",
             "json");
 
         // if save file panel cancelled
@@ -131,6 +131,7 @@ public class RefereeTestMain : MonoBehaviour
         preMatchInfo = matchInfo;
         objectManager.RevertScene(matchInfo);
     }
+
 
     public void RecoverPlace()
     {

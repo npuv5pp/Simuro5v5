@@ -717,7 +717,7 @@ public class Referee : ICloneable
 
     private bool JudgeFree(ref JudgeResult judgeResult)
     {
-        if (matchInfo.Ball.linearVelocity.GetUnityVector2().magnitude < 5)
+        if (matchInfo.Ball.linearVelocity.GetUnityVector2().magnitude < 3)
         {
             standoffTime++;
             if (standoffTime > maxStandoffTime)
@@ -774,7 +774,6 @@ public class Referee : ICloneable
             standoffTime = 0;
             return false;
         }
-
     }
 
     private bool JudgeHalfOrGameEnd(ref JudgeResult judgeResult)
@@ -1930,10 +1929,13 @@ public class Referee : ICloneable
             }
         }
     }
+    
 }
 
 namespace TestReferee
 {
+   
+
     [TestFixture]
     public class TestPlacement
     {
@@ -1944,13 +1946,25 @@ namespace TestReferee
         MatchInfo preMatchInfo;
         RefereeTestMain refereeTestMain = new RefereeTestMain();
 
+        public bool ComparePlaceMatchInfo(MatchInfo matchInfo1, MatchInfo matchInfo2)
+        {
+            if (!matchInfo1.Ball.pos.Equals(matchInfo2.Ball.pos))
+                return false;
+            for (int i = 0; i < Const.RobotsPerTeam; i++)
+            {
+                if (!matchInfo1.BlueRobots[i].Equals(matchInfo2.BlueRobots[i]) ||
+                    !matchInfo2.YellowRobots[i].Equals(matchInfo2.YellowRobots[i]))
+                    return false;
+            }
+            return true;
+        }
         [Test]
         public void TestAuto()
         {
             ResultType[] resultTypes = Enum.GetValues(typeof(ResultType)) as ResultType[];
             Side[] sides = Enum.GetValues(typeof(Side)) as Side[];
             Random random = new Random();
-            int testtimes = 2000;
+            int testtimes = 1000;
             int NeedChange = 0;
             for (int i = 0; i < testtimes; i++)
             {
@@ -1983,7 +1997,7 @@ namespace TestReferee
 
                 matchInfo.Referee.JudgeAutoPlacement(matchInfo, judgeResult);
                 //出现错误，输入到文件中
-                if (preMatchInfo != matchInfo)
+                if (!ComparePlaceMatchInfo(preMatchInfo,matchInfo))
                 {
                     NeedChange++;
                     var failInfo = JsonConvert.SerializeObject(preMatchInfo);

@@ -224,6 +224,7 @@ namespace Simuro5v5
             si.TickMatch = TickMatch;
             return si;
         }
+        
     }
 
     public struct MatchScore
@@ -342,7 +343,7 @@ namespace Simuro5v5
     }
     
     
-
+    
     public struct Vector2D
     {
         public float x;
@@ -417,6 +418,15 @@ namespace Simuro5v5
         {
             return x * rhs.y - y * rhs.x;
         }
+        
+        public bool Equals(Vector2D rhs)
+        {
+            if (x == rhs.x && y == rhs.y)
+                return true;
+            else
+                return false;
+        }
+
 
         public static float Distance (Vector2D lhs, Vector2D rhs)
         {
@@ -489,6 +499,14 @@ namespace Simuro5v5
             pos.x = transform.position.x;
             pos.y = transform.position.z;
             rotation = transform.rotation.eulerAngles.y.FormatUnity2Old().FormatOld();
+        }
+
+        public bool Equals(Robot robot)
+        {
+            if (pos.Equals(robot.pos) && rotation == robot.rotation)
+                return true;
+            else
+                return false;
         }
     }
 

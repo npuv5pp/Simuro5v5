@@ -191,7 +191,7 @@ namespace Simuro5v5.Util
         /// <param name="area">待判断的矩形区域</param>
         /// <returns></returns>
         public bool IsInRectangle(UprightRectangle area)
-        {
+        {   //TODO如果球员有大于零且小于二分之一区域在矩形内，判定结果为不在区域里，应该判断在区域里
             float width = Vector2D.Distance(Point1, Point3);
             float outer = Mathf.Max(
                 Vector2D.Distance(area.Point1, area.Point3),
