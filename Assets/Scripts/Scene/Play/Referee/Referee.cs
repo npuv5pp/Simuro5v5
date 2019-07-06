@@ -171,6 +171,11 @@ public class Referee : ICloneable
 
         var result = CollectJudge();
         savedJudge = result;
+        // 判罚之后应该清零计时
+        if (result.ResultType != ResultType.NormalMatch)
+        {
+            this.standoffTime = 0;
+        }
         return result;
     }
 

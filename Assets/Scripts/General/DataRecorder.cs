@@ -58,7 +58,7 @@ namespace Simuro5v5
 
         private DateTime beginTime;
 
-        private readonly List<RecordData> data = new List<RecordData>();
+        internal readonly List<RecordData> data = new List<RecordData>();
 
         /// <summary>
         /// 已记录的数据长度
