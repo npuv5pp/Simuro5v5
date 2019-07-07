@@ -61,7 +61,7 @@ public class ParameterTest : MonoBehaviour
 //        forward_drag = rb.velocity * -Drag;
         var sidewayV = Vector3.Project(rb.velocity, transform.right);
         if (sidewayV != Vector3.zero)
-            rb.AddForce(forward_force + rb.velocity * -ForwardDrag + transform.right * -SidewayDrag);
+            rb.AddForce(forward_force + rb.velocity * -ForwardDrag + sidewayV / sidewayV.magnitude * -SidewayDrag);
         else
             rb.AddForce(forward_force + rb.velocity * -ForwardDrag);
 
@@ -74,21 +74,28 @@ public class ParameterTest : MonoBehaviour
         OutputData();
     }
 
+    private void LateUpdate()
+    {
+        Debug.DrawRay(transform.position, transform.right * -SidewayDrag);
+    }
+
     float prevA = 0;
     private float prevZ = 0;
 
     void OutputData()
     {
-//        var eulerAngles = rb.transform.eulerAngles;
-//        Debug.Log(string.Format("{0:N10}", eulerAngles.y - prevA));
-//        prevA = eulerAngles.y;
+        var eulerAngles = rb.transform.eulerAngles;
+        var av = string.Format("{0:N10}", eulerAngles.y - prevA);
+        prevA = eulerAngles.y;
 
         var z = rb.transform.position.z;
-        Debug.Log(string.Format("{0:N10}", z - prevZ));
+        var v = string.Format("{0:N10}", z - prevZ);
         prevZ = z;
 
-        writer.WriteLine(
-            $"{rb.velocity.z / Const.FramePerSecond},{rb.angularVelocity.y / Const.FramePerSecond},{rb.position.x},{rb.position.z}");
+        var str = $"v {v}, av {av}";
+        Debug.Log(str);
+
+        writer.WriteLine(str);
     }
 
     private void OnDestroy()

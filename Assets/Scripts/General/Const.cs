@@ -35,7 +35,7 @@ namespace Simuro5v5
 
             // linear
             public readonly static float ForwardForceFactor = 102.89712678726376f;
-            public readonly static float DragFactor = 104.06302915526136f;
+            public readonly static float DragFactor = 79.81736047779975f;
             public readonly static float DoubleZeroDragFactor = DragFactor * 8;
             public readonly static float SidewayDragFactor = 30000;
 

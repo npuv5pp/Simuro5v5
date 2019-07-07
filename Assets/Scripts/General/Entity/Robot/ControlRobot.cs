@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using Simuro5v5;
 
 public class ControlRobot : MonoBehaviour
@@ -6,6 +7,7 @@ public class ControlRobot : MonoBehaviour
     public float ForwardFactor;
     public float TorqueFactor;
     public float Drag;
+    public float SidewayDrag;
     public float AngularDrag;
     public float DoubleZeroDrag;
     public float DoubleZeroAngularDrag;
@@ -34,10 +36,6 @@ public class ControlRobot : MonoBehaviour
 
     private float LeftVelocity;
     private float RightVelocity;
-
-    private float cachedLeftVelocity;
-    private float cachedRightVelocity;
-
 
     Vector3 forward_force, forward_drag;
     Vector3 torque, angular_drag;
@@ -68,12 +66,12 @@ public class ControlRobot : MonoBehaviour
 
         forward_force = -transform.up * (LeftVelocity + RightVelocity) * ForwardFactor;
 
-        if (LeftVelocity == 0 && RightVelocity == 0)
-            forward_drag = rb.velocity * -DoubleZeroDrag;
+        forward_drag = rb.velocity * -Drag;
+        var sidewayV = Vector3.Project(rb.velocity, transform.right);
+        if (sidewayV != Vector3.zero)
+            rb.AddForce(forward_force + forward_drag + sidewayV / sidewayV.magnitude * -SidewayDrag);
         else
-            forward_drag = rb.velocity * -Drag;
-        rb.AddForce(forward_force + forward_drag);
-
+            rb.AddForce(forward_force + forward_drag);
 
         torque = Vector3.up * (LeftVelocity - RightVelocity) * TorqueFactor;
         angular_drag = rb.angularVelocity * -AngularDrag;
@@ -87,8 +85,6 @@ public class ControlRobot : MonoBehaviour
 
     public void SetWheelVelocity(float left, float right)
     {
-        cachedLeftVelocity = LeftVelocity;
-        cachedRightVelocity = RightVelocity;
         LeftVelocity = left;
         RightVelocity = right;
     }
@@ -173,7 +169,7 @@ public class ControlRobot : MonoBehaviour
 
         rb.mass = Const.Robot.Mass;
         rb.drag = rb.angularDrag = 0;
-        rb.useGravity = true;
+        rb.useGravity = false;
         rb.isKinematic = false;
         rb.interpolation = RigidbodyInterpolation.None;
         rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
@@ -185,6 +181,7 @@ public class ControlRobot : MonoBehaviour
         ForwardFactor = Const.Robot.ForwardForceFactor;
         TorqueFactor = Const.Robot.TorqueFactor;
         Drag = Const.Robot.DragFactor;
+        SidewayDrag = Const.Robot.SidewayDragFactor;
         AngularDrag = Const.Robot.AngularDragFactor;
         DoubleZeroDrag = Const.Robot.DoubleZeroDragFactor;
         DoubleZeroAngularDrag = Const.Robot.DoubleZeroAngularDragFactor;

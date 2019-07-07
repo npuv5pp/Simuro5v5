@@ -2004,7 +2004,7 @@ MonoBehaviour:
   AngularDrag: 3769.7751
   DoubleZeroDrag: 400
   LeftVelocity: 125
-  RightVelocity: 125
+  RightVelocity: -125
 --- !u!1 &2090983180
 GameObject:
   m_ObjectHideFlags: 0
