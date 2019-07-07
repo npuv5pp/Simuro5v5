@@ -34,13 +34,15 @@ namespace Simuro5v5
             public readonly static float Mass = 10;
 
             // linear
-            public readonly static float ForwardForceFactor = 47.5f;
-            public readonly static float DragFactor = 50;
+            public readonly static float ForwardForceFactor = 39.5040157f;
+            public readonly static float DragFactor = 45.42384722f;
             public readonly static float DoubleZeroDragFactor = DragFactor * 8;
 
             // angular
-            public readonly static float TorqueFactor = 1156;
-            public readonly static float AngularDragFactor = 3770;
+            // 1194.6272359485248513692711320329
+            public readonly static float TorqueFactor = 1441.30362765f;
+            // 3889.6360299740021410001529285824‬
+            public readonly static float AngularDragFactor = 3214.140962f;
             public readonly static float DoubleZeroAngularDragFactor = AngularDragFactor * 1;
 
             public readonly static float RL = 7.8670658f; // 机器人边长         // 有舍入误差
