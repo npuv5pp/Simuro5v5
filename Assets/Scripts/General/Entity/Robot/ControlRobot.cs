@@ -13,6 +13,7 @@ public class ControlRobot : MonoBehaviour
     public bool Debugging;
 
     bool _physicsEnabled;
+
     public bool physicsEnabled
     {
         get { return _physicsEnabled; }
@@ -26,12 +27,17 @@ public class ControlRobot : MonoBehaviour
             {
                 DisableRigidBodyAndCollider();
             }
+
             _physicsEnabled = value;
         }
     }
 
-    float LeftVelocity { get; set; }
-    float RightVelocity { get; set; }
+    private float LeftVelocity;
+    private float RightVelocity;
+
+    private float cachedLeftVelocity;
+    private float cachedRightVelocity;
+
 
     Vector3 forward_force, forward_drag;
     Vector3 torque, angular_drag;
@@ -47,6 +53,8 @@ public class ControlRobot : MonoBehaviour
         InitParameter();
     }
 
+    private int tick;
+
     void FixedUpdate()
     {
         if (!physicsEnabled)
@@ -54,14 +62,18 @@ public class ControlRobot : MonoBehaviour
             return;
         }
 
+        tick++;
+        if (tick % 2 == 0)
+            return;
+
         forward_force = -transform.up * (LeftVelocity + RightVelocity) * ForwardFactor;
 
-        // 双零减速
         if (LeftVelocity == 0 && RightVelocity == 0)
             forward_drag = rb.velocity * -DoubleZeroDrag;
         else
             forward_drag = rb.velocity * -Drag;
         rb.AddForce(forward_force + forward_drag);
+
 
         torque = Vector3.up * (LeftVelocity - RightVelocity) * TorqueFactor;
         angular_drag = rb.angularVelocity * -AngularDrag;
@@ -75,6 +87,8 @@ public class ControlRobot : MonoBehaviour
 
     public void SetWheelVelocity(float left, float right)
     {
+        cachedLeftVelocity = LeftVelocity;
+        cachedRightVelocity = RightVelocity;
         LeftVelocity = left;
         RightVelocity = right;
     }
@@ -156,6 +170,7 @@ public class ControlRobot : MonoBehaviour
         {
             throw new PhysicsDisabledException();
         }
+
         rb.mass = Const.Robot.Mass;
         rb.drag = rb.angularDrag = 0;
         rb.useGravity = true;
@@ -163,8 +178,8 @@ public class ControlRobot : MonoBehaviour
         rb.interpolation = RigidbodyInterpolation.None;
         rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
         rb.constraints = RigidbodyConstraints.FreezePositionY |
-            RigidbodyConstraints.FreezeRotationX |
-            RigidbodyConstraints.FreezeRotationY;
+                         RigidbodyConstraints.FreezeRotationX |
+                         RigidbodyConstraints.FreezeRotationY;
         rb.maxAngularVelocity = Const.Robot.maxAngularVelocity;
 
         ForwardFactor = Const.Robot.ForwardForceFactor;

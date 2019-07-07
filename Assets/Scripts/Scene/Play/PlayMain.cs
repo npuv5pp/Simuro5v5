@@ -293,7 +293,7 @@ public class PlayMain : MonoBehaviour
 
         // 此时手动摆位已经完成，从场地中拉取信息
         ObjectManager.UpdateFromScene();
-        GlobalMatchInfo.Referee.JudgeAutoPlacement(GlobalMatchInfo, GlobalMatchInfo.Referee.savedJudge);
+//        GlobalMatchInfo.Referee.JudgeAutoPlacement(GlobalMatchInfo, GlobalMatchInfo.Referee.savedJudge);
         ObjectManager.SetBluePlacement(GlobalMatchInfo.BlueRobots);
         ObjectManager.SetYellowPlacement(GlobalMatchInfo.YellowRobots);
         ObjectManager.SetBallPlacement(GlobalMatchInfo.Ball);

@@ -38,12 +38,31 @@ public class ParameterTest : MonoBehaviour
         writer.WriteLine("v,av,x,y");
     }
 
+    private int tick;
+    private int playTime;
+
     void FixedUpdate()
     {
-        // TODO 零减速
+        tick++;
+        if (tick % 2 == 0)
+            return;
+
+//        playTime++;
+//        if (playTime < 40)
+//        {
+//            LeftVelocity = 125;
+//            RightVelocity = -125;
+//        }
+//        else
+//        {
+//            LeftVelocity = 0;
+//            RightVelocity = 0;
+//        }
+
         forward_force = -transform.up * (LeftVelocity + RightVelocity) * ForwardFactor;
+
         if (LeftVelocity == 0 && RightVelocity == 0)
-            forward_drag = rb.velocity * -Drag * 5;
+            forward_drag = rb.velocity * -Drag * DoubleZeroDrag;
         else
             forward_drag = rb.velocity * -Drag;
 
@@ -56,10 +75,13 @@ public class ParameterTest : MonoBehaviour
         OutputData();
     }
 
+    float prevAV = 0;
+
     void OutputData()
     {
-        Debug.Log($"{rb.angularVelocity.y / 50}");
-        writer.WriteLine($"{rb.velocity.z / 50},{rb.angularVelocity.y / 50},{rb.position.x},{rb.position.z}");
+        Debug.Log($"{rb.angularVelocity.y}");
+        writer.WriteLine(
+            $"{rb.velocity.z / Const.FramePerSecond},{rb.angularVelocity.y / Const.FramePerSecond},{rb.position.x},{rb.position.z}");
     }
 
     private void OnDestroy()
@@ -76,8 +98,8 @@ public class ParameterTest : MonoBehaviour
         rb.interpolation = RigidbodyInterpolation.None;
         rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
         rb.constraints = RigidbodyConstraints.FreezePositionY |
-            RigidbodyConstraints.FreezeRotationX |
-            RigidbodyConstraints.FreezeRotationY;
+                         RigidbodyConstraints.FreezeRotationX |
+                         RigidbodyConstraints.FreezeRotationY;
         rb.maxAngularVelocity = Const.Robot.maxAngularVelocity;
 
         ForwardFactor = Const.Robot.ForwardForceFactor;

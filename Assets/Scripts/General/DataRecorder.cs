@@ -187,7 +187,7 @@ namespace Simuro5v5
 #if UNITY_EDITOR
             return JsonConvert.SerializeObject(json, Formatting.Indented);
 #else
-            return JsonConvert.SerializeObject(data);
+            return JsonConvert.SerializeObject(json);
 #endif
         }
     }
