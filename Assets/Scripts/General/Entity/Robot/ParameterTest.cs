@@ -1,4 +1,5 @@
-﻿using Simuro5v5;
+﻿using System;
+using Simuro5v5;
 using UnityEngine;
 using System.IO;
 
@@ -8,7 +9,8 @@ public class ParameterTest : MonoBehaviour
 
     public float ForwardFactor;
     public float TorqueFactor;
-    public float Drag;
+    public float ForwardDrag;
+    public float SidewayDrag;
     public float AngularDrag;
     public float DoubleZeroDrag;
 
@@ -38,13 +40,11 @@ public class ParameterTest : MonoBehaviour
 
         OnPauseBtnClick();
 
-        ForwardFactor = 39.5040157f;
-        Drag = 45.42384722f;
-        
-        // 1441.413627651178231 
-        TorqueFactor = 1441.30362765f;
-        // 3214.140962
-        AngularDrag = 3214.140962f;
+        ForwardFactor = 102.89712678726376f;
+        ForwardDrag = 79.81736047779975f;
+
+        TorqueFactor = 1156.1817018313f;
+        AngularDrag = 3769.775104018879f;
     }
 
     private int tick;
@@ -58,9 +58,14 @@ public class ParameterTest : MonoBehaviour
 
         forward_force = -transform.forward * (LeftVelocity + RightVelocity) * ForwardFactor;
 
-        forward_drag = rb.velocity * -Drag;
-        rb.AddForce(forward_force + forward_drag);
+//        forward_drag = rb.velocity * -Drag;
+        var sidewayV = Vector3.Project(rb.velocity, transform.right);
+        if (sidewayV != Vector3.zero)
+            rb.AddForce(forward_force + rb.velocity * -ForwardDrag + transform.right * -SidewayDrag);
+        else
+            rb.AddForce(forward_force + rb.velocity * -ForwardDrag);
 
+//        rb.AddForce(forward_force + forward_drag);
 
         torque = Vector3.up * (LeftVelocity - RightVelocity) * TorqueFactor;
         angular_drag = rb.angularVelocity * -AngularDrag;
@@ -75,13 +80,13 @@ public class ParameterTest : MonoBehaviour
     void OutputData()
     {
 //        var eulerAngles = rb.transform.eulerAngles;
-//        Debug.Log(string.Format("{0:N10}", eulerAngles.y - prevAV));
+//        Debug.Log(string.Format("{0:N10}", eulerAngles.y - prevA));
 //        prevA = eulerAngles.y;
 
         var z = rb.transform.position.z;
         Debug.Log(string.Format("{0:N10}", z - prevZ));
         prevZ = z;
-        
+
         writer.WriteLine(
             $"{rb.velocity.z / Const.FramePerSecond},{rb.angularVelocity.y / Const.FramePerSecond},{rb.position.x},{rb.position.z}");
     }
@@ -106,7 +111,7 @@ public class ParameterTest : MonoBehaviour
 
         ForwardFactor = Const.Robot.ForwardForceFactor;
         TorqueFactor = Const.Robot.TorqueFactor;
-        Drag = Const.Robot.DragFactor;
+        ForwardDrag = Const.Robot.DragFactor;
         AngularDrag = Const.Robot.AngularDragFactor;
         DoubleZeroDrag = Const.Robot.DoubleZeroDragFactor;
     }

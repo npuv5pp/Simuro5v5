@@ -468,7 +468,8 @@ MonoBehaviour:
   rightWheel: {fileID: 0}
   ForwardFactor: 47.5
   TorqueFactor: 325
-  Drag: 50
+  ForwardDrag: 0
+  SidewayDrag: 0
   AngularDrag: 1400
   DoubleZeroDrag: 4
   LeftVelocity: 125
@@ -766,7 +767,8 @@ MonoBehaviour:
   rightWheel: {fileID: 0}
   ForwardFactor: 47.5
   TorqueFactor: 909
-  Drag: 50
+  ForwardDrag: 0
+  SidewayDrag: 0
   AngularDrag: 3400
   DoubleZeroDrag: 4
   LeftVelocity: 125
@@ -914,7 +916,8 @@ MonoBehaviour:
   rightWheel: {fileID: 0}
   ForwardFactor: 47.5
   TorqueFactor: 325
-  Drag: 50
+  ForwardDrag: 0
+  SidewayDrag: 0
   AngularDrag: 1400
   DoubleZeroDrag: 4
   LeftVelocity: 125
@@ -1692,7 +1695,8 @@ MonoBehaviour:
   rightWheel: {fileID: 0}
   ForwardFactor: 47.5
   TorqueFactor: 325
-  Drag: 50
+  ForwardDrag: 0
+  SidewayDrag: 0
   AngularDrag: 1400
   DoubleZeroDrag: 4
   LeftVelocity: 125
@@ -1993,13 +1997,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   leftWheel: {fileID: 0}
   rightWheel: {fileID: 0}
-  ForwardFactor: 47.5
-  TorqueFactor: 1441.3036
-  Drag: 50
-  AngularDrag: 3214.1409
+  ForwardFactor: 39.504017
+  TorqueFactor: 1156.1818
+  ForwardDrag: 45.423847
+  SidewayDrag: 30000
+  AngularDrag: 3769.7751
   DoubleZeroDrag: 400
-  LeftVelocity: -125
-  RightVelocity: -125
+  LeftVelocity: 125
+  RightVelocity: 125
 --- !u!1 &2090983180
 GameObject:
   m_ObjectHideFlags: 0
