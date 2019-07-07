@@ -183,17 +183,19 @@ namespace Simuro5v5
 
         public void UpdateFrom(GameObject ball, GameObject[] blue, GameObject[] yellow)
         {
-
             for (int i = 0; i < Const.RobotsPerTeam; i++)
             {
                 BlueRobots[i].UpdateFromTransform(blue[i].transform);
                 YellowRobots[i].UpdateFromTransform(yellow[i].transform);
             }
+
+            var position = ball.transform.position;
             Ball newBall = new Ball
             {
-                pos = { x = ball.transform.position.x, y = ball.transform.position.z },
+                pos = { x = position.x, y = position.z },
             };
             Ball = newBall;
+            Ball.linearVelocity = Vector2D.FromUnityVector3(ball.GetComponents<Rigidbody>().First().velocity);
         }
 
         /// <summary>
@@ -355,6 +357,11 @@ namespace Simuro5v5
         {
             this.x = x;
             this.y = y;
+        }
+
+        public static Vector2D FromUnityVector3(Vector3 vector3)
+        {
+            return new Vector2D(vector3.x, vector3.y);
         }
 
         public Vector3 GetUnityVector3()

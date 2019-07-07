@@ -5,8 +5,10 @@
 ********************************************************************************/
 
 using System;
+using System.CodeDom;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using SFB;
 using UnityEngine;
 using UnityEngine.UI;
@@ -49,12 +51,25 @@ public class GUI_Replay : MonoBehaviour
     {
         ObjectManager = new ObjectManager();
         ShowRecord();
+        //var eventHistory = Recorder.data
+        //    .Where(item => item.matchInfo.Referee.savedJudge.ResultType != ResultType.NormalMatch)
+        //    .Select(a => new FormGUI.EventLog()
+        //    {
+        //        Frame = a.matchInfo.TickMatch,
+        //        Info = a.matchInfo.Referee.savedJudge.Reason,
+        //    })
+        //    .ToList();
+        //var form = Launcher.Launcher.Launch(eventHistory);
+        //form.Show();
+        //
+        // Launcher.Launcher.Main();
     }
 
     private void ShowRecord()
     {
         if (Recorder == null || Recorder.DataLength == 0)
         {
+            Debug.Log("Recorder contains no entry or is null.");
             Recorder = DataRecorder.PlaceHolder();
         }
 
