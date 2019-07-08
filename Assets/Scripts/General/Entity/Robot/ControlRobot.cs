@@ -6,11 +6,11 @@ public class ControlRobot : MonoBehaviour
 {
     public float ForwardFactor;
     public float TorqueFactor;
-    public float Drag;
+    public float ForwardDrag;
     public float SidewayDrag;
     public float AngularDrag;
     public float DoubleZeroDrag;
-    public float DoubleZeroAngularDrag;
+    public float ZeroAngularDrag;
 
     public bool Debugging;
 
@@ -37,8 +37,10 @@ public class ControlRobot : MonoBehaviour
     private float LeftVelocity;
     private float RightVelocity;
 
-    Vector3 forward_force, forward_drag;
+    Vector3 forward_force, forward_drag, sideway_drag;
+    Vector3 forward_left_drag, forward_right_drag;
     Vector3 torque, angular_drag;
+    Vector3 prevLeftPosition, prevRightPosition;
 
     Collider Collider;
     Rigidbody rb;
@@ -64,16 +66,59 @@ public class ControlRobot : MonoBehaviour
         if (tick % 2 == 0)
             return;
 
+        if (gameObject.name == "Blue0")
+        {
+            Debug.Log($"{LeftVelocity}, {RightVelocity}");
+        }
+
+        // 动力
         forward_force = -transform.up * (LeftVelocity + RightVelocity) * ForwardFactor;
-
-        forward_drag = rb.velocity * -Drag;
+        // 速度方向的空气阻力
+        forward_drag = rb.velocity * -ForwardDrag;
+        // 切向速度
         var sidewayV = Vector3.Project(rb.velocity, transform.right);
-        if (sidewayV != Vector3.zero)
-            rb.AddForce(forward_force + forward_drag + sidewayV / sidewayV.magnitude * -SidewayDrag);
-        else
-            rb.AddForce(forward_force + forward_drag);
+        // 切向阻力
+        sideway_drag = sidewayV == Vector3.zero ? Vector3.zero : sidewayV / sidewayV.magnitude * -SidewayDrag;
+        rb.AddForce(forward_force + forward_drag + sideway_drag);
 
+        var leftVelocity = leftWheelPosition - prevLeftPosition;
+        var rightVelocity = rightWheelPosition - prevRightPosition;
+        prevLeftPosition = leftWheelPosition;
+        prevRightPosition = rightWheelPosition;
+
+        if (LeftVelocity == 0 && RightVelocity == 0)
+        {
+            forward_drag = rb.velocity * -DoubleZeroDrag;
+            rb.AddForce(forward_drag);
+        }
+        else if (LeftVelocity == 0)
+        {
+            var dot = Vector3.Dot(leftVelocity, transform.up);
+            if (dot > 0 && RightVelocity < 0)
+            {
+                rb.AddForceAtPosition(transform.up * -ZeroAngularDrag, rightWheelPosition);
+            }
+            else if (dot < 0 && RightVelocity > 0)
+            {
+                rb.AddForceAtPosition(-transform.up * -ZeroAngularDrag, rightWheelPosition);
+            }
+        }
+        else if (RightVelocity == 0)
+        {
+            var dot = Vector3.Dot(rightVelocity, transform.up);
+            if (dot > 0 && RightVelocity < 0)
+            {
+                rb.AddForceAtPosition(transform.up * -ZeroAngularDrag, leftWheelPosition);
+            }
+            else if (dot < 0 && RightVelocity > 0)
+            {
+                rb.AddForceAtPosition(-transform.up * -ZeroAngularDrag, leftWheelPosition);
+            }
+        }
+
+        // 动力扭矩
         torque = Vector3.up * (LeftVelocity - RightVelocity) * TorqueFactor;
+        // 阻力扭矩
         angular_drag = rb.angularVelocity * -AngularDrag;
         rb.AddTorque(torque + angular_drag);
     }
@@ -180,10 +225,13 @@ public class ControlRobot : MonoBehaviour
 
         ForwardFactor = Const.Robot.ForwardForceFactor;
         TorqueFactor = Const.Robot.TorqueFactor;
-        Drag = Const.Robot.DragFactor;
+        ForwardDrag = Const.Robot.DragFactor;
         SidewayDrag = Const.Robot.SidewayDragFactor;
         AngularDrag = Const.Robot.AngularDragFactor;
         DoubleZeroDrag = Const.Robot.DoubleZeroDragFactor;
-        DoubleZeroAngularDrag = Const.Robot.DoubleZeroAngularDragFactor;
+        ZeroAngularDrag = Const.Robot.ZeroAngularDragFactor;
     }
+
+    private Vector3 rightWheelPosition => transform.position + transform.right * Const.Robot.HRL;
+    private Vector3 leftWheelPosition => transform.position - transform.right * Const.Robot.HRL;
 }

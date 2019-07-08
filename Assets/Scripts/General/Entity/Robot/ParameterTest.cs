@@ -12,12 +12,13 @@ public class ParameterTest : MonoBehaviour
     public float ForwardDrag;
     public float SidewayDrag;
     public float AngularDrag;
+    public float ZeroAngularDrag;
     public float DoubleZeroDrag;
 
     public float LeftVelocity;
     public float RightVelocity;
 
-    Vector3 forward_force, forward_drag;
+    Vector3 forward_force, forward_drag, sideway_drag;
     Vector3 forward_left_drag, forward_right_drag;
     Vector3 torque, angular_drag;
 
@@ -27,16 +28,18 @@ public class ParameterTest : MonoBehaviour
     FileStream fs;
     StreamWriter writer;
 
+    private Vector3 prevLeftPosition, prevRightPosition;
+
     void Start()
     {
         Collider = GetComponent<Collider>();
         rb = GetComponent<Rigidbody>();
         rb.maxAngularVelocity = float.MaxValue;
 
-        fs = File.Open(@"D:\Data\newplatform\robot.csv", FileMode.OpenOrCreate);
+        fs = File.Open(@"D:\Data\newplatform.csv", FileMode.OpenOrCreate);
         fs.SetLength(0);
         writer = new StreamWriter(fs);
-        writer.WriteLine("v,av,x,y");
+        writer.WriteLine("x,y,r");
 
         OnPauseBtnClick();
 
@@ -45,6 +48,12 @@ public class ParameterTest : MonoBehaviour
 
         TorqueFactor = 1156.1817018313f;
         AngularDrag = 3769.775104018879f;
+
+        ZeroAngularDrag = 305500;
+        DoubleZeroDrag = 750;
+
+        prevLeftPosition = leftWheelPosition;
+        prevRightPosition = rightWheelPosition;
     }
 
     private int tick;
@@ -56,27 +65,108 @@ public class ParameterTest : MonoBehaviour
         if (tick % 2 == 0)
             return;
 
-        forward_force = -transform.forward * (LeftVelocity + RightVelocity) * ForwardFactor;
-
-//        forward_drag = rb.velocity * -Drag;
-        var sidewayV = Vector3.Project(rb.velocity, transform.right);
-        if (sidewayV != Vector3.zero)
-            rb.AddForce(forward_force + rb.velocity * -ForwardDrag + sidewayV / sidewayV.magnitude * -SidewayDrag);
+        playTime++;
+        if (playTime < 30)
+            LeftVelocity = RightVelocity = 125;
         else
-            rb.AddForce(forward_force + rb.velocity * -ForwardDrag);
+        {
+            LeftVelocity = 0;
+            RightVelocity = 0;
+        }
 
-//        rb.AddForce(forward_force + forward_drag);
+        if (playTime > 30 && rb.velocity == Vector3.zero)
+        {
+            Time.timeScale = 0;
+            Debug.LogError("Stop!!");
+        }
 
+        var leftVelocity = leftWheelPosition - prevLeftPosition;
+        var rightVelocity = rightWheelPosition - prevRightPosition;
+        prevLeftPosition = leftWheelPosition;
+        prevRightPosition = rightWheelPosition;
+
+        // 动力
+        forward_force = transform.forward * (LeftVelocity + RightVelocity) * ForwardFactor;
+        // 速度方向的空气阻力
+        forward_drag = rb.velocity * -ForwardDrag;
+        // 切向速度
+        var sidewayV = Vector3.Project(rb.velocity, transform.right);
+        // 切向阻力
+        sideway_drag = sidewayV == Vector3.zero ? Vector3.zero : sidewayV / sidewayV.magnitude * -SidewayDrag;
+        rb.AddForce(forward_force + forward_drag + sideway_drag);
+
+        if (LeftVelocity == 0 && RightVelocity == 0)
+        {
+            Debug.LogError("L0,R0");
+            var forwardV = Vector3.Project(rb.velocity, transform.forward);
+            if (forwardV != Vector3.zero)
+            {
+                forward_drag = rb.velocity * -DoubleZeroDrag;
+                rb.AddForce(forward_drag);
+//                forward_left_drag = forward_right_drag = forwardV / forwardV.magnitude * -DoubleZeroDrag;
+//                rb.AddForceAtPosition(forward_right_drag, rightWheelPosition);
+//                rb.AddForceAtPosition(forward_left_drag, leftWheelPosition);
+            }
+            else
+            {
+                forward_right_drag = forward_left_drag = Vector3.zero;
+            }
+        }
+        else if (LeftVelocity == 0)
+        {
+            Debug.LogError("L0,R-");
+            var dot = Vector3.Dot(rightVelocity, transform.forward);
+            if (dot > 0 && RightVelocity < 0)
+            {
+                rb.AddForceAtPosition(transform.forward * -ZeroAngularDrag, rightWheelPosition);
+            }
+            else if (dot < 0 && RightVelocity > 0)
+            {
+                rb.AddForceAtPosition(-transform.forward * -ZeroAngularDrag, rightWheelPosition);
+            }
+        }
+        else if (RightVelocity == 0)
+        {
+            Debug.LogError("R0,L-");
+            var dot = Vector3.Dot(leftVelocity, transform.forward);
+            if (dot > 0 && LeftVelocity < 0)
+            {
+                rb.AddForceAtPosition(transform.forward * -ZeroAngularDrag, leftWheelPosition);
+            }
+            else if (dot < 0 && RightVelocity > 0)
+            {
+                rb.AddForceAtPosition(-transform.forward * -ZeroAngularDrag, leftWheelPosition);
+            }
+        }
+
+        // 动力扭矩
         torque = Vector3.up * (LeftVelocity - RightVelocity) * TorqueFactor;
+        // 阻力扭矩
         angular_drag = rb.angularVelocity * -AngularDrag;
         rb.AddTorque(torque + angular_drag);
-
         OutputData();
+    }
+
+    private Vector3 rightWheelPosition => transform.position + transform.right * Const.Robot.HRL;
+    private Vector3 leftWheelPosition => transform.position - transform.right * Const.Robot.HRL;
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.L))
+        {
+            rb.AddForceAtPosition(rb.transform.forward * SidewayDrag, leftWheelPosition);
+        }
+
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            rb.AddForceAtPosition(rb.transform.forward * SidewayDrag, leftWheelPosition);
+        }
     }
 
     private void LateUpdate()
     {
-        Debug.DrawRay(transform.position, transform.right * -SidewayDrag);
+        Debug.DrawRay(rightWheelPosition, forward_right_drag);
+        Debug.DrawRay(leftWheelPosition, forward_left_drag);
     }
 
     float prevA = 0;
@@ -95,6 +185,7 @@ public class ParameterTest : MonoBehaviour
         var str = $"v {v}, av {av}";
         Debug.Log(str);
 
+        str = $"{rb.position.x},{rb.position.z},{rb.rotation.eulerAngles.y}";
         writer.WriteLine(str);
     }
 
@@ -131,6 +222,8 @@ public class ParameterTest : MonoBehaviour
         rb.transform.rotation = Quaternion.Euler(0, 0, 0);
         prevA = 0;
         prevZ = 0;
+        playTime = 0;
+        Time.timeScale = 0;
     }
 
     public void OnPauseBtnClick()
