@@ -88,7 +88,7 @@ namespace Simuro5v5.Util
                    && (Point1 - Point4).Cross(p - Point4) >= 0;
         }
     }
-    
+
     public class UprightRectangle : RectangleBase
     {
         private float LeftX { get; }
@@ -112,6 +112,14 @@ namespace Simuro5v5.Util
         public override bool ContainsPoint(Vector2D point)
         {
             return point.x < RightX && point.x > LeftX && point.y > BotY && point.y < TopY;
+        }
+
+        public bool ContainsCircle(Vector2D point, float radius)
+        {
+            return new UprightRectangle(LeftX + radius,
+                                        RightX - radius,
+                                        TopY - radius,
+                                        BotY - radius).ContainsPoint(point);
         }
     }
 

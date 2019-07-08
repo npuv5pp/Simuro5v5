@@ -507,26 +507,26 @@ public class Referee : ICloneable
 
         }
         //进球
-        if (yellowGoalState.ContainsPoint(matchInfo.Ball.pos))
+        if (yellowGoalState.ContainsCircle(matchInfo.Ball.pos, Const.Ball.HBL))
         {
             judgeResult = new JudgeResult
             {
                 Actor = Side.Yellow,
                 Reason = "Be scored and PlaceKick again",
-                ResultType = ResultType.PlaceKick
+                ResultType = ResultType.PlaceKick,
+                WhoGoal = Side.Blue
             };
-            judgeResult.WhoGoal = Side.Blue;
             return true;
         }
-        if (blueGoalState.ContainsPoint(matchInfo.Ball.pos))
+        if (blueGoalState.ContainsCircle(matchInfo.Ball.pos, Const.Ball.HBL))
         {
             judgeResult = new JudgeResult
             {
                 Actor = Side.Blue,
                 Reason = "Be scored and PlaceKick again",
-                ResultType = ResultType.PlaceKick
+                ResultType = ResultType.PlaceKick,
+                WhoGoal = Side.Yellow
             };
-            judgeResult.WhoGoal = Side.Yellow;
             return true;
         }
         return false;
