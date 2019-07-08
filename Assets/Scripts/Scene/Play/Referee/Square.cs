@@ -60,8 +60,8 @@ namespace Simuro5v5.Util
             var da = -ad;
             var db = -bd;
 
-            return (ac * ad) * (bc * bd) <= 0 &&
-                   (ca * cb) * (da * db) <= 0;
+            return (ac.Cross(ad)) * (bc.Cross(bd)) <= 0 &&
+                   (ca.Cross(cb)) * (da.Cross(db)) <= 0;    
         }
 
         public bool IsCrossedBy(RectangleBase rect)
@@ -205,6 +205,16 @@ namespace Simuro5v5.Util
                 Vector2D.Distance(area.Point1, area.Point3),
                 Vector2D.Distance(area.Point1, area.Point4));
             return area.ContainsPoint(Midpoint) && !IsCrossedBy(area) && width < outer;
+        }
+
+        /// <summary>
+        /// 测试是否与矩形交叉或者在矩形内
+        /// </summary>
+        /// <param name="area"></param>
+        /// <returns></returns>
+        public bool IsOverlapWithRectangle(UprightRectangle area)
+        {
+            return IsCrossedBy(area) || IsInRectangle(area);
         }
     }
 

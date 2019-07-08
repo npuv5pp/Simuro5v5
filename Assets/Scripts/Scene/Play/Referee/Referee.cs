@@ -1048,8 +1048,8 @@ public class Referee : ICloneable
             {
                 //两种不规范情况
                 //1.位置在防守方半场内 2. 未在球场内
-                if (DefenderPosSquare[i].square.IsInRectangle(defenderHalfState)
-                    || !DefenderPosSquare[i].square.IsInRectangle(stadiumState))
+                if (DefenderPosSquare[i].square.IsOverlapWithRectangle(defenderHalfState)
+                    || !DefenderPosSquare[i].square.IsOverlapWithRectangle(stadiumState))
                 {
                     ChangeRobotSafePos(ref DefenderPosSquare[i], SafePosSquare);
                     JudgeSafePosSquare(SafePosSquare, OffensivePosSquare, DefenderPosSquare);
@@ -1072,7 +1072,7 @@ public class Referee : ICloneable
         for (int i = 0; i < Const.RobotsPerTeam; i++)
         {
             //只允许有一个进攻球员在防守半场中
-            if (OffensivePosSquare[i].square.IsInRectangle(defenderHalfState) && attackRobotID == -1)
+            if (OffensivePosSquare[i].square.IsOverlapWithRectangle(defenderHalfState) && attackRobotID == -1)
             {
                 attackRobotID = i;
                 break;
@@ -1100,8 +1100,8 @@ public class Referee : ICloneable
             }
             // 三种不规范情况:
             //1.在防守方半场 2.未在球场内 3.与之前摆完位的球员发生了重叠
-            if (OffensivePosSquare[i].square.IsInRectangle(defenderHalfState)
-                || !OffensivePosSquare[i].square.IsInRectangle(stadiumState)
+            if (OffensivePosSquare[i].square.IsOverlapWithRectangle(defenderHalfState)
+                || !OffensivePosSquare[i].square.IsOverlapWithRectangle(stadiumState)
                 || RobotCrossByRobots(OffensivePosSquare[i], DefenderPosSquare))
             {
                 ChangeRobotSafePos(ref OffensivePosSquare[i], SafePosSquare);
@@ -1252,8 +1252,8 @@ public class Referee : ICloneable
             //两种不规范情况：
             //1.不能再进入开球圆区域 2. 不能进入防守方半场 3.未在球场内
             if (PlaceOffensivePosSquare[i].square.OverlapWithCircle(new Vector2D(0, 0), 25)
-                || PlaceOffensivePosSquare[i].square.IsInRectangle(defenderHalfState)
-                || !PlaceOffensivePosSquare[i].square.IsInRectangle(stadiumState))
+                || PlaceOffensivePosSquare[i].square.IsOverlapWithRectangle(defenderHalfState)
+                || !PlaceOffensivePosSquare[i].square.IsOverlapWithRectangle(stadiumState))
             {
                 ChangeRobotSafePos(ref PlaceOffensivePosSquare[i], PlaceOffensiveSafePosSquare);
                 JudgeSafePosSquare(PlaceDefenderSafePosSquare, PlaceOffensivePosSquare, PlaceDefenderPosSquare);
@@ -1277,8 +1277,8 @@ public class Referee : ICloneable
             //三种不规范情况
             //1.进入开球圆区域内 2.不能进入进攻方半场 3.未在球场内
             if (PlaceDefenderPosSquare[i].square.OverlapWithCircle(new Vector2D(0, 0), 25)
-                || PlaceDefenderPosSquare[i].square.IsInRectangle(offensiveHalfState)
-                || !PlaceDefenderPosSquare[i].square.IsInRectangle(stadiumState))
+                || PlaceDefenderPosSquare[i].square.IsOverlapWithRectangle(offensiveHalfState)
+                || !PlaceDefenderPosSquare[i].square.IsOverlapWithRectangle(stadiumState))
             {
                 ChangeRobotSafePos(ref PlaceDefenderPosSquare[i], PlaceDefenderSafePosSquare);
                 JudgeSafePosSquare(PlaceDefenderSafePosSquare, PlaceOffensivePosSquare, PlaceDefenderPosSquare);
@@ -1431,7 +1431,7 @@ public class Referee : ICloneable
             //两种情况不规范
             //需要注意的是：进攻方可以到达对方半场，不受限制
             //1.未在球场内 2.与自身重叠
-            if (!GoalieOffensivePosSquare[i].square.IsInRectangle(stadiumState)
+            if (!GoalieOffensivePosSquare[i].square.IsOverlapWithRectangle(stadiumState)
                 || RobotCrossByRobots(GoalieOffensivePosSquare[i], GoalieOffensivePosSquare, true, i))
             {
                 ChangeRobotSafePos(ref GoalieOffensivePosSquare[i], GoalieOffensiveSafePosSquare);
@@ -1445,8 +1445,8 @@ public class Referee : ICloneable
         {
             //三种情况不规范
             //1.到对方半场，2.未在球场内 3.与自身重叠 4.与敌方重叠
-            if (GoalieDefenderPosSquare[i].square.IsInRectangle(offensiveHalfState)
-                || !GoalieDefenderPosSquare[i].square.IsInRectangle(stadiumState)
+            if (GoalieDefenderPosSquare[i].square.IsOverlapWithRectangle(offensiveHalfState)
+                || !GoalieDefenderPosSquare[i].square.IsOverlapWithRectangle(stadiumState)
                 || RobotCrossByRobots(GoalieDefenderPosSquare[i], GoalieDefenderPosSquare, true, i)
                 || RobotCrossByRobots(GoalieDefenderPosSquare[i], GoalieOffensivePosSquare))
             {
@@ -1664,8 +1664,8 @@ public class Referee : ICloneable
             if (i == OffensiveFreeId) continue;
             //三种不规范情况
             //1.除了进攻球员在争球区域内 2. 未在球场内 3. 与自身队伍球员重叠
-            if (FreeOffensivePosSquare[i].square.IsInRectangle(FreeState)
-                || !FreeOffensivePosSquare[i].square.IsInRectangle(stadiumState)
+            if (FreeOffensivePosSquare[i].square.IsOverlapWithRectangle(FreeState)
+                || !FreeOffensivePosSquare[i].square.IsOverlapWithRectangle(stadiumState)
                 || RobotCrossByRobots(FreeOffensivePosSquare[i], FreeOffensivePosSquare, true, i))
             {
                 ChangeRobotSafePos(ref FreeOffensivePosSquare[i], FreeSafePosSquare);
@@ -1691,8 +1691,8 @@ public class Referee : ICloneable
             if (i == DefenderFreeId) continue;
             //三种不规范情况
             //1.除了进攻球员在争球区域内 2. 未在球场内 3. 与自身队伍球员重叠 4.与敌方球员重叠
-            if (FreeDefenderPosSquare[i].square.IsInRectangle(FreeState)
-                || !FreeDefenderPosSquare[i].square.IsInRectangle(stadiumState)
+            if (FreeDefenderPosSquare[i].square.IsOverlapWithRectangle(FreeState)
+                || !FreeDefenderPosSquare[i].square.IsOverlapWithRectangle(stadiumState)
                 || RobotCrossByRobots(FreeDefenderPosSquare[i], FreeDefenderPosSquare, true, i)
                 || RobotCrossByRobots(FreeDefenderPosSquare[i], FreeOffensivePosSquare))
             {
