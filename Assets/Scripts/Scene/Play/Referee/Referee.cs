@@ -742,7 +742,7 @@ public class Referee : ICloneable
 
     private bool JudgeFree(ref JudgeResult judgeResult)
     {
-        if (matchInfo.Ball.linearVelocity.GetUnityVector2().magnitude < 3)
+        if (matchInfo.Ball.linearVelocity.GetUnityVector2().magnitude < 50)
         {
             standoffTime++;
             if (standoffTime > maxStandoffTime)
