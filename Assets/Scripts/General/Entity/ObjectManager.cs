@@ -289,7 +289,7 @@ namespace Simuro5v5
         /// </summary>
         public void Resume()
         {
-            Time.timeScale = Const.TimeScale;
+            Time.timeScale = Const.DefaultTimeScale;
         }
 
         /// <summary>

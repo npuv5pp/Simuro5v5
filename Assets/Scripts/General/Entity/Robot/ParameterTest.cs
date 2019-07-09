@@ -103,9 +103,6 @@ public class ParameterTest : MonoBehaviour
             {
                 forward_drag = rb.velocity * -DoubleZeroDrag;
                 rb.AddForce(forward_drag);
-//                forward_left_drag = forward_right_drag = forwardV / forwardV.magnitude * -DoubleZeroDrag;
-//                rb.AddForceAtPosition(forward_right_drag, rightWheelPosition);
-//                rb.AddForceAtPosition(forward_left_drag, leftWheelPosition);
             }
             else
             {
@@ -231,6 +228,6 @@ public class ParameterTest : MonoBehaviour
         if (Time.timeScale != 0)
             Time.timeScale = 0;
         else
-            Time.timeScale = 1;
+            Time.timeScale = Const.DefaultTimeScale;
     }
 }

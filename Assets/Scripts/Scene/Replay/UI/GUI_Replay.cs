@@ -43,7 +43,7 @@ public class GUI_Replay : MonoBehaviour
 
     private int SliderPosition
     {
-        get => (int)Slider.value;
+        get => (int) Slider.value;
         set => Slider.value = value;
     }
 
@@ -93,10 +93,12 @@ public class GUI_Replay : MonoBehaviour
         {
             OnPauseClicked();
         }
+
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             OnBackToGameClicked();
         }
+
         if (Input.GetKeyDown(KeyCode.UpArrow))
         {
             SpeedDropdown.value -= 1;
@@ -134,6 +136,7 @@ public class GUI_Replay : MonoBehaviour
         {
             OnPreviousClicked();
         }
+
         if (Input.GetKey(KeyCode.RightArrow))
         {
             OnNextClicked();
@@ -156,25 +159,28 @@ public class GUI_Replay : MonoBehaviour
         switch (mp)
         {
             case MatchPhase.FirstHalf:
-                {
-                    PhaseText.text = "First Half";
-                    break;
-                }
+            {
+                PhaseText.text = "First Half";
+                break;
+            }
+
             case MatchPhase.SecondHalf:
-                {
-                    PhaseText.text = "Second Half";
-                    break;
-                }
+            {
+                PhaseText.text = "Second Half";
+                break;
+            }
+
             case MatchPhase.OverTime:
-                {
-                    PhaseText.text = "Over Time";
-                    break;
-                }
+            {
+                PhaseText.text = "Over Time";
+                break;
+            }
+
             case MatchPhase.Penalty:
-                {
-                    PhaseText.text = "Penalty Shootout";
-                    break;
-                }
+            {
+                PhaseText.text = "Penalty Shootout";
+                break;
+            }
         }
     }
 
@@ -243,7 +249,7 @@ public class GUI_Replay : MonoBehaviour
     public void OnSliderScrolled(BaseEventData _data)
     {
         var data = _data as PointerEventData;
-        SliderPosition += (int)data.scrollDelta.y;
+        SliderPosition += (int) data.scrollDelta.y;
     }
 
     /// <summary>
@@ -280,19 +286,18 @@ public class GUI_Replay : MonoBehaviour
         switch (SpeedDropdown.value)
         {
             case 0:
-                Time.timeScale = 1;
+                Time.timeScale = Const.DefaultTimeScale;
                 break;
             case 1:
-                Time.timeScale = 0.5f;
+                Time.timeScale = Const.DefaultTimeScale / 2;
                 break;
             case 2:
-                Time.timeScale = 0.2f;
+                Time.timeScale = Const.DefaultTimeScale / 5;
                 break;
             case 3:
-                Time.timeScale = 0.1f;
+                Time.timeScale = Const.DefaultTimeScale / 10;
                 break;
         }
-
     }
 
     /// <summary>
@@ -301,8 +306,8 @@ public class GUI_Replay : MonoBehaviour
     /// <param name="data"></param>
     public void OnSpeedScrolled(BaseEventData data)
     {
-        var pointerEventData = (PointerEventData)data;
-        SpeedDropdown.value -= (int)pointerEventData.scrollDelta.y;
+        var pointerEventData = (PointerEventData) data;
+        SpeedDropdown.value -= (int) pointerEventData.scrollDelta.y;
     }
 
     public void ExportDataRecord()
@@ -312,7 +317,7 @@ public class GUI_Replay : MonoBehaviour
             "",
             $"match-{DateTime.Now:yyyy-MM-dd_hhmmss}.json",
             "json");
-        
+
         // if save file panel cancelled
         if (string.IsNullOrEmpty(path))
         {

@@ -16,7 +16,7 @@ namespace Simuro5v5
         public readonly static float FixedDeltaTime = 1.0f / FramePerSecond / 2;
 
         // 默认时间流速
-        public readonly static float TimeScale = 1.0f;
+        public readonly static float DefaultTimeScale = 1f;
         public readonly static float inch2cm = 2.54f;
         public readonly static float cm2inch = 1.0f / 2.54f;
 
@@ -48,7 +48,7 @@ namespace Simuro5v5
             public const float HRL = 3.9335329f; // 机器人半边长       // 有舍入误差
             public readonly static float maxVelocity = 125.0f; // 机器人最大线速度
 
-            public readonly static float maxAngularVelocity = float.MaxValue; // 机器人最大角速度，角度制
+            public readonly static float maxAngularVelocity = 360; // 机器人最大角速度，角度制
 
             //public readonly static float maxAngularVelocity = 4024.07121363f; // 机器人最大角速度，角度制
             public readonly static float kv = 66.0f; // 使加速度为1时需要乘的系数
@@ -67,7 +67,7 @@ namespace Simuro5v5
 
         public static class Ball
         {
-            public readonly static float mass = 2;
+            public readonly static float mass = 10 / 13.7f;
 
             public readonly static float BL = 5.043424f; // 球的直径
             public const float HBL = 2.521712f; // 球的半径
