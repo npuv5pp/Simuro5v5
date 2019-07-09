@@ -66,11 +66,6 @@ public class ControlRobot : MonoBehaviour
         if (tick % 2 == 0)
             return;
 
-        if (gameObject.name == "Blue0")
-        {
-            Debug.Log($"{LeftVelocity}, {RightVelocity}");
-        }
-
         // 动力
         forward_force = -transform.up * (LeftVelocity + RightVelocity) * ForwardFactor;
         // 速度方向的空气阻力
