@@ -92,32 +92,24 @@ public class ControlRobot : MonoBehaviour
         }
         else if (LeftVelocity == 0)
         {
-            var dot = Vector3.Dot(rightVelocity, forwardDir);
-            MyDebugWarning($"{dot} {rightVelocity} {forwardDir}");
-            if (dot > 0 && RightVelocity < 0)
+            var dot = Vector3.Dot(leftVelocity, forwardDir);
+            if (RightVelocity < 0)
             {
-                Debug.LogError(gameObject.name + " L0,R-");
-                rb.AddForceAtPosition(forwardDir * -ZeroAngularDrag, rightWheelPosition);
-            }
-            else if (dot < 0 && RightVelocity > 0)
-            {
-                Debug.LogError(gameObject.name + " L0,R-");
-                rb.AddForceAtPosition(-forwardDir * -ZeroAngularDrag, rightWheelPosition);
+                if (dot > 0)
+                    rb.AddForceAtPosition(forwardDir * -ZeroAngularDrag, leftWheelPosition);
+                else if (dot < 0)
+                    rb.AddForceAtPosition(-forwardDir * -ZeroAngularDrag, leftWheelPosition);
             }
         }
         else if (RightVelocity == 0)
         {
-            var dot = Vector3.Dot(leftVelocity, forwardDir);
-            MyDebugWarning($"{dot} {leftVelocity} {forwardDir}");
-            if (dot > 0 && LeftVelocity < 0)
+            var dot = Vector3.Dot(rightVelocity, forwardDir);
+            if (LeftVelocity < 0)
             {
-                Debug.LogError(gameObject.name + " R0,L-");
-                rb.AddForceAtPosition(forwardDir * -ZeroAngularDrag, leftWheelPosition);
-            }
-            else if (dot < 0 && LeftVelocity > 0)
-            {
-                Debug.LogError(gameObject.name + " R0,L-");
-                rb.AddForceAtPosition(-forwardDir * -ZeroAngularDrag, leftWheelPosition);
+                if (dot > 0)
+                    rb.AddForceAtPosition(forwardDir * -ZeroAngularDrag, rightWheelPosition);
+                else if (dot < 0)
+                    rb.AddForceAtPosition(-forwardDir * -ZeroAngularDrag, rightWheelPosition);
             }
         }
 
@@ -242,31 +234,31 @@ public class ControlRobot : MonoBehaviour
 
     void MyDebug(string str)
     {
-        #if DEBUG
+#if DEBUG
         if (Debugging)
         {
             Debug.Log($"[{gameObject.name}] {str}");
         }
-        #endif
+#endif
     }
 
     void MyDebugWarning(string str)
     {
-        #if DEBUG
+#if DEBUG
         if (Debugging)
         {
             Debug.LogWarning($"[{gameObject.name}] {str}");
         }
-        #endif
+#endif
     }
 
     void MyDebugError(string str)
     {
-        #if DEBUG
+#if DEBUG
         if (Debugging)
         {
             Debug.LogError($"[{gameObject.name}] {str}");
         }
-        #endif
+#endif
     }
 }
