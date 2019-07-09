@@ -5,9 +5,6 @@ using Simuro5v5;
 using UnityEngine;
 using NUnit.Framework;
 using Simuro5v5.Util;
-using UnityEngine.SceneManagement;
-using UnityEngine.TestTools;
-using System.Collections;
 using System.IO;
 using Random = System.Random;
 
@@ -630,7 +627,6 @@ public class Referee : ICloneable
             {
                 if (goalieBlueId != -1 && JudgeCollision(BlueObject[goalieBlueId], YellowObject[i]))
                 {
-                    Debug.LogError($"Goalie: {goalieBlueId}, Collision: {i}");
                     judgeResult = new JudgeResult
                     {
                         ResultType = ResultType.GoalKick,
@@ -677,7 +673,6 @@ public class Referee : ICloneable
             {
                 if (goalieYellowId != -1 && JudgeCollision(YellowObject[goalieYellowId], BlueObject[i]))
                 {
-                    Debug.LogError($"Goalie: {goalieYellowId}, Collision: {i}");
                     judgeResult = new JudgeResult
                     {
                         ResultType = ResultType.GoalKick,
@@ -889,12 +884,12 @@ public class Referee : ICloneable
         List<GameObject> touchObject = object1.GetComponent<BoxColliderEvent>().TouchObject;
         if (touchObject.IndexOf(object2) == -1)
         {
-            touchObject.Clear();
+            //touchObject.Clear();
             return false;
         }
         else
         {
-            touchObject.Clear();
+            //touchObject.Clear();
             return true;
         }
     }
