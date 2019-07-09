@@ -98,6 +98,8 @@ namespace Simuro5v5
             {
                 Ball = Ball,
                 TickMatch = TickMatch,
+                TickPhase = TickPhase,
+                MatchPhase = MatchPhase,
                 Score = Score,
                 Referee = (Referee)Referee.Clone(),
                 BlueRobots = (Robot[])BlueRobots.Clone(),

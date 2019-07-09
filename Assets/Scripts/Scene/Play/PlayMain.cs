@@ -133,7 +133,7 @@ public class PlayMain : MonoBehaviour
     /// </summary>
     public void InMatchLoop()
     {
-        if (manualPlacing) throw new InvalidOperationException("manual placing");
+        if (ManualPlacing) throw new InvalidOperationException("manual placing");
         if (!LoadSucceed || !Started || Paused) return;
 
         // 触发事件，作为上一拍的结束
@@ -256,12 +256,9 @@ public class PlayMain : MonoBehaviour
     /// 手动摆位已启用且正在处于手动摆位状态时为真；仅当手动摆位已经启动时可以设置。
     /// </summary>
     /// <value></value>
-    public bool manualPlacing
+    public bool ManualPlacing
     {
-        get
-        {
-            return manualPlaceEnabled && _manualPlacing;
-        }
+        get => manualPlaceEnabled && _manualPlacing;
         private set
         {
             if (!manualPlaceEnabled) throw new InvalidOperationException("manual place disabled");
@@ -277,7 +274,7 @@ public class PlayMain : MonoBehaviour
     {
         if (!manualPlaceEnabled) throw new InvalidOperationException("manual place disabled");
         PauseMatchClearly();
-        manualPlacing = true;
+        ManualPlacing = true;
 
         ObjectManager.SetToDefault();
         ObjectManager.SetStill();
@@ -300,7 +297,7 @@ public class PlayMain : MonoBehaviour
         ObjectManager.SetStill();
 
         Event.Send(Event.EventType1.AutoPlacement, GlobalMatchInfo);
-        manualPlacing = false;
+        ManualPlacing = false;
         ResumeMatchClearly();
     }
 
@@ -388,7 +385,7 @@ public class PlayMain : MonoBehaviour
     /// </summary>
     public void ResumeMatch()
     {
-        if (manualPlacing) throw new InvalidOperationException("manual placing");
+        if (ManualPlacing) throw new InvalidOperationException("manual placing");
 
         if (!timedPausing)
         {

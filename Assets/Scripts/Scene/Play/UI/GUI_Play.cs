@@ -152,7 +152,7 @@ public class GUI_Play : MonoBehaviour
             {
                 if (playMain.Started)
                 {
-                    if (playMain.Paused && !playMain.manualPlacing)
+                    if (playMain.Paused && !playMain.ManualPlacing)
                     {
                         playMain.ResumeMatch();
                     }
@@ -173,8 +173,8 @@ public class GUI_Play : MonoBehaviour
         UpdateAnim();
 
         // 在手动摆位时不允许切换手动/自动摆位
-        toggleManualPlacing.interactable = !playMain.manualPlacing;
-        mouseDrag.dragEnabled = !MenuOpen && playMain.manualPlacing;
+        toggleManualPlacing.interactable = !playMain.ManualPlacing;
+        mouseDrag.dragEnabled = !MenuOpen && playMain.ManualPlacing;
     }
 
     void UpdateAnim()
@@ -458,7 +458,7 @@ public class GUI_Play : MonoBehaviour
         if (playMain.Started)
         {
             PopMenu();
-            if (playMain.manualPlaceEnabled && playMain.manualPlacing)
+            if (playMain.manualPlaceEnabled && playMain.ManualPlacing)
             {
                 playMain.EndManualPlace();
             }
@@ -485,7 +485,7 @@ public class GUI_Play : MonoBehaviour
     /// </summary>
     public void EndPlaceClicked()
     {
-        if (playMain.manualPlaceEnabled && playMain.manualPlacing)
+        if (playMain.manualPlaceEnabled && playMain.ManualPlacing)
         {
             playMain.EndManualPlace();
         }
