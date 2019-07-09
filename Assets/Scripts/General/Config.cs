@@ -14,7 +14,9 @@ namespace Simuro5v5.Config
     /// 每个配置组均为静态类，类中每个包含get、set属性访问器的静态public成员均作为
     /// </para>
     /// </summary>
-    class ConfigGroupAttribute : Attribute { }
+    class ConfigGroupAttribute : Attribute
+    {
+    }
 
     [ConfigGroup]
     public static class StrategyConfig
@@ -38,12 +40,42 @@ namespace Simuro5v5.Config
     {
     }
 
+    [ConfigGroup]
+    public static class ParameterConfig
+    {
+        // linear
+        public static float ForwardForceFactor { get; set; }
+        public static float DragFactor { get; set; }
+        public static float DoubleZeroDragFactor { get; set; }
+        public static float SidewayDragFactor { get; set; }
+
+        // angular
+        public static float TorqueFactor { get; set; }
+        public static float AngularDragFactor { get; set; }
+        public static float ZeroAngularDragFactor { get; set; }
+
+        static ParameterConfig()
+        {
+            // linear
+            ForwardForceFactor = 102.89712678726376f;
+            DragFactor = 79.81736047779975f;
+            DoubleZeroDragFactor = 760;
+            SidewayDragFactor = 30000;
+
+            // angular
+            TorqueFactor = 1156.1817018313f;
+            AngularDragFactor = 3769.775104018879f;
+            ZeroAngularDragFactor = 305500;
+        }
+    }
+
     public static class ConfigManager
     {
         private static readonly List<Type> PlatformConfig = new List<Type>
         {
             typeof(GeneralConfig),
             typeof(StrategyConfig),
+            typeof(ParameterConfig),
         };
 
         private static readonly string DefaultConfigJson = ToJson();
@@ -62,6 +94,7 @@ namespace Simuro5v5.Config
                     ResetToDefault();
                 }
             }
+
             // 无论如何重新写回文件，可以修正文件中缺失的键
             ToFile(configPath);
         }
@@ -95,6 +128,7 @@ namespace Simuro5v5.Config
             {
                 configDict[configType.Name] = TypeToDict(configType);
             }
+
             return JsonConvert.SerializeObject(configDict, Formatting.Indented);
         }
 
@@ -106,8 +140,7 @@ namespace Simuro5v5.Config
 
         public static void FromJson(string json)
         {
-            Dictionary<string, object> dict = JsonConvert.
-                DeserializeObject<Dictionary<string, object>>(json);
+            Dictionary<string, object> dict = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
 
             foreach (var configType in PlatformConfig)
             {
@@ -128,7 +161,7 @@ namespace Simuro5v5.Config
                 if (!dict.ContainsKey(p.Name)) continue;
                 if (HasConfigAttribute(obj))
                 {
-                    var d = ((Newtonsoft.Json.Linq.JObject)dict[p.Name]).ToObject<Dictionary<string, object>>();
+                    var d = ((Newtonsoft.Json.Linq.JObject) dict[p.Name]).ToObject<Dictionary<string, object>>();
                     DictToType(d, objType);
                 }
                 else
@@ -140,10 +173,12 @@ namespace Simuro5v5.Config
                         {
                             val = Convert.ToInt32(val);
                         }
+
                         p.SetValue(null, val, null);
                     }
                     catch
-                    { }
+                    {
+                    }
                 }
             }
         }
@@ -169,6 +204,7 @@ namespace Simuro5v5.Config
                     }
                 }
             }
+
             return dict;
         }
 
@@ -182,6 +218,7 @@ namespace Simuro5v5.Config
                     return true;
                 }
             }
+
             return false;
         }
     }

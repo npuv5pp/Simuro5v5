@@ -66,8 +66,12 @@ public class ControlRobot : MonoBehaviour
         if (tick % 2 == 0)
             return;
 
+        var forwardDir = -transform.up;
+
+        MyDebugWarning($"{LeftVelocity}, {RightVelocity}");
+
         // 动力
-        forward_force = -transform.up * (LeftVelocity + RightVelocity) * ForwardFactor;
+        forward_force = forwardDir * (LeftVelocity + RightVelocity) * ForwardFactor;
         // 速度方向的空气阻力
         forward_drag = rb.velocity * -ForwardDrag;
         // 切向速度
@@ -88,26 +92,32 @@ public class ControlRobot : MonoBehaviour
         }
         else if (LeftVelocity == 0)
         {
-            var dot = Vector3.Dot(leftVelocity, transform.up);
+            var dot = Vector3.Dot(rightVelocity, forwardDir);
+            MyDebugWarning($"{dot} {rightVelocity} {forwardDir}");
             if (dot > 0 && RightVelocity < 0)
             {
-                rb.AddForceAtPosition(transform.up * -ZeroAngularDrag, rightWheelPosition);
+                Debug.LogError(gameObject.name + " L0,R-");
+                rb.AddForceAtPosition(forwardDir * -ZeroAngularDrag, rightWheelPosition);
             }
             else if (dot < 0 && RightVelocity > 0)
             {
-                rb.AddForceAtPosition(-transform.up * -ZeroAngularDrag, rightWheelPosition);
+                Debug.LogError(gameObject.name + " L0,R-");
+                rb.AddForceAtPosition(-forwardDir * -ZeroAngularDrag, rightWheelPosition);
             }
         }
         else if (RightVelocity == 0)
         {
-            var dot = Vector3.Dot(rightVelocity, transform.up);
-            if (dot > 0 && RightVelocity < 0)
+            var dot = Vector3.Dot(leftVelocity, forwardDir);
+            MyDebugWarning($"{dot} {leftVelocity} {forwardDir}");
+            if (dot > 0 && LeftVelocity < 0)
             {
-                rb.AddForceAtPosition(transform.up * -ZeroAngularDrag, leftWheelPosition);
+                Debug.LogError(gameObject.name + " R0,L-");
+                rb.AddForceAtPosition(forwardDir * -ZeroAngularDrag, leftWheelPosition);
             }
-            else if (dot < 0 && RightVelocity > 0)
+            else if (dot < 0 && LeftVelocity > 0)
             {
-                rb.AddForceAtPosition(-transform.up * -ZeroAngularDrag, leftWheelPosition);
+                Debug.LogError(gameObject.name + " R0,L-");
+                rb.AddForceAtPosition(-forwardDir * -ZeroAngularDrag, leftWheelPosition);
             }
         }
 
@@ -229,4 +239,34 @@ public class ControlRobot : MonoBehaviour
 
     private Vector3 rightWheelPosition => transform.position + transform.right * Const.Robot.HRL;
     private Vector3 leftWheelPosition => transform.position - transform.right * Const.Robot.HRL;
+
+    void MyDebug(string str)
+    {
+        #if DEBUG
+        if (Debugging)
+        {
+            Debug.Log($"[{gameObject.name}] {str}");
+        }
+        #endif
+    }
+
+    void MyDebugWarning(string str)
+    {
+        #if DEBUG
+        if (Debugging)
+        {
+            Debug.LogWarning($"[{gameObject.name}] {str}");
+        }
+        #endif
+    }
+
+    void MyDebugError(string str)
+    {
+        #if DEBUG
+        if (Debugging)
+        {
+            Debug.LogError($"[{gameObject.name}] {str}");
+        }
+        #endif
+    }
 }

@@ -130,7 +130,7 @@ public class ParameterTest : MonoBehaviour
             {
                 rb.AddForceAtPosition(transform.forward * -ZeroAngularDrag, leftWheelPosition);
             }
-            else if (dot < 0 && RightVelocity > 0)
+            else if (dot < 0 && LeftVelocity > 0)
             {
                 rb.AddForceAtPosition(-transform.forward * -ZeroAngularDrag, leftWheelPosition);
             }
