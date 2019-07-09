@@ -625,7 +625,8 @@ public class Referee : ICloneable
             int bigStateNum = 0;
             for (int i = 0; i <= 4; i++)
             {
-                if (goalieBlueId != -1 && JudgeCollision(BlueObject[goalieBlueId], YellowObject[i]))
+                if (goalieBlueId != -1 &&
+                    JudgeCollision2(matchInfo.BlueRobots[goalieBlueId], matchInfo.YellowRobots[i]))
                 {
                     judgeResult = new JudgeResult
                     {
@@ -671,7 +672,8 @@ public class Referee : ICloneable
             int bigStateNum = 0;
             for (int i = 0; i <= 4; i++)
             {
-                if (goalieYellowId != -1 && JudgeCollision(YellowObject[goalieYellowId], BlueObject[i]))
+                if (goalieYellowId != -1 &&
+                    JudgeCollision2(matchInfo.YellowRobots[goalieYellowId], matchInfo.BlueRobots[i]))
                 {
                     judgeResult = new JudgeResult
                     {
@@ -879,6 +881,7 @@ public class Referee : ICloneable
     /// <param name="object1"></param>
     /// <param name="object2"></param>
     /// <returns></returns>
+    [Obsolete("Use JudgeCollision2")]
     private bool JudgeCollision(GameObject object1, GameObject object2)
     {
         List<GameObject> touchObject = object1.GetComponent<BoxColliderEvent>().TouchObject;
@@ -892,6 +895,16 @@ public class Referee : ICloneable
             //touchObject.Clear();
             return true;
         }
+    }
+
+    /// <summary>
+    /// whether robot1 collide robot2
+    /// </summary>
+    private bool JudgeCollision2(Robot robot1, Robot robot2)
+    {
+        var square1 = new Square(robot1.pos, robot1.rotation);
+        var square2 = new Square(robot2.pos, robot2.rotation);
+        return square1.IsCrossedBy(square2);
     }
 
     public struct RobotPosSquare
