@@ -363,7 +363,7 @@ namespace Simuro5v5
 
         public static Vector2D FromUnityVector3(Vector3 vector3)
         {
-            return new Vector2D(vector3.x, vector3.y);
+            return new Vector2D(vector3.x, vector3.z);
         }
 
         public Vector3 GetUnityVector3()
