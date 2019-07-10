@@ -36,7 +36,7 @@ using Event = Simuro5v5.EventSystem.Event;
 /// 事件的触发：
 /// 场地进行有效更新（摆位或物理引擎带轮速运行一拍）时，触发MatchInfoUpdate事件；摆位后会触发AutoPlacement事件。
 /// 对事件的处理以“使得外部可以以其记录整个比赛进程”为准<br/>
-/// </mmary>
+/// </summary>
 public class PlayMain : MonoBehaviour
 {
     /// <summary>
@@ -59,6 +59,9 @@ public class PlayMain : MonoBehaviour
 
     public Action OnNextPhase;
     public Action OnMatchStart;
+
+    // 记录上一拍的类型
+    private ResultType lastResultType = ResultType.NormalMatch;
 
     /// <summary>
     /// 进入场景之后。如果已经有实例在运行，立即销毁所绑定的Entity；否则激活已存在的单例
@@ -151,97 +154,115 @@ public class PlayMain : MonoBehaviour
         GlobalMatchInfo.TickMatch++;
         GlobalMatchInfo.TickPhase++;
 
-        // 执行动作，更新输入
-        if (judgeResult.ResultType == ResultType.GameOver)
+        switch (judgeResult.ResultType)
         {
-            // 整场比赛结束
-            Debug.Log("Game Over");
+            // 执行动作，更新输入
+            case ResultType.GameOver:
+                // 整场比赛结束
+                Debug.Log("Game Over");
 
-            // 判断是否进球
-            switch (judgeResult.WhoGoal)
-            {
-                case Side.Blue:
-                    GlobalMatchInfo.Score.BlueScore++;
-                    break;
-                case Side.Yellow:
-                    GlobalMatchInfo.Score.YellowScore++;
-                    break;
-            }
-
-            StopMatch();
-        }
-        else if (judgeResult.ResultType == ResultType.NextPhase)
-        {
-            // 阶段结束
-            // 这之后的物理引擎运行的一拍无意义，不用触发事件
-            Debug.Log("next phase");
-            if (GlobalMatchInfo.MatchPhase == MatchPhase.FirstHalf)
-            {
-                Debug.Log("switch role");
-                SwitchRole();
-            }
-            GlobalMatchInfo.MatchPhase = GlobalMatchInfo.MatchPhase.NextPhase();
-            GlobalMatchInfo.TickPhase = 0;      // 时间指定为0，使得下一拍的裁判得知新阶段的开始
-            OnNextPhase();
-        }
-        else if (judgeResult.ResultType == ResultType.NormalMatch)
-        {
-            // 正常比赛，输入轮速
-            UpdateWheelsToScene();
-        }
-        else
-        {
-            // 摆位，输入摆位信息
-
-            // 判断是否进球
-            switch(judgeResult.WhoGoal)
-            {
-                case Side.Blue:
-                    GlobalMatchInfo.Score.BlueScore++;
-                    break;
-                case Side.Yellow:
-                    GlobalMatchInfo.Score.YellowScore++;
-                    break;
-            }
-
-            StrategyManager.Blue.OnJudgeResult(judgeResult);
-            StrategyManager.Yellow.OnJudgeResult(new JudgeResult
-            {
-                Actor = judgeResult.Actor.ToAnother(),
-                ResultType = judgeResult.ResultType,
-                Reason = judgeResult.Reason
-            });
-
-            // 手动摆位
-            if (manualPlaceEnabled)
-            {
-                Debug.Log("manual placing");
-                BeginManualPlace();
-            }
-            else
-            {
-                Debug.Log("auto placing");
-
-                void Callback()
+                // 可能最后一拍正好进球，需要判断
+                switch (judgeResult.WhoGoal)
                 {
-                    UpdatePlacementToScene(judgeResult);
-                    ObjectManager.SetStill();
-                    Event.Send(Event.EventType1.AutoPlacement, GlobalMatchInfo);
-
-                    PauseForSeconds(2, () => { });
+                    case Side.Blue:
+                        GlobalMatchInfo.Score.BlueScore++;
+                        break;
+                    case Side.Yellow:
+                        GlobalMatchInfo.Score.YellowScore++;
+                        break;
                 }
 
-                // TODO 考虑连续出现摆位的情况
-                if (GlobalMatchInfo.TickMatch > 1)
+                StopMatch();
+                break;
+            
+            case ResultType.NextPhase:
+                // 阶段结束
+                // 这之后的物理引擎运行的一拍无意义，不用触发事件
+                Debug.Log("next phase");
+                if (GlobalMatchInfo.MatchPhase == MatchPhase.FirstHalf)
                 {
-                    PauseForSeconds(2, Callback);
+                    Debug.Log("switch role");
+                    SwitchRole();
+                }
+
+                GlobalMatchInfo.MatchPhase = GlobalMatchInfo.MatchPhase.NextPhase();
+                GlobalMatchInfo.TickPhase = 0; // 时间指定为0，使得下一拍的裁判得知新阶段的开始
+                OnNextPhase();
+                break;
+
+            case ResultType.NormalMatch:
+                // 正常比赛，输入轮速
+                UpdateWheelsToScene();
+                break;
+            
+            default:
+                // NOTE: 这是一个补丁
+                // 如果上一拍出现过摆位，则忽略这拍
+                switch (lastResultType)
+                {
+                    case ResultType.GameOver:
+                    case ResultType.NextPhase:
+                    case ResultType.NormalMatch:
+                        break;
+                    default:
+                        return;
+                }
+
+                // 摆位，输入摆位信息
+
+                // 判断是否进球
+                switch (judgeResult.WhoGoal)
+                {
+                    case Side.Blue:
+                        GlobalMatchInfo.Score.BlueScore++;
+                        break;
+                    case Side.Yellow:
+                        GlobalMatchInfo.Score.YellowScore++;
+                        break;
+                }
+
+                StrategyManager.Blue.OnJudgeResult(judgeResult);
+                StrategyManager.Yellow.OnJudgeResult(new JudgeResult
+                {
+                    Actor = judgeResult.Actor.ToAnother(),
+                    ResultType = judgeResult.ResultType,
+                    Reason = judgeResult.Reason
+                });
+
+                // 手动摆位
+                if (manualPlaceEnabled)
+                {
+                    Debug.Log("manual placing");
+                    BeginManualPlace();
                 }
                 else
                 {
-                    Callback();
+                    Debug.Log("auto placing");
+
+                    void Callback()
+                    {
+                        UpdatePlacementToScene(judgeResult);
+                        ObjectManager.SetStill();
+                        Event.Send(Event.EventType1.AutoPlacement, GlobalMatchInfo);
+
+                        PauseForSeconds(2, () => { });
+                    }
+
+                    // TODO 考虑连续出现摆位的情况
+                    if (GlobalMatchInfo.TickMatch > 1)
+                    {
+                        PauseForSeconds(2, Callback);
+                    }
+                    else
+                    {
+                        Callback();
+                    }
                 }
-            }
+
+                break;
         }
+        
+        lastResultType = judgeResult.ResultType;
     }
 
     /// <summary>
@@ -407,7 +428,6 @@ public class PlayMain : MonoBehaviour
         IEnumerator _PauseCoroutine()
         {
             timedPausing = true;
-            PauseMatchClearly();
             yield return new WaitForSecondsRealtime(sec);
             try
             {
@@ -423,6 +443,7 @@ public class PlayMain : MonoBehaviour
 
         if (sec > 0)
         {
+            PauseMatchClearly();
             StartCoroutine(_PauseCoroutine());
         }
     }
