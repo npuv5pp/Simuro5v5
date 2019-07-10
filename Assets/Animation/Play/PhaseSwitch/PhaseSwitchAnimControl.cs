@@ -21,17 +21,17 @@ public class PhaseSwitchAnimControl : MonoBehaviour
         switch (current)
         {
             case MatchPhase.FirstHalf:
-                str = "First Half Start";
+                str = "<b>First Half Start</b>";
                 break;
             case MatchPhase.SecondHalf:
-                str = "Second Half Start";
+                str = "<b>Second Half Start</b>\n<size=70%>Switch Role";
                 break;
             case MatchPhase.OverTime:
-                str = "Over Time Start";
+                str = "<b>Over Time Start</b>";
                 break;
             // case MatchPhase.Penalty:
             default:
-                str = "Penalty War Start";
+                str = "<b>Penalty War Start</b>";
                 break;
         }
         text.text = str;
@@ -46,11 +46,11 @@ public class PhaseSwitchAnimControl : MonoBehaviour
         StartCoroutine(func());
     }
 
-    // private void Update()
-    // {
-    //     if (Input.GetKeyDown(KeyCode.N))
-    //     {
-    //         Notify(MatchPhase.FirstHalf);
-    //     }
-    // }
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.N))
+        {
+            Notify(MatchPhase.OverTime);
+        }
+    }
 }
