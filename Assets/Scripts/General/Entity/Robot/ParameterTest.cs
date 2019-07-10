@@ -2,6 +2,7 @@
 using Simuro5v5;
 using UnityEngine;
 using System.IO;
+using UnityEditor;
 
 public class ParameterTest : MonoBehaviour
 {
@@ -50,18 +51,19 @@ public class ParameterTest : MonoBehaviour
         TorqueFactor = 1156.1817018313f;
         AngularDrag = 3769.775104018879f;
 
-        ZeroAngularDrag = 305500;
+        ZeroAngularDrag = 2097.9773f;
         DoubleZeroDrag = 760;
 
         prevLeftPosition = leftWheelPosition;
         prevRightPosition = rightWheelPosition;
-        
+
         maxX = minX = transform.position.x;
         maxY = minY = transform.position.y;
     }
 
     private int tick;
     private int playTime;
+    float prevEuler;
 
     void FixedUpdate()
     {
@@ -70,21 +72,34 @@ public class ParameterTest : MonoBehaviour
             return;
 
         playTime++;
-        LeftVelocity = 30;
-        RightVelocity = 60;
+        if (playTime < 30)
+        {
+            LeftVelocity = 125;
+            RightVelocity = 125;
+        }
+        else if (playTime < 32)
+        {
+            LeftVelocity = -1;
+            RightVelocity = 0;
+        }
+        else
+        {
+            LeftVelocity = -1;
+            RightVelocity = 0;
+        }
+
+        if (playTime >= 29 && playTime <= 32)
+        {
+            Debug.Log($"{transform.eulerAngles.y - prevEuler}");
+        }
+
+        if (playTime == 33)
+        {
+            OnPauseBtnClick();
+        }
+        prevEuler = transform.eulerAngles.y;
 
         var forwardDir = transform.forward;
-
-        // 动力
-        forward_force = (LeftVelocity + RightVelocity) * ForwardFactor * forwardDir;
-        // 速度方向的空气阻力
-        forward_drag = rb.velocity * -ForwardDrag;
-        // 切向速度
-        var sidewayV = Vector3.Project(rb.velocity, transform.right);
-        // 切向阻力
-//        sideway_drag = sidewayV.magnitude < 0.1 ? Vector3.zero : sidewayV / sidewayV.magnitude * -SidewayDrag;
-        sideway_drag = sidewayV * -SidewayDrag;
-        rb.AddForce(forward_force + forward_drag + sideway_drag);
 
         var leftVelocity = leftWheelPosition - prevLeftPosition;
         var rightVelocity = rightWheelPosition - prevRightPosition;
@@ -99,28 +114,70 @@ public class ParameterTest : MonoBehaviour
         else if (LeftVelocity == 0)
         {
             var dot = Vector3.Dot(leftVelocity, forwardDir);
-            if (RightVelocity < 0)
+            if (Math.Abs(dot) > 0.001 && RightVelocity < 0)
             {
+                var leftV = Vector3.Project(leftVelocity, forwardDir);
                 if (dot > 0)
-                    rb.AddForceAtPosition(forwardDir * -ZeroAngularDrag, leftWheelPosition);
+                {
+                    forward_drag = rb.velocity * -DoubleZeroDrag;
+                    rb.AddForce(forward_drag);
+                    // 左手系
+                    rb.AddTorque(leftV.magnitude * ZeroAngularDrag * Vector3.down, ForceMode.Impulse);
+//                    rb.AddForceAtPosition(-ZeroAngularDrag * leftV,
+//                        leftWheelPosition);
+                }
                 else if (dot < 0)
-                    rb.AddForceAtPosition(-forwardDir * -ZeroAngularDrag, leftWheelPosition);
+                {
+                    forward_drag = rb.velocity * -DoubleZeroDrag;
+                    rb.AddForce(forward_drag);
+                    rb.AddTorque(leftV.magnitude * ZeroAngularDrag * Vector3.up, ForceMode.Impulse);
+//                    rb.AddForceAtPosition(-ZeroAngularDrag * -leftV,
+//                        leftWheelPosition);
+                }
             }
         }
         else if (RightVelocity == 0)
         {
             var dot = Vector3.Dot(rightVelocity, forwardDir);
-            if (LeftVelocity < 0)
+            if (Math.Abs(dot) > 0.001 && LeftVelocity < 0)
             {
+                var rightV = Vector3.Project(rightVelocity, forwardDir);
                 if (dot > 0)
-                    rb.AddForceAtPosition(forwardDir * -ZeroAngularDrag, rightWheelPosition);
+                {
+                    forward_drag = rb.velocity * -DoubleZeroDrag;
+                    rb.AddForce(forward_drag);
+                    rb.AddTorque(rightV.magnitude * ZeroAngularDrag * Vector3.up, ForceMode.Impulse);
+//                    rb.AddForceAtPosition(-ZeroAngularDrag * rightV,
+//                        rightWheelPosition);
+                }
                 else if (dot < 0)
-                    rb.AddForceAtPosition(-forwardDir * -ZeroAngularDrag, rightWheelPosition);
+                {
+                    forward_drag = rb.velocity * -DoubleZeroDrag;
+                    rb.AddForce(forward_drag);
+                    rb.AddTorque(rightV.magnitude * ZeroAngularDrag * Vector3.down, ForceMode.Impulse);
+//                    rb.AddForceAtPosition(-ZeroAngularDrag * -rightV,
+//                        rightWheelPosition);
+                }
             }
         }
+        else
+        {
+            // 切向速度
+            var sidewayV = Vector3.Project(rb.velocity, transform.right);
+            // 切向阻力
+//        sideway_drag = sidewayV.magnitude < 0.1 ? Vector3.zero : sidewayV / sidewayV.magnitude * -30000;
+            sideway_drag = sidewayV * -SidewayDrag;
+            rb.AddForce(sideway_drag);
+        }
+
+        // 动力
+        forward_force = (LeftVelocity + RightVelocity) * ForwardFactor * forwardDir;
+        // 速度方向的空气阻力
+        forward_drag = rb.velocity * -ForwardDrag;
+        rb.AddForce(forward_force + forward_drag);
 
         // 动力扭矩
-        torque = Vector3.up * (LeftVelocity - RightVelocity) * TorqueFactor;
+        torque = (LeftVelocity - RightVelocity) * TorqueFactor * Vector3.up;
         // 阻力扭矩
         angular_drag = rb.angularVelocity * -AngularDrag;
         rb.AddTorque(torque + angular_drag);
@@ -174,7 +231,7 @@ public class ParameterTest : MonoBehaviour
             minX = rb.transform.position.x;
         if (rb.transform.position.z < minY)
             minY = rb.transform.position.z;
-        Debug.Log($"{(maxX - minX + maxY - minY) / 2}");
+//        Debug.Log($"{(maxX - minX + maxY - minY) / 2}");
 
         str = $"{rb.position.x},{rb.position.z},{rb.rotation.eulerAngles.y}";
         writer.WriteLine(str);
