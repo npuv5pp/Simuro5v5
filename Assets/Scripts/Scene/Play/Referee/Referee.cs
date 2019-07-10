@@ -16,7 +16,6 @@ using Random = System.Random;
 /// </summary>
 public class Referee : ICloneable
 {
-
     private GameObject[] BlueObject;
     private GameObject[] YellowObject;
     private GameObject BallObject;
@@ -99,14 +98,12 @@ public class Referee : ICloneable
     /// <summary>
     /// 球的停滞时间
     /// </summary>
-    [JsonProperty]
-    private int standoffTime;
+    [JsonProperty] private int standoffTime;
 
     /// <summary>
     /// 保存最近一次的判决结果
     /// </summary>
-    [JsonProperty]
-    public JudgeResult savedJudge;
+    [JsonProperty] public JudgeResult savedJudge;
 
     public Referee()
     {
@@ -173,6 +170,7 @@ public class Referee : ICloneable
         {
             this.standoffTime = 0;
         }
+
         return result;
     }
 
@@ -194,6 +192,7 @@ public class Referee : ICloneable
             BlueRobotSquare[i] = new Square(BlueRobotsPos[i], matchInfo.BlueRobots[i].rotation);
             YellowRobotSquare[i] = new Square(YellowRobotsPos[i], matchInfo.YellowRobots[i].rotation);
         }
+
         //该情况一般只用于门球情况，进攻方自定义球的坐标
         this.BallPos = matchInfo.Ball.pos;
 
@@ -223,7 +222,7 @@ public class Referee : ICloneable
 
         //正常比赛状态：上半场、下半场、加时赛
         if (matchInfo.MatchPhase == MatchPhase.FirstHalf || matchInfo.MatchPhase == MatchPhase.SecondHalf
-            || matchInfo.MatchPhase == MatchPhase.OverTime)
+                                                         || matchInfo.MatchPhase == MatchPhase.OverTime)
         {
             if (JudgePlace(ref judgeResult))
                 return judgeResult;
@@ -260,6 +259,7 @@ public class Referee : ICloneable
                     Reason = "Penalty competition start , Blue first"
                 };
             }
+
             //点球限制时间未结束
             if (penaltyTime < penaltyLimitTime)
             {
@@ -287,6 +287,7 @@ public class Referee : ICloneable
                 {
                     UpdatePenaltyState(ref judgeResult);
                 }
+
                 return judgeResult;
             }
         }
@@ -315,6 +316,7 @@ public class Referee : ICloneable
                 }
             }
         }
+
         return id;
     }
 
@@ -378,7 +380,6 @@ public class Referee : ICloneable
                 Reason = "Over 5 second and turn to Blue penalty"
             };
         }
-
     }
 
     private bool JudgePenaltyGoal(ref JudgeResult judgeResult)
@@ -405,6 +406,7 @@ public class Referee : ICloneable
                     Actor = Side.Yellow
                 };
             }
+
             penaltyTime = 0;
             penaltySide = Side.Yellow;
             judgeResult.WhoGoal = Side.Blue;
@@ -422,6 +424,7 @@ public class Referee : ICloneable
                     Actor = Side.Nobody
                 };
             }
+
             //特殊情况：黄方点球时，且为第五轮点球，进行结算
             if (penaltyOfNum == 5)
             {
@@ -462,6 +465,7 @@ public class Referee : ICloneable
                     Actor = Side.Blue
                 };
             }
+
             penaltyTime = 0;
             penaltySide = Side.Blue;
             judgeResult.WhoGoal = Side.Yellow;
@@ -494,6 +498,7 @@ public class Referee : ICloneable
                     matchState = "";
                     break;
             }
+
             judgeResult = new JudgeResult
             {
                 Actor = Side.Blue,
@@ -501,8 +506,8 @@ public class Referee : ICloneable
                 ResultType = ResultType.PlaceKick
             };
             return true;
-
         }
+
         //进球
         if (yellowGoalState.ContainsCircle(matchInfo.Ball.pos, Const.Ball.HBL))
         {
@@ -515,6 +520,7 @@ public class Referee : ICloneable
             };
             return true;
         }
+
         if (blueGoalState.ContainsCircle(matchInfo.Ball.pos, Const.Ball.HBL))
         {
             judgeResult = new JudgeResult
@@ -526,6 +532,7 @@ public class Referee : ICloneable
             };
             return true;
         }
+
         return false;
     }
 
@@ -542,6 +549,7 @@ public class Referee : ICloneable
             };
             return true;
         }
+
         if (matchInfo.Ball.pos.x > 0)
         {
             int smallStateNum = 0;
@@ -552,11 +560,13 @@ public class Referee : ICloneable
                 {
                     bigStateNum++;
                 }
+
                 if (blueSmallState.ContainsPoint(blueRobots[i].pos))
                 {
                     smallStateNum++;
                 }
             }
+
             if (bigStateNum >= 4)
             {
                 judgeResult = new JudgeResult
@@ -567,6 +577,7 @@ public class Referee : ICloneable
                 };
                 return true;
             }
+
             if (smallStateNum >= 2)
             {
                 judgeResult = new JudgeResult
@@ -588,11 +599,13 @@ public class Referee : ICloneable
                 {
                     bigStateNum++;
                 }
+
                 if (yellowSmallState.ContainsPoint(yellowRobots[i].pos))
                 {
                     smallStateNum++;
                 }
             }
+
             if (bigStateNum >= 4)
             {
                 judgeResult = new JudgeResult
@@ -603,6 +616,7 @@ public class Referee : ICloneable
                 };
                 return true;
             }
+
             if (smallStateNum >= 2)
             {
                 judgeResult = new JudgeResult
@@ -614,6 +628,7 @@ public class Referee : ICloneable
                 return true;
             }
         }
+
         return false;
     }
 
@@ -636,15 +651,18 @@ public class Referee : ICloneable
                     };
                     return true;
                 }
+
                 if (blueBigState.ContainsPoint(yellowRobots[i].pos))
                 {
                     bigStateNum++;
                 }
+
                 if (blueSmallState.ContainsPoint(yellowRobots[i].pos))
                 {
                     smallStateNum++;
                 }
             }
+
             if (bigStateNum >= 4)
             {
                 judgeResult = new JudgeResult
@@ -655,6 +673,7 @@ public class Referee : ICloneable
                 };
                 return true;
             }
+
             if (smallStateNum >= 2)
             {
                 judgeResult = new JudgeResult
@@ -683,15 +702,18 @@ public class Referee : ICloneable
                     };
                     return true;
                 }
+
                 if (yellowBigState.ContainsPoint(blueRobots[i].pos))
                 {
                     bigStateNum++;
                 }
+
                 if (yellowSmallState.ContainsPoint(blueRobots[i].pos))
                 {
                     smallStateNum++;
                 }
             }
+
             if (bigStateNum >= 4)
             {
                 judgeResult = new JudgeResult
@@ -702,6 +724,7 @@ public class Referee : ICloneable
                 };
                 return true;
             }
+
             if (smallStateNum >= 2)
             {
                 judgeResult = new JudgeResult
@@ -713,8 +736,8 @@ public class Referee : ICloneable
                 return true;
             }
         }
-        return false;
 
+        return false;
     }
 
     private bool JudgeFree(ref JudgeResult judgeResult)
@@ -782,7 +805,7 @@ public class Referee : ICloneable
     {
         if (matchInfo.MatchPhase == MatchPhase.FirstHalf)
         {
-            if (matchInfo.TickMatch == endOfHalfgametime)
+            if (matchInfo.TickPhase == endOfHalfgametime)
             {
                 // matchInfo.MatchPhase = MatchPhase.SecondHalf;
                 judgeResult = new JudgeResult
@@ -793,12 +816,14 @@ public class Referee : ICloneable
                 };
                 return true;
             }
-            else return false;
+
+            return false;
         }
-        else if (matchInfo.MatchPhase == MatchPhase.SecondHalf)
+
+        if (matchInfo.MatchPhase == MatchPhase.SecondHalf)
         {
             //下半场结束，判断比分是否结束
-            if (matchInfo.TickMatch == endOfHalfgametime)
+            if (matchInfo.TickPhase == endOfHalfgametime)
             {
                 if (blueScore > yellowScore)
                 {
@@ -828,14 +853,17 @@ public class Referee : ICloneable
                         Reason = "SecondHalf Game end and start"
                     };
                 }
+
                 return true;
             }
-            else return false;
+
+            return false;
         }
+
         //加时赛结束，同样判断比分
-        else if (matchInfo.MatchPhase == MatchPhase.OverTime)
+        if (matchInfo.MatchPhase == MatchPhase.OverTime)
         {
-            if (matchInfo.TickMatch == endOfOvergametime)
+            if (matchInfo.TickPhase == endOfOvergametime)
             {
                 if (blueScore > yellowScore)
                 {
@@ -865,14 +893,14 @@ public class Referee : ICloneable
                         Reason = "Overtime Game end ,and start Penalty game"
                     };
                 }
+
                 return true;
             }
-            else return false;
-        }
-        else
-        {
+
             return false;
         }
+
+        return false;
     }
 
     /// <summary>
@@ -912,12 +940,14 @@ public class Referee : ICloneable
         public Vector2D Pos;
         public bool occupy;
         public Square square;
+
         public RobotPosSquare(Vector2D pos, float angle = 0)
         {
             Pos = pos;
             occupy = false;
             square = new Square(Pos, angle);
         }
+
         public void GetNewPosSquare(Vector2D pos, float angle = 0)
         {
             Pos = pos;
@@ -928,10 +958,11 @@ public class Referee : ICloneable
 
 
     private void JudgePenaltyPlacement(JudgeResult judgeResult)
-    {   //InNeedChange判断是否需要更改摆位
-        Vector2D PenaltyBallPos;//点球坐标
-        Vector2D PenaltyDefenderGoaliePos;//守门员坐标
-        Vector2D PenaltyAttakcPos;//进攻方的点球球员坐标
+    {
+        //InNeedChange判断是否需要更改摆位
+        Vector2D PenaltyBallPos; //点球坐标
+        Vector2D PenaltyDefenderGoaliePos; //守门员坐标
+        Vector2D PenaltyAttakcPos; //进攻方的点球球员坐标
         //机器人所占区域
         RobotPosSquare[] DefenderPosSquare = new RobotPosSquare[5];
         RobotPosSquare[] OffensivePosSquare = new RobotPosSquare[5];
@@ -944,7 +975,8 @@ public class Referee : ICloneable
 
         if (judgeResult.Actor == Side.Blue)
         {
-            SafePosSquare = new RobotPosSquare[10] {
+            SafePosSquare = new RobotPosSquare[10]
+            {
                 new RobotPosSquare(new Vector2D(5f, 6f)),
                 new RobotPosSquare(new Vector2D(5f, 16f)),
                 new RobotPosSquare(new Vector2D(5f, 26f)),
@@ -954,17 +986,18 @@ public class Referee : ICloneable
                 new RobotPosSquare(new Vector2D(5f, -16f)),
                 new RobotPosSquare(new Vector2D(5f, -26f)),
                 new RobotPosSquare(new Vector2D(5f, -36f)),
-                new RobotPosSquare(new Vector2D(5f, -46f))};
+                new RobotPosSquare(new Vector2D(5f, -46f))
+            };
             //蓝方执行点球时相关坐标
-            PenaltyBallPos = new Vector2D(-72.5f, 0f);//点球坐标
-            PenaltyDefenderGoaliePos = new Vector2D(-106f, 0f);//守门员坐标
-            PenaltyAttakcPos = new Vector2D(-50f, 0f);//进攻点球员坐标
-                                                      //PenaltyDefenderSafePosSquare = new RobotPosSquare[5] {  //黄方的安全区域点
-                                                      //new RobotPosSquare(new Vector2D(5f, 6f)),
-                                                      //new RobotPosSquare(new Vector2D(5f, 16f)),
-                                                      //new RobotPosSquare(new Vector2D(5f, 26f)),
-                                                      //new RobotPosSquare(new Vector2D(5f, 36f)),
-                                                      //new RobotPosSquare(new Vector2D(5f, 46f)) };
+            PenaltyBallPos = new Vector2D(-72.5f, 0f); //点球坐标
+            PenaltyDefenderGoaliePos = new Vector2D(-106f, 0f); //守门员坐标
+            PenaltyAttakcPos = new Vector2D(-50f, 0f); //进攻点球员坐标
+            //PenaltyDefenderSafePosSquare = new RobotPosSquare[5] {  //黄方的安全区域点
+            //new RobotPosSquare(new Vector2D(5f, 6f)),
+            //new RobotPosSquare(new Vector2D(5f, 16f)),
+            //new RobotPosSquare(new Vector2D(5f, 26f)),
+            //new RobotPosSquare(new Vector2D(5f, 36f)),
+            //new RobotPosSquare(new Vector2D(5f, 46f)) };
 
             ////蓝方的安全区域点
             //PenaltyOffensiveSafePosSquare = new RobotPosSquare[5] {
@@ -980,7 +1013,8 @@ public class Referee : ICloneable
         }
         else
         {
-            SafePosSquare = new RobotPosSquare[10] {
+            SafePosSquare = new RobotPosSquare[10]
+            {
                 new RobotPosSquare(new Vector2D(-5f, 5f)),
                 new RobotPosSquare(new Vector2D(-5f, 20f)),
                 new RobotPosSquare(new Vector2D(-5f, 35f)),
@@ -990,11 +1024,12 @@ public class Referee : ICloneable
                 new RobotPosSquare(new Vector2D(-5f, -20f)),
                 new RobotPosSquare(new Vector2D(-5f, -35f)),
                 new RobotPosSquare(new Vector2D(-5f, -50f)),
-                new RobotPosSquare(new Vector2D(-5f, -65f))};
+                new RobotPosSquare(new Vector2D(-5f, -65f))
+            };
             //黄方执行点球时相关坐标
-            PenaltyBallPos = new Vector2D(72.5f, 0f);//点球坐标
-            PenaltyDefenderGoaliePos = new Vector2D(106f, 0f);//守门员坐标
-            PenaltyAttakcPos = new Vector2D(50f, 0f);//进攻点球员坐标
+            PenaltyBallPos = new Vector2D(72.5f, 0f); //点球坐标
+            PenaltyDefenderGoaliePos = new Vector2D(106f, 0f); //守门员坐标
+            PenaltyAttakcPos = new Vector2D(50f, 0f); //进攻点球员坐标
             ////黄方的安全区域点
             //PenaltyDefenderSafePosSquare = new RobotPosSquare[5] {
             //    new RobotPosSquare(new Vector2D(-5f, -6f)),
@@ -1015,6 +1050,7 @@ public class Referee : ICloneable
             GoalieId = FindGoalie(Side.Blue);
             UpdateOffAndDefInfo(DefenderPosSquare, OffensivePosSquare, Side.Yellow);
         }
+
         //刚开始先来一个检测
         JudgeSafePosSquare(SafePosSquare, OffensivePosSquare, DefenderPosSquare);
         BallPos = PenaltyBallPos;
@@ -1043,8 +1079,8 @@ public class Referee : ICloneable
                         (new Vector2D(106, DefenderPosSquare[GoalieId].Pos.y));
                 }
             }
-
         }
+
         //先对防守方检测
         for (int i = 0; i < Const.RobotsPerTeam; i++)
         {
@@ -1073,8 +1109,8 @@ public class Referee : ICloneable
                 ChangeRobotSafePos(ref DefenderPosSquare[i], SafePosSquare);
                 JudgeSafePosSquare(SafePosSquare, OffensivePosSquare, DefenderPosSquare);
             }
-
         }
+
         //对进攻球员选择
         int attackRobotID = -1;
         for (int i = 0; i < Const.RobotsPerTeam; i++)
@@ -1086,18 +1122,21 @@ public class Referee : ICloneable
                 break;
             }
         }
+
         if (attackRobotID == -1)
         {
             attackRobotID = 1;
             OffensivePosSquare[1].GetNewPosSquare(PenaltyAttakcPos);
             JudgeSafePosSquare(SafePosSquare, OffensivePosSquare, DefenderPosSquare);
         }
+
         //对进攻球员与球检测，不能重叠
         if (OffensivePosSquare[attackRobotID].square.ContainsPoint(BallPos))
         {
             OffensivePosSquare[attackRobotID].GetNewPosSquare(PenaltyAttakcPos);
             JudgeSafePosSquare(SafePosSquare, OffensivePosSquare, DefenderPosSquare);
         }
+
         //再对进攻方进行检测
         for (int i = 0; i < Const.RobotsPerTeam; i++)
         {
@@ -1106,6 +1145,7 @@ public class Referee : ICloneable
             {
                 continue;
             }
+
             // 三种不规范情况:
             //1.在防守方半场 2.未在球场内 3.与之前摆完位的球员发生了重叠
             if (OffensivePosSquare[i].square.IsOverlapWithRectangle(defenderHalfState)
@@ -1116,6 +1156,7 @@ public class Referee : ICloneable
                 JudgeSafePosSquare(SafePosSquare, OffensivePosSquare, DefenderPosSquare);
             }
         }
+
         //最后进攻方再和自己队球员进行判断
         for (int i = 0; i < Const.RobotsPerTeam; i++)
         {
@@ -1124,7 +1165,6 @@ public class Referee : ICloneable
                 ChangeRobotSafePos(ref OffensivePosSquare[i], SafePosSquare);
                 JudgeSafePosSquare(SafePosSquare, OffensivePosSquare, DefenderPosSquare);
             }
-
         }
 
         if (judgeResult.Actor == Side.Blue)
@@ -1135,7 +1175,6 @@ public class Referee : ICloneable
         {
             UpdatePlacementPos(OffensivePosSquare, DefenderPosSquare, matchInfo, Side.Yellow);
         }
-
     }
 
 
@@ -1143,7 +1182,7 @@ public class Referee : ICloneable
     {
         //由于开球情况特殊，进攻方防守方安全区域不是同一个地方，即采用进攻方防守方两个安全区域
 
-        Vector2D PlaceBallPos = new Vector2D(0, 0);//开球坐标
+        Vector2D PlaceBallPos = new Vector2D(0, 0); //开球坐标
         //防守方的安全区域点
         RobotPosSquare[] PlaceDefenderSafePosSquare;
         //进攻方的安全区域点
@@ -1168,29 +1207,33 @@ public class Referee : ICloneable
             //    new RobotPosSquare(new Vector2D(-32,-20)),
             //    new RobotPosSquare(new Vector2D(-32,-40))};
 
-            PlaceOffensiveSafePosSquare = new RobotPosSquare[10] {
+            PlaceOffensiveSafePosSquare = new RobotPosSquare[10]
+            {
                 new RobotPosSquare(new Vector2D(32, 0)),
                 new RobotPosSquare(new Vector2D(32, 15)),
-                new RobotPosSquare(new Vector2D(32,-15)),
-                new RobotPosSquare(new Vector2D(32,30)),
-                new RobotPosSquare(new Vector2D(32,-30)),
+                new RobotPosSquare(new Vector2D(32, -15)),
+                new RobotPosSquare(new Vector2D(32, 30)),
+                new RobotPosSquare(new Vector2D(32, -30)),
                 new RobotPosSquare(new Vector2D(32, 45)),
                 new RobotPosSquare(new Vector2D(32, -45)),
-                new RobotPosSquare(new Vector2D(32,60)),
-                new RobotPosSquare(new Vector2D(32,-60)),
-                new RobotPosSquare(new Vector2D(45,0))};
+                new RobotPosSquare(new Vector2D(32, 60)),
+                new RobotPosSquare(new Vector2D(32, -60)),
+                new RobotPosSquare(new Vector2D(45, 0))
+            };
 
-            PlaceDefenderSafePosSquare = new RobotPosSquare[10] {
+            PlaceDefenderSafePosSquare = new RobotPosSquare[10]
+            {
                 new RobotPosSquare(new Vector2D(-32, 0)),
                 new RobotPosSquare(new Vector2D(-32, 15)),
-                new RobotPosSquare(new Vector2D(-32,-15)),
-                new RobotPosSquare(new Vector2D(-32,30)),
-                new RobotPosSquare(new Vector2D(-32,-30)),
+                new RobotPosSquare(new Vector2D(-32, -15)),
+                new RobotPosSquare(new Vector2D(-32, 30)),
+                new RobotPosSquare(new Vector2D(-32, -30)),
                 new RobotPosSquare(new Vector2D(-32, 45)),
                 new RobotPosSquare(new Vector2D(-32, -45)),
-                new RobotPosSquare(new Vector2D(-32,60)),
-                new RobotPosSquare(new Vector2D(-32,-60)),
-                new RobotPosSquare(new Vector2D(-45,0))};
+                new RobotPosSquare(new Vector2D(-32, 60)),
+                new RobotPosSquare(new Vector2D(-32, -60)),
+                new RobotPosSquare(new Vector2D(-45, 0))
+            };
 
             UpdateOffAndDefInfo(PlaceDefenderPosSquare, PlaceOffensivePosSquare, Side.Blue);
             JudgeSafePosSquare(PlaceDefenderSafePosSquare, PlaceOffensivePosSquare, PlaceDefenderPosSquare);
@@ -1198,34 +1241,39 @@ public class Referee : ICloneable
         }
         else
         {
-            PlaceDefenderSafePosSquare = new RobotPosSquare[10] {
+            PlaceDefenderSafePosSquare = new RobotPosSquare[10]
+            {
                 new RobotPosSquare(new Vector2D(32, 0)),
                 new RobotPosSquare(new Vector2D(32, 15)),
-                new RobotPosSquare(new Vector2D(32,-15)),
-                new RobotPosSquare(new Vector2D(32,30)),
-                new RobotPosSquare(new Vector2D(32,-30)),
+                new RobotPosSquare(new Vector2D(32, -15)),
+                new RobotPosSquare(new Vector2D(32, 30)),
+                new RobotPosSquare(new Vector2D(32, -30)),
                 new RobotPosSquare(new Vector2D(32, 45)),
                 new RobotPosSquare(new Vector2D(32, -45)),
-                new RobotPosSquare(new Vector2D(32,60)),
-                new RobotPosSquare(new Vector2D(32,-60)),
-                new RobotPosSquare(new Vector2D(45,0))};
+                new RobotPosSquare(new Vector2D(32, 60)),
+                new RobotPosSquare(new Vector2D(32, -60)),
+                new RobotPosSquare(new Vector2D(45, 0))
+            };
 
-            PlaceOffensiveSafePosSquare = new RobotPosSquare[10] {
+            PlaceOffensiveSafePosSquare = new RobotPosSquare[10]
+            {
                 new RobotPosSquare(new Vector2D(-32, 0)),
                 new RobotPosSquare(new Vector2D(-32, 15)),
-                new RobotPosSquare(new Vector2D(-32,-15)),
-                new RobotPosSquare(new Vector2D(-32,30)),
-                new RobotPosSquare(new Vector2D(-32,-30)),
+                new RobotPosSquare(new Vector2D(-32, -15)),
+                new RobotPosSquare(new Vector2D(-32, 30)),
+                new RobotPosSquare(new Vector2D(-32, -30)),
                 new RobotPosSquare(new Vector2D(-32, 45)),
                 new RobotPosSquare(new Vector2D(-32, -45)),
-                new RobotPosSquare(new Vector2D(-32,60)),
-                new RobotPosSquare(new Vector2D(-32,-60)),
-                new RobotPosSquare(new Vector2D(-45,0))};
+                new RobotPosSquare(new Vector2D(-32, 60)),
+                new RobotPosSquare(new Vector2D(-32, -60)),
+                new RobotPosSquare(new Vector2D(-45, 0))
+            };
 
             UpdateOffAndDefInfo(PlaceDefenderPosSquare, PlaceOffensivePosSquare, Side.Yellow);
             JudgeSafePosSquare(PlaceDefenderSafePosSquare, PlaceOffensivePosSquare, PlaceDefenderPosSquare);
             JudgeSafePosSquare(PlaceOffensiveSafePosSquare, PlaceOffensivePosSquare, PlaceDefenderPosSquare);
         }
+
         BallPos = PlaceBallPos;
         int PlaceAttackId = -1;
         //寻找开球球员
@@ -1237,6 +1285,7 @@ public class Referee : ICloneable
                 break;
             }
         }
+
         //未找到进攻球员，则选取一个放入里面进攻
         if (PlaceAttackId == -1)
         {
@@ -1245,6 +1294,7 @@ public class Referee : ICloneable
             JudgeSafePosSquare(PlaceDefenderSafePosSquare, PlaceOffensivePosSquare, PlaceDefenderPosSquare);
             JudgeSafePosSquare(PlaceOffensiveSafePosSquare, PlaceOffensivePosSquare, PlaceDefenderPosSquare);
         }
+
         //再检测开球球员是否与球重叠
         if (PlaceOffensivePosSquare[PlaceAttackId].square.ContainsPoint(BallPos))
         {
@@ -1268,6 +1318,7 @@ public class Referee : ICloneable
                 JudgeSafePosSquare(PlaceOffensiveSafePosSquare, PlaceOffensivePosSquare, PlaceDefenderPosSquare);
             }
         }
+
         //再对自身摆位判断没有重叠
         for (int i = 0; i < Const.RobotsPerTeam; i++)
         {
@@ -1278,6 +1329,7 @@ public class Referee : ICloneable
                 JudgeSafePosSquare(PlaceOffensiveSafePosSquare, PlaceOffensivePosSquare, PlaceDefenderPosSquare);
             }
         }
+
         //再对防守方摆位检测
         //需要注意的是，不需要和对面球员检测是否有重叠
         for (int i = 0; i < Const.RobotsPerTeam; i++)
@@ -1293,6 +1345,7 @@ public class Referee : ICloneable
                 JudgeSafePosSquare(PlaceOffensiveSafePosSquare, PlaceOffensivePosSquare, PlaceDefenderPosSquare);
             }
         }
+
         //再对防守方自身进行检测
         for (int i = 0; i < Const.RobotsPerTeam; i++)
         {
@@ -1316,7 +1369,6 @@ public class Referee : ICloneable
 
     private void JudgeGoaliePlacement(JudgeResult judgeResult)
     {
-
         //下面是默认的球的坐标
         Vector2D GoalieBallPos;
         //门球判断需要注意的是，球的坐标由玩家摆位，不可以与球重叠，需要设置三个守门员的坐标点来避免重叠
@@ -1333,34 +1385,40 @@ public class Referee : ICloneable
         {
             GoalieBallPos = new Vector2D(98f, -20f);
 
-            GoaliePosSafeSquare = new RobotPosSquare[3]{
-                new RobotPosSquare(new Vector2D(105,0)),
-                new RobotPosSquare(new Vector2D (105,-12)),
-                new RobotPosSquare(new Vector2D(105,12))};
+            GoaliePosSafeSquare = new RobotPosSquare[3]
+            {
+                new RobotPosSquare(new Vector2D(105, 0)),
+                new RobotPosSquare(new Vector2D(105, -12)),
+                new RobotPosSquare(new Vector2D(105, 12))
+            };
 
-            GoalieOffensiveSafePosSquare = new RobotPosSquare[10] {
+            GoalieOffensiveSafePosSquare = new RobotPosSquare[10]
+            {
                 new RobotPosSquare(new Vector2D(10, 0)),
                 new RobotPosSquare(new Vector2D(10, 15)),
-                new RobotPosSquare(new Vector2D(10,-15)),
-                new RobotPosSquare(new Vector2D(10,30)),
-                new RobotPosSquare(new Vector2D(10,-30)),
+                new RobotPosSquare(new Vector2D(10, -15)),
+                new RobotPosSquare(new Vector2D(10, 30)),
+                new RobotPosSquare(new Vector2D(10, -30)),
                 new RobotPosSquare(new Vector2D(10, 45)),
                 new RobotPosSquare(new Vector2D(10, -45)),
-                new RobotPosSquare(new Vector2D(10,60)),
-                new RobotPosSquare(new Vector2D(10,-60)),
-                new RobotPosSquare(new Vector2D(25,0))};
+                new RobotPosSquare(new Vector2D(10, 60)),
+                new RobotPosSquare(new Vector2D(10, -60)),
+                new RobotPosSquare(new Vector2D(25, 0))
+            };
 
-            GoalieDefenderSafePosSquare = new RobotPosSquare[10] {
+            GoalieDefenderSafePosSquare = new RobotPosSquare[10]
+            {
                 new RobotPosSquare(new Vector2D(-10, 0)),
                 new RobotPosSquare(new Vector2D(-10, 15)),
-                new RobotPosSquare(new Vector2D(-10,-15)),
-                new RobotPosSquare(new Vector2D(-10,30)),
-                new RobotPosSquare(new Vector2D(-10,-30)),
+                new RobotPosSquare(new Vector2D(-10, -15)),
+                new RobotPosSquare(new Vector2D(-10, 30)),
+                new RobotPosSquare(new Vector2D(-10, -30)),
                 new RobotPosSquare(new Vector2D(-10, 45)),
                 new RobotPosSquare(new Vector2D(-10, -45)),
-                new RobotPosSquare(new Vector2D(-10,60)),
-                new RobotPosSquare(new Vector2D(-10,-60)),
-                new RobotPosSquare(new Vector2D(-25,0))};
+                new RobotPosSquare(new Vector2D(-10, 60)),
+                new RobotPosSquare(new Vector2D(-10, -60)),
+                new RobotPosSquare(new Vector2D(-25, 0))
+            };
 
             UpdateOffAndDefInfo(GoalieDefenderPosSquare, GoalieOffensivePosSquare, Side.Blue);
             JudgeSafePosSquare(GoalieOffensiveSafePosSquare, GoalieOffensivePosSquare, GoalieDefenderPosSquare);
@@ -1371,45 +1429,53 @@ public class Referee : ICloneable
         {
             GoalieBallPos = new Vector2D(-98f, 20f);
 
-            GoaliePosSafeSquare = new RobotPosSquare[3]{
-                new RobotPosSquare(new Vector2D(-105,0)),
-                new RobotPosSquare(new Vector2D (-105,-12)),
-                new RobotPosSquare(new Vector2D(-105,12))};
+            GoaliePosSafeSquare = new RobotPosSquare[3]
+            {
+                new RobotPosSquare(new Vector2D(-105, 0)),
+                new RobotPosSquare(new Vector2D(-105, -12)),
+                new RobotPosSquare(new Vector2D(-105, 12))
+            };
 
-            GoalieDefenderSafePosSquare = new RobotPosSquare[10] {
+            GoalieDefenderSafePosSquare = new RobotPosSquare[10]
+            {
                 new RobotPosSquare(new Vector2D(10, 0)),
                 new RobotPosSquare(new Vector2D(10, 15)),
-                new RobotPosSquare(new Vector2D(10,-15)),
-                new RobotPosSquare(new Vector2D(10,30)),
-                new RobotPosSquare(new Vector2D(10,-30)),
+                new RobotPosSquare(new Vector2D(10, -15)),
+                new RobotPosSquare(new Vector2D(10, 30)),
+                new RobotPosSquare(new Vector2D(10, -30)),
                 new RobotPosSquare(new Vector2D(10, 45)),
                 new RobotPosSquare(new Vector2D(10, -45)),
-                new RobotPosSquare(new Vector2D(10,60)),
-                new RobotPosSquare(new Vector2D(10,-60)),
-                new RobotPosSquare(new Vector2D(25,0))};
+                new RobotPosSquare(new Vector2D(10, 60)),
+                new RobotPosSquare(new Vector2D(10, -60)),
+                new RobotPosSquare(new Vector2D(25, 0))
+            };
 
-            GoalieOffensiveSafePosSquare = new RobotPosSquare[10] {
+            GoalieOffensiveSafePosSquare = new RobotPosSquare[10]
+            {
                 new RobotPosSquare(new Vector2D(-10, 0)),
                 new RobotPosSquare(new Vector2D(-10, 15)),
-                new RobotPosSquare(new Vector2D(-10,-15)),
-                new RobotPosSquare(new Vector2D(-10,30)),
-                new RobotPosSquare(new Vector2D(-10,-30)),
+                new RobotPosSquare(new Vector2D(-10, -15)),
+                new RobotPosSquare(new Vector2D(-10, 30)),
+                new RobotPosSquare(new Vector2D(-10, -30)),
                 new RobotPosSquare(new Vector2D(-10, 45)),
                 new RobotPosSquare(new Vector2D(-10, -45)),
-                new RobotPosSquare(new Vector2D(-10,60)),
-                new RobotPosSquare(new Vector2D(-10,-60)),
-                new RobotPosSquare(new Vector2D(-25,0))};
+                new RobotPosSquare(new Vector2D(-10, 60)),
+                new RobotPosSquare(new Vector2D(-10, -60)),
+                new RobotPosSquare(new Vector2D(-25, 0))
+            };
 
             UpdateOffAndDefInfo(GoalieDefenderPosSquare, GoalieOffensivePosSquare, Side.Yellow);
             JudgeSafePosSquare(GoalieOffensiveSafePosSquare, GoalieOffensivePosSquare, GoalieDefenderPosSquare);
             JudgeSafePosSquare(GoalieDefenderSafePosSquare, GoalieOffensivePosSquare, GoalieDefenderPosSquare);
             GoalieId = FindGoalie(Side.Yellow);
         }
+
         //先对球进行摆位判断
         if (!offensiveSmallState.ContainsPoint(BallPos))
         {
             BallPos = GoalieBallPos;
         }
+
         //没有守门员的话，放置守门员
         if (GoalieId == -1)
         {
@@ -1419,6 +1485,7 @@ public class Referee : ICloneable
             JudgeSafePosSquare(GoalieOffensiveSafePosSquare, GoalieOffensivePosSquare, GoalieDefenderPosSquare);
             JudgeSafePosSquare(GoalieDefenderSafePosSquare, GoalieOffensivePosSquare, GoalieDefenderPosSquare);
         }
+
         //下一步对守门员与球判断有没有重叠
         for (int i = 0; i < 3; i++)
         {
@@ -1463,6 +1530,7 @@ public class Referee : ICloneable
                 JudgeSafePosSquare(GoalieDefenderSafePosSquare, GoalieOffensivePosSquare, GoalieDefenderPosSquare);
             }
         }
+
         if (judgeResult.Actor == Side.Blue)
         {
             UpdatePlacementPos(GoalieOffensivePosSquare, GoalieDefenderPosSquare, matchInfo, Side.Blue);
@@ -1471,7 +1539,6 @@ public class Referee : ICloneable
         {
             UpdatePlacementPos(GoalieOffensivePosSquare, GoalieDefenderPosSquare, matchInfo, Side.Yellow);
         }
-
     }
 
     private void JudgeFreePlacement(JudgeResult judgeResult)
@@ -1514,7 +1581,8 @@ public class Referee : ICloneable
             FreeDefenderPos = new Vector2D(-25f, 60f);
 
             //安全区域点
-            FreeSafePosSquare = new RobotPosSquare[10] {
+            FreeSafePosSquare = new RobotPosSquare[10]
+            {
                 new RobotPosSquare(new Vector2D(-80f, -10f)),
                 new RobotPosSquare(new Vector2D(10f, 65f)),
                 new RobotPosSquare(new Vector2D(-50f, -10f)),
@@ -1524,7 +1592,8 @@ public class Referee : ICloneable
                 new RobotPosSquare(new Vector2D(-65f, -10f)),
                 new RobotPosSquare(new Vector2D(10f, 50f)),
                 new RobotPosSquare(new Vector2D(-35f, -10f)),
-                new RobotPosSquare(new Vector2D(10f, 20f))};
+                new RobotPosSquare(new Vector2D(10f, 20f))
+            };
 
             //蓝方的安全区域点
             //FreeOffensiveSafePosSquare = new RobotPosSquare[5] {
@@ -1549,7 +1618,8 @@ public class Referee : ICloneable
             FreeDefenderPos = new Vector2D(-25f, -60f);
 
             //安全区域点
-            FreeSafePosSquare = new RobotPosSquare[10] {
+            FreeSafePosSquare = new RobotPosSquare[10]
+            {
                 new RobotPosSquare(new Vector2D(-10f, 10f)),
                 new RobotPosSquare(new Vector2D(10f, -65f)),
                 new RobotPosSquare(new Vector2D(-40f, 10f)),
@@ -1559,7 +1629,8 @@ public class Referee : ICloneable
                 new RobotPosSquare(new Vector2D(-25f, 10f)),
                 new RobotPosSquare(new Vector2D(10f, -50f)),
                 new RobotPosSquare(new Vector2D(-55f, 10f)),
-                new RobotPosSquare(new Vector2D(10f, -20f))};
+                new RobotPosSquare(new Vector2D(10f, -20f))
+            };
 
             ////蓝方的安全区域点
             //FreeOffensiveSafePosSquare = new RobotPosSquare[5] {
@@ -1584,7 +1655,8 @@ public class Referee : ICloneable
             FreeOffensivePos = new Vector2D(85f, 60f);
 
             //安全区域点
-            FreeSafePosSquare = new RobotPosSquare[10] {
+            FreeSafePosSquare = new RobotPosSquare[10]
+            {
                 new RobotPosSquare(new Vector2D(10f, -10f)),
                 new RobotPosSquare(new Vector2D(-10f, 65f)),
                 new RobotPosSquare(new Vector2D(40f, -10f)),
@@ -1620,7 +1692,8 @@ public class Referee : ICloneable
             FreeOffensivePos = new Vector2D(85f, -60f);
 
             //安全区域点
-            FreeSafePosSquare = new RobotPosSquare[10] {
+            FreeSafePosSquare = new RobotPosSquare[10]
+            {
                 new RobotPosSquare(new Vector2D(10f, 10f)),
                 new RobotPosSquare(new Vector2D(-10f, -65f)),
                 new RobotPosSquare(new Vector2D(40f, 10f)),
@@ -1630,7 +1703,8 @@ public class Referee : ICloneable
                 new RobotPosSquare(new Vector2D(25f, 10f)),
                 new RobotPosSquare(new Vector2D(-10f, -50f)),
                 new RobotPosSquare(new Vector2D(55f, 10f)),
-                new RobotPosSquare(new Vector2D(-10f, -20f))};
+                new RobotPosSquare(new Vector2D(-10f, -20f))
+            };
 
             ////黄方的安全区域点
             //FreeOffensiveSafePosSquare = new RobotPosSquare[5] {
@@ -1642,6 +1716,7 @@ public class Referee : ICloneable
             UpdateOffAndDefInfo(FreeDefenderPosSquare, FreeOffensivePosSquare, Side.Blue);
             JudgeSafePosSquare(FreeSafePosSquare, FreeOffensivePosSquare, FreeDefenderPosSquare);
         }
+
         //先对球进行摆位
         BallPos = FreeBallPos;
         //再寻找守门员
@@ -1651,6 +1726,7 @@ public class Referee : ICloneable
             FreeOffensivePosSquare[GoalieId].GetNewPosSquare(FreeOffensiveGoaliePos);
             JudgeSafePosSquare(FreeSafePosSquare, FreeOffensivePosSquare, FreeDefenderPosSquare);
         }
+
         //再对进攻方规范
         //如果没有进攻球员，则安排一个
         if (OffensiveFreeId == -1)
@@ -1659,12 +1735,14 @@ public class Referee : ICloneable
             FreeOffensivePosSquare[OffensiveFreeId].GetNewPosSquare(FreeOffensivePos);
             JudgeSafePosSquare(FreeSafePosSquare, FreeOffensivePosSquare, FreeDefenderPosSquare);
         }
+
         //如果在争球半场内，但是没有规范位置，则放置摆位点
         if (FreeOffensivePosSquare[OffensiveFreeId].Pos.IsNotNear(FreeOffensivePos))
         {
             FreeOffensivePosSquare[OffensiveFreeId].GetNewPosSquare(FreeOffensivePos);
             JudgeSafePosSquare(FreeSafePosSquare, FreeOffensivePosSquare, FreeDefenderPosSquare);
         }
+
         //再对进攻方先进行摆位判断
         for (int i = 0; i < Const.RobotsPerTeam; i++)
         {
@@ -1680,6 +1758,7 @@ public class Referee : ICloneable
                 JudgeSafePosSquare(FreeSafePosSquare, FreeOffensivePosSquare, FreeDefenderPosSquare);
             }
         }
+
         //再对防守方进行摆位判断
         //先寻找是否有争球球员
         if (DefenderFreeId == -1)
@@ -1688,12 +1767,14 @@ public class Referee : ICloneable
             FreeDefenderPosSquare[DefenderFreeId].GetNewPosSquare(FreeDefenderPos);
             JudgeSafePosSquare(FreeSafePosSquare, FreeOffensivePosSquare, FreeDefenderPosSquare);
         }
+
         //如果在争球半场内但没有在争球点
         if (FreeDefenderPosSquare[DefenderFreeId].Pos.IsNotNear(FreeDefenderPos))
         {
             FreeDefenderPosSquare[DefenderFreeId].GetNewPosSquare(FreeDefenderPos);
             JudgeSafePosSquare(FreeSafePosSquare, FreeOffensivePosSquare, FreeDefenderPosSquare);
         }
+
         for (int i = 0; i < Const.RobotsPerTeam; i++)
         {
             if (i == DefenderFreeId) continue;
@@ -1708,6 +1789,7 @@ public class Referee : ICloneable
                 JudgeSafePosSquare(FreeSafePosSquare, FreeOffensivePosSquare, FreeDefenderPosSquare);
             }
         }
+
         if (judgeResult.Actor == Side.Blue)
         {
             UpdatePlacementPos(FreeOffensivePosSquare, FreeDefenderPosSquare, matchInfo, Side.Blue);
@@ -1716,7 +1798,6 @@ public class Referee : ICloneable
         {
             UpdatePlacementPos(FreeOffensivePosSquare, FreeDefenderPosSquare, matchInfo, Side.Yellow);
         }
-
     }
 
     /// <summary>
@@ -1733,6 +1814,7 @@ public class Referee : ICloneable
                 {
                     if (i == GoalieId) continue;
                 }
+
                 if (FreeState.ContainsPoint(blueRobots[i].pos))
                 {
                     FreeRobotId = i;
@@ -1748,6 +1830,7 @@ public class Referee : ICloneable
                 {
                     if (i == GoalieId) continue;
                 }
+
                 if (FreeState.ContainsPoint(yellowRobots[i].pos))
                 {
                     FreeRobotId = i;
@@ -1755,8 +1838,8 @@ public class Referee : ICloneable
                 }
             }
         }
-        return -1;
 
+        return -1;
     }
 
     private void ChangeRobotSafePos(ref RobotPosSquare robotPosSquare, RobotPosSquare[] robotsSafePosSquares)
@@ -1775,7 +1858,8 @@ public class Referee : ICloneable
     /// <summary>
     /// 默认情况是检测对面组别，第三个参数为true表示检测自身组别
     /// </summary>
-    private bool RobotCrossByRobots(RobotPosSquare robotPosSquare, RobotPosSquare[] robotsPosSquare, bool self = false, int selfid = -1)
+    private bool RobotCrossByRobots(RobotPosSquare robotPosSquare, RobotPosSquare[] robotsPosSquare, bool self = false,
+        int selfid = -1)
     {
         //默认是检测对面组别
         //如果是检查与对面组，对所有都检查
@@ -1788,8 +1872,8 @@ public class Referee : ICloneable
                     return true;
                 }
             }
-            return false;
 
+            return false;
         }
         else
         {
@@ -1801,13 +1885,15 @@ public class Referee : ICloneable
                     return true;
                 }
             }
+
             return false;
         }
     }
 
 
     //更新进攻方和防守方信息
-    private void UpdateOffAndDefInfo(RobotPosSquare[] DefenderPosSquare, RobotPosSquare[] OffensivePosSquare, Side Offensive)
+    private void UpdateOffAndDefInfo(RobotPosSquare[] DefenderPosSquare, RobotPosSquare[] OffensivePosSquare,
+        Side Offensive)
     {
         if (Offensive == Side.Yellow)
         {
@@ -1816,6 +1902,7 @@ public class Referee : ICloneable
                 DefenderPosSquare[i] = new RobotPosSquare(BlueRobotsPos[i], matchInfo.BlueRobots[i].rotation);
                 OffensivePosSquare[i] = new RobotPosSquare(YellowRobotsPos[i], matchInfo.YellowRobots[i].rotation);
             }
+
             offensiveHalfState = yellowHalfState;
             defenderHalfState = blueHalfState;
 
@@ -1829,6 +1916,7 @@ public class Referee : ICloneable
                 DefenderPosSquare[i] = new RobotPosSquare(YellowRobotsPos[i], matchInfo.YellowRobots[i].rotation);
                 OffensivePosSquare[i] = new RobotPosSquare(BlueRobotsPos[i], matchInfo.BlueRobots[i].rotation);
             }
+
             offensiveHalfState = blueHalfState;
             defenderHalfState = yellowHalfState;
 
@@ -1837,7 +1925,8 @@ public class Referee : ICloneable
         }
     }
 
-    private void UpdatePlacementPos(RobotPosSquare[] OffensiveRobotsPosSquare, RobotPosSquare[] DefensiveRobotsPosSquare, MatchInfo matchInfo, Side Offensive)
+    private void UpdatePlacementPos(RobotPosSquare[] OffensiveRobotsPosSquare,
+        RobotPosSquare[] DefensiveRobotsPosSquare, MatchInfo matchInfo, Side Offensive)
     {
         matchInfo.Ball.pos = BallPos;
         for (int i = 0; i < Const.RobotsPerTeam; i++)
@@ -1856,7 +1945,8 @@ public class Referee : ICloneable
     }
 
     //New判断安全区占用问题
-    private void JudgeSafePosSquare(RobotPosSquare[] SafePosSquare, RobotPosSquare[] OffensivePosSquare, RobotPosSquare[] DefenderPosSquare, int NumOfSafePos = 10)
+    private void JudgeSafePosSquare(RobotPosSquare[] SafePosSquare, RobotPosSquare[] OffensivePosSquare,
+        RobotPosSquare[] DefenderPosSquare, int NumOfSafePos = 10)
     {
         for (int i = 0; i < NumOfSafePos; i++)
         {
@@ -1875,12 +1965,12 @@ public class Referee : ICloneable
                     SafePosSquare[i].occupy = false;
                 }
             }
-
         }
     }
 
     //判断是否占用安全区域情况
-    private void JudgeSatePosOverlap(RobotPosSquare[] OffensiveSafePos, RobotPosSquare[] DefenderSafePos, Side Offensive, Side Defender)
+    private void JudgeSatePosOverlap(RobotPosSquare[] OffensiveSafePos, RobotPosSquare[] DefenderSafePos,
+        Side Offensive, Side Defender)
     {
         for (int i = 0; i < Const.RobotsPerTeam; i++)
         {
@@ -1895,17 +1985,20 @@ public class Referee : ICloneable
                     {
                         OffensiveSafePos[i].occupy = true;
                     }
+
                     if (!OffensiveSafePos[i].occupy && OffensiveSafePos[i].square.IsCrossedBy(YellowRobotSquare[j]))
                     {
                         //如果一方安全区被另一方占用，抢夺另一方对应的安全区
                         OffensiveSafePos[i].Pos = DefenderSafePos[i].Pos;
                         DefenderSafePos[i].occupy = true;
                     }
+
                     //检验黄方安全区域
                     if (!DefenderSafePos[i].occupy && DefenderSafePos[i].square.IsCrossedBy(YellowRobotSquare[j]))
                     {
                         DefenderSafePos[i].occupy = true;
                     }
+
                     if (!DefenderSafePos[i].occupy && DefenderSafePos[i].square.IsCrossedBy(BlueRobotSquare[j]))
                     {
                         //如果一方安全区被另一方占用，抢夺另一方对应的安全区
@@ -1921,17 +2014,20 @@ public class Referee : ICloneable
                     {
                         OffensiveSafePos[i].occupy = true;
                     }
+
                     if (!OffensiveSafePos[i].occupy && OffensiveSafePos[i].square.IsCrossedBy(BlueRobotSquare[j]))
                     {
                         //如果一方安全区被另一方占用，抢夺另一方对应的安全区
                         OffensiveSafePos[i].Pos = DefenderSafePos[i].Pos;
                         DefenderSafePos[i].occupy = true;
                     }
+
                     //检验蓝方安全区域
                     if (!DefenderSafePos[i].occupy && DefenderSafePos[i].square.IsCrossedBy(BlueRobotSquare[j]))
                     {
                         DefenderSafePos[i].occupy = true;
                     }
+
                     if (!DefenderSafePos[i].occupy && DefenderSafePos[i].square.IsCrossedBy(YellowRobotSquare[j]))
                     {
                         //如果一方安全区被另一方占用，抢夺另一方对应的安全区
@@ -1942,13 +2038,10 @@ public class Referee : ICloneable
             }
         }
     }
-    
 }
 
 namespace TestReferee
 {
-   
-
     [TestFixture]
     public class TestPlacement
     {
@@ -1969,8 +2062,10 @@ namespace TestReferee
                     !matchInfo2.YellowRobots[i].Equals(matchInfo2.YellowRobots[i]))
                     return false;
             }
+
             return true;
         }
+
         [Test]
         public void TestAuto()
         {
@@ -1995,14 +2090,17 @@ namespace TestReferee
                 {
                     judgeResult.Actor = Side.Yellow;
                 }
+
                 if (judgeResult.ResultType == ResultType.FreeKickLeftTop)
                 {
                     judgeResult.Actor = Side.Yellow;
                 }
+
                 if (judgeResult.ResultType == ResultType.FreeKickRightBot)
                 {
                     judgeResult.Actor = Side.Blue;
                 }
+
                 if (judgeResult.ResultType == ResultType.FreeKickRightBot)
                 {
                     judgeResult.Actor = Side.Blue;
@@ -2010,12 +2108,13 @@ namespace TestReferee
 
                 matchInfo.Referee.JudgeAutoPlacement(matchInfo, judgeResult);
                 //出现错误，输入到文件中
-                if (!ComparePlaceMatchInfo(preMatchInfo,matchInfo))
+                if (!ComparePlaceMatchInfo(preMatchInfo, matchInfo))
                 {
                     NeedChange++;
                     var failInfo = JsonConvert.SerializeObject(preMatchInfo);
-                    string filepath = "H:\\V5++\\UnityProject\\Bug\\" + judgeResult.ResultType + "--" + judgeResult.Actor +
-                        $"{DateTime.Now:yyyy-MM-dd_hhmmss}" + "--" + i + ".json";
+                    string filepath = "H:\\V5++\\UnityProject\\Bug\\" + judgeResult.ResultType + "--" +
+                                      judgeResult.Actor +
+                                      $"{DateTime.Now:yyyy-MM-dd_hhmmss}" + "--" + i + ".json";
                     FileStream fs = new FileStream(filepath, FileMode.Create, FileAccess.ReadWrite);
                     StreamWriter sw = new StreamWriter(fs);
                     fs.SetLength(0);
@@ -2027,6 +2126,7 @@ namespace TestReferee
                     Debug.Log(i + "次测试正确");
                 }
             }
+
             Debug.Log("错误率为：" + NeedChange / testtimes);
             //错误率小于0.1
             Assert.IsTrue(NeedChange / testtimes < 0.1);
@@ -2189,5 +2289,4 @@ namespace TestReferee
         //        yield return null;
         //}
     }
-
 }
