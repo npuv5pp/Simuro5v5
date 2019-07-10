@@ -45,15 +45,19 @@ public class ParameterTest : MonoBehaviour
 
         ForwardFactor = 102.89712678726376f;
         ForwardDrag = 79.81736047779975f;
+        SidewayDrag = 950;
 
         TorqueFactor = 1156.1817018313f;
         AngularDrag = 3769.775104018879f;
 
         ZeroAngularDrag = 305500;
-        DoubleZeroDrag = 750;
+        DoubleZeroDrag = 760;
 
         prevLeftPosition = leftWheelPosition;
         prevRightPosition = rightWheelPosition;
+        
+        maxX = minX = transform.position.x;
+        maxY = minY = transform.position.y;
     }
 
     private int tick;
@@ -66,73 +70,52 @@ public class ParameterTest : MonoBehaviour
             return;
 
         playTime++;
-        if (playTime < 30)
-            LeftVelocity = RightVelocity = 125;
-        else
-        {
-            LeftVelocity = 0;
-            RightVelocity = 0;
-        }
+        LeftVelocity = 30;
+        RightVelocity = 60;
 
-        if (playTime > 30 && rb.velocity == Vector3.zero)
-        {
-            Time.timeScale = 0;
-            Debug.LogError("Stop!!");
-        }
+        var forwardDir = transform.forward;
+
+        // 动力
+        forward_force = (LeftVelocity + RightVelocity) * ForwardFactor * forwardDir;
+        // 速度方向的空气阻力
+        forward_drag = rb.velocity * -ForwardDrag;
+        // 切向速度
+        var sidewayV = Vector3.Project(rb.velocity, transform.right);
+        // 切向阻力
+//        sideway_drag = sidewayV.magnitude < 0.1 ? Vector3.zero : sidewayV / sidewayV.magnitude * -SidewayDrag;
+        sideway_drag = sidewayV * -SidewayDrag;
+        rb.AddForce(forward_force + forward_drag + sideway_drag);
 
         var leftVelocity = leftWheelPosition - prevLeftPosition;
         var rightVelocity = rightWheelPosition - prevRightPosition;
         prevLeftPosition = leftWheelPosition;
         prevRightPosition = rightWheelPosition;
 
-        // 动力
-        forward_force = transform.forward * (LeftVelocity + RightVelocity) * ForwardFactor;
-        // 速度方向的空气阻力
-        forward_drag = rb.velocity * -ForwardDrag;
-        // 切向速度
-        var sidewayV = Vector3.Project(rb.velocity, transform.right);
-        // 切向阻力
-        sideway_drag = sidewayV == Vector3.zero ? Vector3.zero : sidewayV / sidewayV.magnitude * -SidewayDrag;
-        rb.AddForce(forward_force + forward_drag + sideway_drag);
-
         if (LeftVelocity == 0 && RightVelocity == 0)
         {
-            Debug.LogError("L0,R0");
-            var forwardV = Vector3.Project(rb.velocity, transform.forward);
-            if (forwardV != Vector3.zero)
-            {
-                forward_drag = rb.velocity * -DoubleZeroDrag;
-                rb.AddForce(forward_drag);
-            }
-            else
-            {
-                forward_right_drag = forward_left_drag = Vector3.zero;
-            }
+            forward_drag = rb.velocity * -DoubleZeroDrag;
+            rb.AddForce(forward_drag);
         }
         else if (LeftVelocity == 0)
         {
-            Debug.LogError("L0,R-");
-            var dot = Vector3.Dot(rightVelocity, transform.forward);
-            if (dot > 0 && RightVelocity < 0)
+            var dot = Vector3.Dot(leftVelocity, forwardDir);
+            if (RightVelocity < 0)
             {
-                rb.AddForceAtPosition(transform.forward * -ZeroAngularDrag, rightWheelPosition);
-            }
-            else if (dot < 0 && RightVelocity > 0)
-            {
-                rb.AddForceAtPosition(-transform.forward * -ZeroAngularDrag, rightWheelPosition);
+                if (dot > 0)
+                    rb.AddForceAtPosition(forwardDir * -ZeroAngularDrag, leftWheelPosition);
+                else if (dot < 0)
+                    rb.AddForceAtPosition(-forwardDir * -ZeroAngularDrag, leftWheelPosition);
             }
         }
         else if (RightVelocity == 0)
         {
-            Debug.LogError("R0,L-");
-            var dot = Vector3.Dot(leftVelocity, transform.forward);
-            if (dot > 0 && LeftVelocity < 0)
+            var dot = Vector3.Dot(rightVelocity, forwardDir);
+            if (LeftVelocity < 0)
             {
-                rb.AddForceAtPosition(transform.forward * -ZeroAngularDrag, leftWheelPosition);
-            }
-            else if (dot < 0 && LeftVelocity > 0)
-            {
-                rb.AddForceAtPosition(-transform.forward * -ZeroAngularDrag, leftWheelPosition);
+                if (dot > 0)
+                    rb.AddForceAtPosition(forwardDir * -ZeroAngularDrag, rightWheelPosition);
+                else if (dot < 0)
+                    rb.AddForceAtPosition(-forwardDir * -ZeroAngularDrag, rightWheelPosition);
             }
         }
 
@@ -168,6 +151,7 @@ public class ParameterTest : MonoBehaviour
 
     float prevA = 0;
     private float prevZ = 0;
+    float maxX, maxY, minX, minY;
 
     void OutputData()
     {
@@ -180,7 +164,17 @@ public class ParameterTest : MonoBehaviour
         prevZ = z;
 
         var str = $"v {v}, av {av}";
-        Debug.Log(str);
+//        Debug.Log(str);
+
+        if (rb.transform.position.x > maxX)
+            maxX = rb.transform.position.x;
+        if (rb.transform.position.z > maxY)
+            maxY = rb.transform.position.z;
+        if (rb.transform.position.x < minX)
+            minX = rb.transform.position.x;
+        if (rb.transform.position.z < minY)
+            minY = rb.transform.position.z;
+        Debug.Log($"{(maxX - minX + maxY - minY) / 2}");
 
         str = $"{rb.position.x},{rb.position.z},{rb.rotation.eulerAngles.y}";
         writer.WriteLine(str);
@@ -220,6 +214,8 @@ public class ParameterTest : MonoBehaviour
         prevA = 0;
         prevZ = 0;
         playTime = 0;
+        maxX = minX = transform.position.x;
+        maxY = minY = transform.position.z;
         Time.timeScale = 0;
     }
 

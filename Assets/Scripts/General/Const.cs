@@ -37,7 +37,7 @@ namespace Simuro5v5
             public readonly static float ForwardForceFactor = 102.89712678726376f;
             public readonly static float DragFactor = 79.81736047779975f;
             public readonly static float DoubleZeroDragFactor = 760;
-            public readonly static float SidewayDragFactor = 30000;
+            public readonly static float SidewayDragFactor = 750;
 
             // angular
             public readonly static float TorqueFactor = 1156.1817018313f;

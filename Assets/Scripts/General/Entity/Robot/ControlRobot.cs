@@ -77,7 +77,9 @@ public class ControlRobot : MonoBehaviour
         // 切向速度
         var sidewayV = Vector3.Project(rb.velocity, transform.right);
         // 切向阻力
-        sideway_drag = sidewayV == Vector3.zero ? Vector3.zero : sidewayV / sidewayV.magnitude * -SidewayDrag;
+        MyDebug($"{sidewayV} {sidewayV.magnitude}");
+//        sideway_drag = sidewayV.magnitude < 0.1 ? Vector3.zero : sidewayV / sidewayV.magnitude * -SidewayDrag;
+        sideway_drag = sidewayV * -SidewayDrag;
         rb.AddForce(forward_force + forward_drag + sideway_drag);
 
         var leftVelocity = leftWheelPosition - prevLeftPosition;
