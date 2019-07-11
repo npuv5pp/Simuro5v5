@@ -72,98 +72,77 @@ public class ParameterTest : MonoBehaviour
             return;
 
         playTime++;
-        if (playTime < 30)
-        {
-            LeftVelocity = 125;
-            RightVelocity = 125;
-        }
-        else if (playTime < 32)
-        {
-            LeftVelocity = -1;
-            RightVelocity = 0;
-        }
-        else
-        {
-            LeftVelocity = -1;
-            RightVelocity = 0;
-        }
+        LeftVelocity = 125;
+        RightVelocity = 125;
 
-        if (playTime >= 29 && playTime <= 32)
-        {
-            Debug.Log($"{transform.eulerAngles.y - prevEuler}");
-        }
-
-        if (playTime == 33)
-        {
-            OnPauseBtnClick();
-        }
-        prevEuler = transform.eulerAngles.y;
-
+        // 前向
         var forwardDir = transform.forward;
+        // 右边
+        var rightDir = transform.right;
+        // 线速度
+        var velocity = rb.velocity;
+        // 角速度
+        var angularVelocity = rb.angularVelocity;
+        // 左轮中点速度
+        var leftPointVelocity = leftWheelPosition - prevLeftPosition;
+        // 右轮中点速度
+        var rightPointVelocity = rightWheelPosition - prevRightPosition;
 
-        var leftVelocity = leftWheelPosition - prevLeftPosition;
-        var rightVelocity = rightWheelPosition - prevRightPosition;
         prevLeftPosition = leftWheelPosition;
         prevRightPosition = rightWheelPosition;
 
         if (LeftVelocity == 0 && RightVelocity == 0)
         {
-            forward_drag = rb.velocity * -DoubleZeroDrag;
+            // 双零直线减速
+            forward_drag = velocity * -DoubleZeroDrag;
             rb.AddForce(forward_drag);
         }
         else if (LeftVelocity == 0)
         {
-            var dot = Vector3.Dot(leftVelocity, forwardDir);
+            // 左轮为0减速，
+            var dot = Vector3.Dot(leftPointVelocity, forwardDir);
             if (Math.Abs(dot) > 0.001 && RightVelocity < 0)
             {
-                var leftV = Vector3.Project(leftVelocity, forwardDir);
+                var leftV = Vector3.Project(leftPointVelocity, forwardDir);
                 if (dot > 0)
                 {
-                    forward_drag = rb.velocity * -DoubleZeroDrag;
+                    forward_drag = velocity * -DoubleZeroDrag;
                     rb.AddForce(forward_drag);
                     // 左手系
                     rb.AddTorque(leftV.magnitude * ZeroAngularDrag * Vector3.down, ForceMode.Impulse);
-//                    rb.AddForceAtPosition(-ZeroAngularDrag * leftV,
-//                        leftWheelPosition);
                 }
                 else if (dot < 0)
                 {
-                    forward_drag = rb.velocity * -DoubleZeroDrag;
+                    forward_drag = velocity * -DoubleZeroDrag;
                     rb.AddForce(forward_drag);
                     rb.AddTorque(leftV.magnitude * ZeroAngularDrag * Vector3.up, ForceMode.Impulse);
-//                    rb.AddForceAtPosition(-ZeroAngularDrag * -leftV,
-//                        leftWheelPosition);
                 }
             }
         }
         else if (RightVelocity == 0)
         {
-            var dot = Vector3.Dot(rightVelocity, forwardDir);
+            var dot = Vector3.Dot(rightPointVelocity, forwardDir);
             if (Math.Abs(dot) > 0.001 && LeftVelocity < 0)
             {
-                var rightV = Vector3.Project(rightVelocity, forwardDir);
+                var rightV = Vector3.Project(rightPointVelocity, forwardDir);
                 if (dot > 0)
                 {
-                    forward_drag = rb.velocity * -DoubleZeroDrag;
+                    forward_drag = velocity * -DoubleZeroDrag;
                     rb.AddForce(forward_drag);
                     rb.AddTorque(rightV.magnitude * ZeroAngularDrag * Vector3.up, ForceMode.Impulse);
-//                    rb.AddForceAtPosition(-ZeroAngularDrag * rightV,
-//                        rightWheelPosition);
                 }
                 else if (dot < 0)
                 {
-                    forward_drag = rb.velocity * -DoubleZeroDrag;
+                    forward_drag = velocity * -DoubleZeroDrag;
                     rb.AddForce(forward_drag);
                     rb.AddTorque(rightV.magnitude * ZeroAngularDrag * Vector3.down, ForceMode.Impulse);
-//                    rb.AddForceAtPosition(-ZeroAngularDrag * -rightV,
-//                        rightWheelPosition);
                 }
             }
         }
         else
         {
             // 切向速度
-            var sidewayV = Vector3.Project(rb.velocity, transform.right);
+            var sidewayV = Vector3.Project(velocity, rightDir);
             // 切向阻力
 //        sideway_drag = sidewayV.magnitude < 0.1 ? Vector3.zero : sidewayV / sidewayV.magnitude * -30000;
             sideway_drag = sidewayV * -SidewayDrag;
@@ -173,13 +152,13 @@ public class ParameterTest : MonoBehaviour
         // 动力
         forward_force = (LeftVelocity + RightVelocity) * ForwardFactor * forwardDir;
         // 速度方向的空气阻力
-        forward_drag = rb.velocity * -ForwardDrag;
+        forward_drag = velocity * -ForwardDrag;
         rb.AddForce(forward_force + forward_drag);
 
         // 动力扭矩
         torque = (LeftVelocity - RightVelocity) * TorqueFactor * Vector3.up;
         // 阻力扭矩
-        angular_drag = rb.angularVelocity * -AngularDrag;
+        angular_drag = angularVelocity * -AngularDrag;
         rb.AddTorque(torque + angular_drag);
         OutputData();
     }
@@ -210,6 +189,8 @@ public class ParameterTest : MonoBehaviour
     private float prevZ = 0;
     float maxX, maxY, minX, minY;
 
+    float t1z = 0;
+
     void OutputData()
     {
         var eulerAngles = rb.transform.eulerAngles;
@@ -217,24 +198,40 @@ public class ParameterTest : MonoBehaviour
         prevA = eulerAngles.y;
 
         var z = rb.transform.position.z;
-        var v = string.Format("{0:N10}", z - prevZ);
+        var v = z - prevZ;
         prevZ = z;
 
-        var str = $"v {v}, av {av}";
-//        Debug.Log(str);
+        if (playTime == 2)
+        {
+            t1z = z;
+            Debug.Log(t1z);
+        }
 
-        if (rb.transform.position.x > maxX)
-            maxX = rb.transform.position.x;
-        if (rb.transform.position.z > maxY)
-            maxY = rb.transform.position.z;
-        if (rb.transform.position.x < minX)
-            minX = rb.transform.position.x;
-        if (rb.transform.position.z < minY)
-            minY = rb.transform.position.z;
+        if (playTime > 10 && playTime < 13)
+        {
+            Debug.LogError($"{z - t1z}");
+        }
+        else
+        {
+            Debug.Log($"{z - t1z}");
+        }
+
+        if (playTime > 13)
+            OnPauseBtnClick();
+        
+//      circle
+//        if (rb.transform.position.x > maxX)
+//            maxX = rb.transform.position.x;
+//        if (rb.transform.position.z > maxY)
+//            maxY = rb.transform.position.z;
+//        if (rb.transform.position.x < minX)
+//            minX = rb.transform.position.x;
+//        if (rb.transform.position.z < minY)
+//            minY = rb.transform.position.z;
 //        Debug.Log($"{(maxX - minX + maxY - minY) / 2}");
 
-        str = $"{rb.position.x},{rb.position.z},{rb.rotation.eulerAngles.y}";
-        writer.WriteLine(str);
+//        str = $"{rb.position.x},{rb.position.z},{v},{rb.rotation.eulerAngles.y}";
+//        writer.WriteLine(str);
     }
 
     private void OnDestroy()
@@ -264,9 +261,16 @@ public class ParameterTest : MonoBehaviour
 
     public void OnResetBtnClick()
     {
+        var ball = GameObject.Find("Ball");
+        ball.transform.position = new Vector3 {y = 5.29f, z = 6.78f};
+        var brb = ball.GetComponent<Rigidbody>();
+        brb.velocity = Vector3.zero;
+        brb.angularVelocity = Vector3.zero;
+        brb.mass = 0.8821f;
+
         rb.angularVelocity = Vector3.zero;
         rb.velocity = Vector3.zero;
-        rb.transform.position = Vector3.zero;
+        rb.transform.position = new Vector3 {y = 1.52f};
         rb.transform.rotation = Quaternion.Euler(0, 0, 0);
         prevA = 0;
         prevZ = 0;
@@ -274,6 +278,8 @@ public class ParameterTest : MonoBehaviour
         maxX = minX = transform.position.x;
         maxY = minY = transform.position.z;
         Time.timeScale = 0;
+
+        t1z = 0;
     }
 
     public void OnPauseBtnClick()

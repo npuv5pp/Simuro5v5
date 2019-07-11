@@ -18,7 +18,7 @@ public class ControlRobot : MonoBehaviour
 
     public bool physicsEnabled
     {
-        get { return _physicsEnabled; }
+        get => _physicsEnabled;
         set
         {
             if (value)
@@ -66,73 +66,76 @@ public class ControlRobot : MonoBehaviour
         if (tick % 2 == 0)
             return;
 
+        // 前向
         var forwardDir = -transform.up;
+        // 右边
+        var rightDir = transform.right;
+        // 线速度
+        var velocity = rb.velocity;
+        // 角速度
+        var angularVelocity = rb.angularVelocity;
+        // 左轮中点速度
+        var leftPointVelocity = leftWheelPosition - prevLeftPosition;
+        // 右轮中点速度
+        var rightPointVelocity = rightWheelPosition - prevRightPosition;
 
-        MyDebugWarning($"{LeftVelocity}, {RightVelocity}");
-
-        var leftVelocity = leftWheelPosition - prevLeftPosition;
-        var rightVelocity = rightWheelPosition - prevRightPosition;
         prevLeftPosition = leftWheelPosition;
         prevRightPosition = rightWheelPosition;
 
+        MyDebugWarning($"{LeftVelocity}, {RightVelocity}");
+
         if (LeftVelocity == 0 && RightVelocity == 0)
         {
-            forward_drag = rb.velocity * -DoubleZeroDrag;
+            // 双零直线减速
+            forward_drag = velocity * -DoubleZeroDrag;
             rb.AddForce(forward_drag);
         }
         else if (LeftVelocity == 0)
         {
-            var dot = Vector3.Dot(leftVelocity, forwardDir);
+            // 左轮为0减速，
+            var dot = Vector3.Dot(leftPointVelocity, forwardDir);
             if (Math.Abs(dot) > 0.001 && RightVelocity < 0)
             {
-                var leftV = Vector3.Project(leftVelocity, forwardDir);
+                var leftV = Vector3.Project(leftPointVelocity, forwardDir);
                 if (dot > 0)
                 {
-                    forward_drag = rb.velocity * -DoubleZeroDrag;
+                    forward_drag = velocity * -DoubleZeroDrag;
                     rb.AddForce(forward_drag);
                     // 左手系
                     rb.AddTorque(leftV.magnitude * ZeroAngularDrag * Vector3.down, ForceMode.Impulse);
-//                    rb.AddForceAtPosition(-ZeroAngularDrag * leftV,
-//                        leftWheelPosition);
                 }
                 else if (dot < 0)
                 {
-                    forward_drag = rb.velocity * -DoubleZeroDrag;
+                    forward_drag = velocity * -DoubleZeroDrag;
                     rb.AddForce(forward_drag);
                     rb.AddTorque(leftV.magnitude * ZeroAngularDrag * Vector3.up, ForceMode.Impulse);
-//                    rb.AddForceAtPosition(-ZeroAngularDrag * -leftV,
-//                        leftWheelPosition);
                 }
             }
         }
         else if (RightVelocity == 0)
         {
-            var dot = Vector3.Dot(rightVelocity, forwardDir);
+            var dot = Vector3.Dot(rightPointVelocity, forwardDir);
             if (Math.Abs(dot) > 0.001 && LeftVelocity < 0)
             {
-                var rightV = Vector3.Project(rightVelocity, forwardDir);
+                var rightV = Vector3.Project(rightPointVelocity, forwardDir);
                 if (dot > 0)
                 {
-                    forward_drag = rb.velocity * -DoubleZeroDrag;
+                    forward_drag = velocity * -DoubleZeroDrag;
                     rb.AddForce(forward_drag);
                     rb.AddTorque(rightV.magnitude * ZeroAngularDrag * Vector3.up, ForceMode.Impulse);
-//                    rb.AddForceAtPosition(-ZeroAngularDrag * rightV,
-//                        rightWheelPosition);
                 }
                 else if (dot < 0)
                 {
-                    forward_drag = rb.velocity * -DoubleZeroDrag;
+                    forward_drag = velocity * -DoubleZeroDrag;
                     rb.AddForce(forward_drag);
                     rb.AddTorque(rightV.magnitude * ZeroAngularDrag * Vector3.down, ForceMode.Impulse);
-//                    rb.AddForceAtPosition(-ZeroAngularDrag * -rightV,
-//                        rightWheelPosition);
                 }
             }
         }
         else
         {
             // 切向速度
-            var sidewayV = Vector3.Project(rb.velocity, transform.right);
+            var sidewayV = Vector3.Project(velocity, rightDir);
             // 切向阻力
 //        sideway_drag = sidewayV.magnitude < 0.1 ? Vector3.zero : sidewayV / sidewayV.magnitude * -30000;
             sideway_drag = sidewayV * -SidewayDrag;
@@ -142,13 +145,13 @@ public class ControlRobot : MonoBehaviour
         // 动力
         forward_force = (LeftVelocity + RightVelocity) * ForwardFactor * forwardDir;
         // 速度方向的空气阻力
-        forward_drag = rb.velocity * -ForwardDrag;
+        forward_drag = velocity * -ForwardDrag;
         rb.AddForce(forward_force + forward_drag);
 
         // 动力扭矩
         torque = (LeftVelocity - RightVelocity) * TorqueFactor * Vector3.up;
         // 阻力扭矩
-        angular_drag = rb.angularVelocity * -AngularDrag;
+        angular_drag = angularVelocity * -AngularDrag;
         rb.AddTorque(torque + angular_drag);
     }
 
