@@ -9,10 +9,6 @@ public class GUI_MainMenu : MonoBehaviour {
         Screen.fullScreen = false;
         Simuro5v5.Config.ConfigManager.ReadConfigFile("config.json");
 	}
-	
-	void Update ()
-    {
-    }
 
     public void OnGameButtonClicked()
     {
