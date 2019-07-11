@@ -2,7 +2,7 @@
 
 # Introduction
 
-![screenshot](./Documents/screenshot.png)
+![screenshot](https://raw.githubusercontent.com/npuv5pp/Simuro5v5/c9e93546d63fe9776d34817f0733e41fba437067/Documents/screenshot.png)
 
 This platform uses a new strategy loading method, but also provides a DLL way compatible with the old platform. The wrapper for the old platform DLL strategy can be found in [this repository](https://github.com/npuv5pp/V5DLLAdapter).
 
