@@ -33,6 +33,12 @@ public class ParameterTest : MonoBehaviour
 
     void Start()
     {
+        var ball = GameObject.Find("Ball");
+        ball.transform.position = new Vector3 {y = 5.29f, z = 6.78f};
+        var brb = ball.GetComponent<Rigidbody>();
+        
+        brb.mass = 0.95f;
+        
         Collider = GetComponent<Collider>();
         rb = GetComponent<Rigidbody>();
         rb.maxAngularVelocity = float.MaxValue;
@@ -40,7 +46,7 @@ public class ParameterTest : MonoBehaviour
         fs = File.Open(@"D:\Data\newplatform.csv", FileMode.OpenOrCreate);
         fs.SetLength(0);
         writer = new StreamWriter(fs);
-        writer.WriteLine("x,y,r");
+        writer.WriteLine("x,y,v,r");
 
         OnPauseBtnClick();
 
@@ -189,36 +195,24 @@ public class ParameterTest : MonoBehaviour
     private float prevZ = 0;
     float maxX, maxY, minX, minY;
 
-    float t1z = 0;
-
     void OutputData()
     {
         var eulerAngles = rb.transform.eulerAngles;
         var av = string.Format("{0:N10}", eulerAngles.y - prevA);
         prevA = eulerAngles.y;
 
-        var z = rb.transform.position.z;
+        var z = transform.position.z;
         var v = z - prevZ;
         prevZ = z;
 
-        if (playTime == 2)
+//        if (playTime > 10)
         {
-            t1z = z;
-            Debug.Log(t1z);
+            Debug.LogError($"{v}");
         }
 
-        if (playTime > 10 && playTime < 13)
-        {
-            Debug.LogError($"{z - t1z}");
-        }
-        else
-        {
-            Debug.Log($"{z - t1z}");
-        }
-
-        if (playTime > 13)
+        if (playTime > 23)
             OnPauseBtnClick();
-        
+
 //      circle
 //        if (rb.transform.position.x > maxX)
 //            maxX = rb.transform.position.x;
@@ -230,8 +224,9 @@ public class ParameterTest : MonoBehaviour
 //            minY = rb.transform.position.z;
 //        Debug.Log($"{(maxX - minX + maxY - minY) / 2}");
 
-//        str = $"{rb.position.x},{rb.position.z},{v},{rb.rotation.eulerAngles.y}";
-//        writer.WriteLine(str);
+        var str = $"{rb.position.x},{rb.position.z},{v},{rb.rotation.eulerAngles.y}";
+        writer.WriteLine(str);
+        writer.Flush();
     }
 
     private void OnDestroy()
@@ -262,24 +257,22 @@ public class ParameterTest : MonoBehaviour
     public void OnResetBtnClick()
     {
         var ball = GameObject.Find("Ball");
-        ball.transform.position = new Vector3 {y = 5.29f, z = 6.78f};
+        ball.transform.position = new Vector3 {y = 5.29f, z = 6.46f};
         var brb = ball.GetComponent<Rigidbody>();
         brb.velocity = Vector3.zero;
         brb.angularVelocity = Vector3.zero;
-        brb.mass = 0.8821f;
 
         rb.angularVelocity = Vector3.zero;
         rb.velocity = Vector3.zero;
         rb.transform.position = new Vector3 {y = 1.52f};
         rb.transform.rotation = Quaternion.Euler(0, 0, 0);
+        Debug.LogWarning(rb.transform.position);
         prevA = 0;
         prevZ = 0;
         playTime = 0;
         maxX = minX = transform.position.x;
         maxY = minY = transform.position.z;
         Time.timeScale = 0;
-
-        t1z = 0;
     }
 
     public void OnPauseBtnClick()

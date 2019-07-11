@@ -69,7 +69,7 @@ namespace Simuro5v5
         public static class Ball
         {
 //            public readonly static float mass = 10 / 16.7f;
-            public readonly static float mass = 0.8821f;
+            public readonly static float mass = 0.95f;
 
             public readonly static float BL = 5.043424f; // 球的直径
             public const float HBL = 2.521712f; // 球的半径
