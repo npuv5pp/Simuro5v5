@@ -61,7 +61,7 @@ public class PlayMain : MonoBehaviour
     public Action OnMatchStart;
 
     // 记录上一拍的类型
-    private ResultType lastResultType = ResultType.NormalMatch;
+    private bool isLastFrameAGoal = false;
 
     /// <summary>
     /// 进入场景之后。如果已经有实例在运行，立即销毁所绑定的Entity；否则激活已存在的单例
@@ -197,16 +197,9 @@ public class PlayMain : MonoBehaviour
             
             default:
                 // NOTE: 这是一个补丁
-                // 如果上一拍出现过摆位，则忽略这拍
-                switch (lastResultType)
-                {
-                    case ResultType.GameOver:
-                    case ResultType.NextPhase:
-                    case ResultType.NormalMatch:
-                        break;
-                    default:
-                        return;
-                }
+                // 如果上一拍进球，则忽略这拍
+                if (isLastFrameAGoal && judgeResult.WhoGoal != Side.Nobody)
+                    return;
 
                 // 摆位，输入摆位信息
 
@@ -261,8 +254,8 @@ public class PlayMain : MonoBehaviour
 
                 break;
         }
-        
-        lastResultType = judgeResult.ResultType;
+
+        isLastFrameAGoal = judgeResult.WhoGoal != Side.Nobody;
     }
 
     /// <summary>

@@ -149,7 +149,7 @@ public class Referee : ICloneable
 
     /// <summary>
     /// 根据传入的matchInfo，结合已保存的信息，给出下一拍应有的动作（JudgeResult）。<br/>
-    /// 这个接口不会对<parmref name="matchInfo">作任何修改，所有的信息由返回值给出
+    /// 这个接口不会对<paramref name="matchInfo"/>作任何修改，所有的信息由返回值给出
     /// </summary>
     /// <param name="matchInfo">需要被判断的比赛信息</param>
     /// <returns>下一拍应有的动作信息</returns>
@@ -554,7 +554,7 @@ public class Referee : ICloneable
         {
             int smallStateNum = 0;
             int bigStateNum = 0;
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < 5; i++)
             {
                 if (blueBigState.ContainsPoint(blueRobots[i].pos))
                 {
@@ -593,7 +593,7 @@ public class Referee : ICloneable
         {
             int smallStateNum = 0;
             int bigStateNum = 0;
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < 5; i++)
             {
                 if (yellowBigState.ContainsPoint(yellowRobots[i].pos))
                 {
