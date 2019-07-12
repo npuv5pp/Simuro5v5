@@ -61,12 +61,12 @@ public class Referee : ICloneable
     /// <summary>
     /// 上下半场游戏比赛时间 5分钟
     /// </summary>
-    private int endOfHalfgametime;
+    private int endOfHalfGameTime;
 
     /// <summary>
     /// 加时赛游戏比赛时间 3分钟
     /// </summary>
-    private int endOfOvergametime;
+    private int endOfOverGameTime;
 
     /// <summary>
     /// 点球大战中每次罚球点球限制时间5秒
@@ -107,14 +107,11 @@ public class Referee : ICloneable
 
     public Referee()
     {
-#if UNITY_EDITOR
-        // 编辑器中调试的时候将时间设置短一点
-        endOfHalfgametime = 20 * Const.FramePerSecond;
-        endOfOvergametime = 20 * Const.FramePerSecond;
-#else
-        endOfHalfgametime = 5 * 60 * Const.FramePerSecond;
-        endOfOvergametime = 5 * 60 * Const.FramePerSecond;
-#endif
+        //// 编辑器中调试的时候将时间设置短一点
+        //endOfHalfGameTime = 20 * Const.FramePerSecond;
+        //endOfOverGameTime = 20 * Const.FramePerSecond;
+        endOfHalfGameTime = 5 * 60 * Const.FramePerSecond;
+        endOfOverGameTime = 5 * 60 * Const.FramePerSecond;
         penaltySide = Side.Blue;
         penaltyLimitTime = 5 * Const.FramePerSecond;
         penaltyTime = 0;
@@ -805,7 +802,7 @@ public class Referee : ICloneable
     {
         if (matchInfo.MatchPhase == MatchPhase.FirstHalf)
         {
-            if (matchInfo.TickPhase == endOfHalfgametime)
+            if (matchInfo.TickPhase == endOfHalfGameTime)
             {
                 // matchInfo.MatchPhase = MatchPhase.SecondHalf;
                 judgeResult = new JudgeResult
@@ -823,7 +820,7 @@ public class Referee : ICloneable
         if (matchInfo.MatchPhase == MatchPhase.SecondHalf)
         {
             //下半场结束，判断比分是否结束
-            if (matchInfo.TickPhase == endOfHalfgametime)
+            if (matchInfo.TickPhase == endOfHalfGameTime)
             {
                 if (blueScore > yellowScore)
                 {
@@ -863,7 +860,7 @@ public class Referee : ICloneable
         //加时赛结束，同样判断比分
         if (matchInfo.MatchPhase == MatchPhase.OverTime)
         {
-            if (matchInfo.TickPhase == endOfOvergametime)
+            if (matchInfo.TickPhase == endOfOverGameTime)
             {
                 if (blueScore > yellowScore)
                 {

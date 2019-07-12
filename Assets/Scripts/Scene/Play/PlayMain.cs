@@ -60,8 +60,11 @@ public class PlayMain : MonoBehaviour
     public Action OnNextPhase;
     public Action OnMatchStart;
 
-    // 记录上一拍的类型
+    /// 记录上一拍的类型
     private bool isLastFrameAGoal = false;
+
+    /// 累积的排位数
+    private int pendingPlacement = 0;
 
     /// <summary>
     /// 进入场景之后。如果已经有实例在运行，立即销毁所绑定的Entity；否则激活已存在的单例
@@ -199,7 +202,9 @@ public class PlayMain : MonoBehaviour
                 // NOTE: 这是一个补丁
                 // 如果上一拍进球，则忽略这拍
                 if (isLastFrameAGoal && judgeResult.WhoGoal != Side.Nobody)
+                {
                     return;
+                }
 
                 // 摆位，输入摆位信息
 
@@ -230,20 +235,22 @@ public class PlayMain : MonoBehaviour
                 }
                 else
                 {
-                    Debug.Log("auto placing");
-
                     void Callback()
                     {
+                        pendingPlacement--;
+                        Debug.Log("callback placement " + pendingPlacement);
                         UpdatePlacementToScene(judgeResult);
                         ObjectManager.SetStill();
                         Event.Send(Event.EventType1.AutoPlacement, GlobalMatchInfo);
 
-                        PauseForSeconds(2, () => { });
+                        // PauseForSeconds(2, () => { });
                     }
 
                     // TODO 考虑连续出现摆位的情况
+                    pendingPlacement++;
                     if (GlobalMatchInfo.TickMatch > 1)
                     {
+                        Debug.Log("Will stop at " + GlobalMatchInfo.TickMatch + " " + pendingPlacement);
                         PauseForSeconds(2, Callback);
                     }
                     else
