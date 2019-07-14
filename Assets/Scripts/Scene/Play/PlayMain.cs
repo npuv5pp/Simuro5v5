@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using Simuro5v5;
 using Simuro5v5.Config;
@@ -24,7 +25,7 @@ using Event = Simuro5v5.EventSystem.Event;
 ///
 /// 比赛阶段：
 /// 一场比赛最多分为4个阶段：上半场、下半场、加时、点球大战；<br/>
-/// 每个阶段都由一个摆位开始，由NextPhase或者GameOver结束；
+/// 每个阶段都由一个摆位开始，由 <see cref="ResultType.NextPhase"/> 或者 <see cref="ResultType.GameOver"/> 结束；
 /// 每个阶段结束后，不会清空比分，但会清空比赛时间，将比赛时间设置为0以使得下一拍的裁判得知这是一个新的阶段；
 /// 每个阶段运行期间可能产生正常比赛和摆位两种状态。<br/>
 /// 
@@ -60,11 +61,15 @@ public class PlayMain : MonoBehaviour
     public Action OnNextPhase;
     public Action OnMatchStart;
 
-    /// 记录上一拍的类型
-    private bool isLastFrameAGoal = false;
+    #region 对暂停的补丁
+    // 由于有时暂停会无效，所以需要补丁
 
-    /// 累积的排位数
-    private int pendingPlacement = 0;
+    private int placementCount = 0;
+    private int callbackCount = 0;
+    private int lastPlacementId = 0;
+    private Queue<int> placementToIgnore = new Queue<int>();
+    
+    #endregion
 
     /// <summary>
     /// 进入场景之后。如果已经有实例在运行，立即销毁所绑定的Entity；否则激活已存在的单例
@@ -146,6 +151,14 @@ public class PlayMain : MonoBehaviour
         // 如果现在是阶段的第一拍，上一拍无意义，不用触发事件
         if (GlobalMatchInfo.TickPhase != 0)
             Event.Send(Event.EventType1.MatchInfoUpdate, GlobalMatchInfo);
+        else
+        {
+            // 在第一拍做初始化
+            placementCount = 0;
+            callbackCount = 0;
+            lastPlacementId = 0;
+            placementToIgnore = new Queue<int>();
+        }
 
         /* 之前处理上一拍 */
         /* 之后为本拍做准备 */
@@ -199,15 +212,6 @@ public class PlayMain : MonoBehaviour
                 break;
             
             default:
-                // NOTE: 这是一个补丁
-                // 如果上一拍进球，则忽略这拍
-                if (isLastFrameAGoal && judgeResult.WhoGoal != Side.Nobody)
-                {
-                    return;
-                }
-
-                // 摆位，输入摆位信息
-
                 // 判断是否进球
                 switch (judgeResult.WhoGoal)
                 {
@@ -237,8 +241,24 @@ public class PlayMain : MonoBehaviour
                 {
                     void Callback()
                     {
-                        pendingPlacement--;
-                        Debug.Log("callback placement " + pendingPlacement);
+                        #region Patch to placement
+
+                        int callbackId = callbackCount;
+                        callbackCount++;
+                        if (callbackId == lastPlacementId)
+                        {
+                            lastPlacementId = 0;
+                        }
+                        else
+                        {
+                            Debug.Assert(placementToIgnore.Peek() == callbackId);
+                            placementToIgnore.Dequeue();
+                            return;
+                        }
+
+                        #endregion
+                        
+                        Debug.Log("callback placement " + callbackId);
                         UpdatePlacementToScene(judgeResult);
                         ObjectManager.SetStill();
                         Event.Send(Event.EventType1.AutoPlacement, GlobalMatchInfo);
@@ -247,10 +267,25 @@ public class PlayMain : MonoBehaviour
                     }
 
                     // TODO 考虑连续出现摆位的情况
-                    pendingPlacement++;
+
+                    #region Patch to placement
+
+                    int placementId = placementCount;
+                    placementCount++;
+                    if (lastPlacementId == 0)
+                    {
+                        lastPlacementId = placementId;
+                    }
+                    else
+                    {
+                        placementToIgnore.Enqueue(placementId);
+                    }
+                
+                    #endregion
+                    
                     if (GlobalMatchInfo.TickMatch > 1)
                     {
-                        Debug.Log("Will stop at " + GlobalMatchInfo.TickMatch + " " + pendingPlacement);
+                        Debug.Log("Will stop at " + GlobalMatchInfo.TickMatch + " " + placementId);
                         PauseForSeconds(2, Callback);
                     }
                     else
@@ -261,8 +296,6 @@ public class PlayMain : MonoBehaviour
 
                 break;
         }
-
-        isLastFrameAGoal = judgeResult.WhoGoal != Side.Nobody;
     }
 
     /// <summary>
