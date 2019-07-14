@@ -606,18 +606,6 @@ public class Referee : ICloneable
 
     private bool JudgePenalty(ref JudgeResult judgeResult)
     {
-        ////考虑进入点球大战中，且首拍为0.进行点球
-        //if (matchInfo.MatchPhase == MatchPhase.Penalty && matchInfo.TickPhase == 0)
-        //{
-        //    judgeResult = new JudgeResult
-        //    {
-        //        ResultType = ResultType.PenaltyKick,
-        //        Actor = Side.Blue,
-        //        Reason = "Penalty shoot-out start and blue first penalty"
-        //    };
-        //    return true;
-        //}
-
         if (matchInfo.Ball.pos.x > 0)
         {
             int smallStateNum = 0;
@@ -661,7 +649,10 @@ public class Referee : ICloneable
         {
             int smallStateNum = 0;
             int bigStateNum = 0;
-            for (int i = 0; i < 5; i++)
+            //test three attack
+            //忽略黄方小禁区
+            for (int i = 0; i < 2 ; i++)
+                //for(int i = 0 ;i<5;i++)
             {
                 if (yellowBigState.ContainsPoint(yellowRobots[i].pos))
                 {

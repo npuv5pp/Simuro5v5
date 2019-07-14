@@ -36,6 +36,7 @@ public class GUI_Replay : MonoBehaviour
     public TMP_Text tickText;
     public TMP_Text PhaseText;
     public TMP_Text JudgeResultText;
+    public TMP_Text BlueScore, YellowScore;
 
     public static DataRecorder Recorder { get; set; }
     private ObjectManager ObjectManager { get; set; }
@@ -153,6 +154,8 @@ public class GUI_Replay : MonoBehaviour
         tickText.text = $"{data.matchInfo.TickMatch}/{Recorder.DataLength}";
         JudgeResultText.text = data.matchInfo.Referee.savedJudge.ToRichText();
         RenderPhaseText(data.matchInfo.MatchPhase);
+        BlueScore.text = data.matchInfo.Score.BlueScore.ToString();
+        YellowScore.text = data.matchInfo.Score.YellowScore.ToString();
     }
 
     void RenderPhaseText(MatchPhase mp)
