@@ -22,9 +22,9 @@ namespace Simuro5v5
             return 90.0f - rot;
         }
 
-        // 规定rot∈(-180, 180]
-        // 扩展方法谨慎使用
-        // 按照旧的标准规整角度
+        /// 规定rot∈(-180, 180]
+        /// 扩展方法谨慎使用
+        /// 按照旧的标准规整角度
         public static float FormatOld(this float rot)
         {
             while (rot > 180.0f)

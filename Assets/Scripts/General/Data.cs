@@ -187,8 +187,8 @@ namespace Simuro5v5
         {
             for (int i = 0; i < Const.RobotsPerTeam; i++)
             {
-                BlueRobots[i].UpdateFromTransform(blue[i].transform);
-                YellowRobots[i].UpdateFromTransform(yellow[i].transform);
+                BlueRobots[i].UpdateFromRigidbody(blue[i].GetComponent<Rigidbody>());
+                YellowRobots[i].UpdateFromRigidbody(yellow[i].GetComponent<Rigidbody>());
             }
 
             var position = ball.transform.position;
@@ -250,8 +250,6 @@ namespace Simuro5v5
         public OpponentRobot[] opp = new OpponentRobot[Const.RobotsPerTeam];
         public Ball currentBall;
         public int TickMatch;
-
-        public SideInfo() { }
 
         public void ConvertToAnotherSide()
         {
