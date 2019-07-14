@@ -8,6 +8,7 @@ public class BuildBatch
     private static void BuildGame(BuildTarget target, string path = null)
     {
         string truePath = path ?? EditorUtility.SaveFolderPanel("Choose Build Location", "", "");
+        truePath = Path.Combine(truePath, "Simuro5v5.exe");
         var scenes =
             EditorBuildSettings.scenes
                 .Where(s => s.enabled)
@@ -32,8 +33,8 @@ public class BuildBatch
     public static void BuildWindows32And64()
     {
         string path = EditorUtility.SaveFolderPanel("Choose Build Location", "", "");
-        string win32Path = Path.Combine(path, "win32", "Simuro5v5.exe");
-        string win64Path = Path.Combine(path, "win64", "Simuro5v5.exe");
+        string win32Path = Path.Combine(path, "x86");
+        string win64Path = Path.Combine(path, "x64");
         BuildGame(BuildTarget.StandaloneWindows, win32Path);
         BuildGame(BuildTarget.StandaloneWindows64, win64Path);
     }
