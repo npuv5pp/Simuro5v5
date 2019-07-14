@@ -223,17 +223,11 @@ public class PlayMain : MonoBehaviour
                         break;
                 }
 
-                StrategyManager.Blue.OnJudgeResult(judgeResult);
-                StrategyManager.Yellow.OnJudgeResult(new JudgeResult
-                {
-                    Actor = judgeResult.Actor.ToAnother(),
-                    ResultType = judgeResult.ResultType,
-                    Reason = judgeResult.Reason
-                });
 
                 // 手动摆位
                 if (manualPlaceEnabled)
                 {
+                    BoardcastJudgeResult(judgeResult);
                     Debug.Log("manual placing");
                     BeginManualPlace();
                 }
@@ -258,6 +252,7 @@ public class PlayMain : MonoBehaviour
 
                         #endregion
                         
+                        BoardcastJudgeResult(judgeResult);
                         Debug.Log("callback placement " + callbackId);
                         UpdatePlacementToScene(judgeResult);
                         ObjectManager.SetStill();
@@ -296,6 +291,17 @@ public class PlayMain : MonoBehaviour
 
                 break;
         }
+    }
+
+    private void BoardcastJudgeResult(JudgeResult judgeResult)
+    {
+        StrategyManager.Blue.OnJudgeResult(judgeResult);
+        StrategyManager.Yellow.OnJudgeResult(new JudgeResult
+        {
+            Actor = judgeResult.Actor.ToAnother(),
+            ResultType = judgeResult.ResultType,
+            Reason = judgeResult.Reason
+        });
     }
 
     /// <summary>
