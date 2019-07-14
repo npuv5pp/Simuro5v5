@@ -19,8 +19,8 @@ obj
 Build.zip
 config.json
 
-Assets/Plugins
-Assets/Plugins.meta
+Assets/Plugins/Editor/JetBrains/
+Assets/Plugins/Editor/JetBrains.meta
 .idea
 *.DotSettings
 *.DotSettings.user
