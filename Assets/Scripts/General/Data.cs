@@ -197,7 +197,7 @@ namespace Simuro5v5
                 pos = { x = position.x, y = position.z },
             };
             Ball = newBall;
-            Ball.linearVelocity = Vector2D.FromUnityVector3(ball.GetComponents<Rigidbody>().First().velocity);
+            Ball.linearVelocity = Vector2D.FromUnityVector3(ball.GetComponent<Rigidbody>().velocity);
         }
 
         /// <summary>

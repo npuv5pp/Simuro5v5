@@ -68,10 +68,18 @@ public class Referee : ICloneable
     /// </summary>
     private int endOfOverGameTime;
 
+    //点球大战有关信息开始
+
     /// <summary>
-    /// 点球大战中每次罚球点球限制时间5秒
+    /// 点球大战中每次罚球点球限制时间3秒
     /// </summary>
     private int penaltyLimitTime;
+
+    /// <summary>
+    /// 点球大战根据踢一次球后判断有没有进球，保存是否进行了踢球
+    /// </summary>
+    private bool penaltyTouchBall;
+    
 
     /// <summary>
     /// 点球大战中点球方，依次交换顺序
@@ -80,7 +88,7 @@ public class Referee : ICloneable
     private Side penaltySide;
 
     /// <summary>
-    /// 点球大战中所执行的时间
+    /// 点球大战未踢球时间
     /// </summary>
     private int penaltyTime;
 
@@ -89,6 +97,24 @@ public class Referee : ICloneable
     /// TODO: 将这些信息暴露出去，显示在UI上
     /// </summary>
     private int penaltyOfNum;
+
+    /// <summary>
+    /// 是否进入突然死亡模式
+    /// </summary>
+    private bool penaltySuddenDeath;
+
+    /// <summary>
+    /// 点球大战中点球球员的序号
+    /// </summary>
+    private int penaltyAttackID;
+
+    /// <summary>
+    /// 点球大战中进攻方守门员的序号
+    /// </summary>
+    private int penaltyGoalID;
+    private UprightRectangle defenderPenaltySmallState;
+    private UprightRectangle offensivePenaltySmallState;
+    ///点球大战有关信息结束 
 
     /// <summary>
     /// 球的最大的停滞时间
@@ -113,7 +139,7 @@ public class Referee : ICloneable
         endOfHalfGameTime = 5 * 60 * Const.FramePerSecond;
         endOfOverGameTime = 5 * 60 * Const.FramePerSecond;
         penaltySide = Side.Blue;
-        penaltyLimitTime = 5 * Const.FramePerSecond;
+        penaltyLimitTime = 3 * Const.FramePerSecond;
         penaltyTime = 0;
         standoffTime = 0;
         maxStandoffTime = 10 * Const.FramePerSecond;
@@ -122,11 +148,11 @@ public class Referee : ICloneable
         YellowRobotsPos = new Vector2D[Const.RobotsPerTeam];
         BlueRobotSquare = new Square[Const.RobotsPerTeam];
         YellowRobotSquare = new Square[Const.RobotsPerTeam];
-        //OffensiveRobotsPos = new Vector2D[Const.RobotsPerTeam];
-        //DefenderRobotsPos = new Vector2D[Const.RobotsPerTeam];
 
         ObjectManager.FindObjects(out BlueObject, out YellowObject, out BallObject);
 
+        penaltySide = Side.Nobody;
+        penaltySuddenDeath = false;
         savedJudge = new JudgeResult
         {
             Actor = Side.Nobody,
@@ -152,6 +178,12 @@ public class Referee : ICloneable
     /// <returns>下一拍应有的动作信息</returns>
     public JudgeResult Judge(MatchInfo matchInfo)
     {
+        ////test penalty shootout
+        //if(matchInfo.MatchPhase == MatchPhase.FirstHalf)
+        //{
+        //    matchInfo.MatchPhase = MatchPhase.Penalty;
+        //}
+        /////
         this.blueScore = matchInfo.Score.BlueScore;
         this.yellowScore = matchInfo.Score.YellowScore;
         this.matchInfo = matchInfo;
@@ -159,7 +191,12 @@ public class Referee : ICloneable
         this.yellowRobots = matchInfo.YellowRobots;
         this.goalieBlueId = FindGoalie(Side.Blue);
         this.goalieYellowId = FindGoalie(Side.Yellow);
-
+        this.BallPos = matchInfo.Ball.pos;
+        for (int i = 0; i<Const.RobotsPerTeam;i++)
+        {
+            BlueRobotSquare[i] = new Square(BlueRobotsPos[i], matchInfo.BlueRobots[i].rotation);
+            YellowRobotSquare[i] = new Square(YellowRobotsPos[i], matchInfo.YellowRobots[i].rotation);
+        }
         var result = CollectJudge();
         savedJudge = result;
         // 判罚之后应该清零计时
@@ -167,7 +204,6 @@ public class Referee : ICloneable
         {
             this.standoffTime = 0;
         }
-
         return result;
     }
 
@@ -192,7 +228,6 @@ public class Referee : ICloneable
 
         //该情况一般只用于门球情况，进攻方自定义球的坐标
         this.BallPos = matchInfo.Ball.pos;
-
         switch (judgeResult.ResultType)
         {
             case ResultType.PenaltyKick:
@@ -244,50 +279,177 @@ public class Referee : ICloneable
                 Reason = "Normal competition"
             };
         }
-        //点球大战状态
+        //点球大战情况
         else
         {
-            if (matchInfo.TickPhase == 0)
-            {
-                return new JudgeResult
-                {
-                    ResultType = ResultType.PenaltyKick,
-                    Actor = Side.Blue,
-                    Reason = "Penalty competition start , Blue first"
-                };
-            }
+            JudgePenaltyShootOut(ref judgeResult);
+            return judgeResult;
+        }
+    }
 
-            //点球限制时间未结束
-            if (penaltyTime < penaltyLimitTime)
+    private void JudgePenaltyShootOut(ref JudgeResult judgeResult)
+    {
+        Side IllegalMoveSide = Side.Nobody;
+        //刚开始罚球的第一拍
+        if(penaltyTime == 0)
+        {
+            if(penaltySide == Side.Nobody)
             {
-                if (JudgePenaltyGoal(ref judgeResult))
-                    return judgeResult;
-
-                //未进球，拍数增加
-                penaltyTime = penaltyTime + 1;
-                return new JudgeResult
-                {
-                    ResultType = ResultType.NormalMatch,
-                    Actor = Side.Nobody,
-                    Reason = "Normal competition"
-                };
+                penaltySide = Side.Blue;
             }
-            //点球限制时间结束，更新状态
+            //判罚发现点球大战结束
+            if(JudgePenaltyOver(ref judgeResult))
+            {
+                return;  
+            }
+            //未结束的话更新相关信息
+            if(penaltySide == Side.Blue)
+            {
+                offensivePenaltySmallState = blueSmallState;
+                defenderPenaltySmallState = yellowSmallState;
+            }
             else
             {
-                //五轮结束，进行结算
-                if (penaltyOfNum == 5 && penaltySide == Side.Yellow)
+                offensivePenaltySmallState = yellowSmallState;
+                defenderSmallState = blueSmallState;
+            }
+            penaltyTouchBall = false;
+            penaltyAttackID = FindPenaltyAttackID(penaltySide);
+            penaltyGoalID = FindGoalie(penaltySide);
+            penaltyTime++;
+        }
+        //判断有没有非法移动
+        else if (JudgePenaltyIllegalMove(ref IllegalMoveSide, penaltySide))
+        {
+            if (IllegalMoveSide == penaltySide)
+            {
+                judgeResult = new JudgeResult
                 {
-                    JudgeFiveRoundPenalty(ref judgeResult);
-                }
-                else
+                    Actor = penaltySide.ToAnother(),
+                    ResultType = ResultType.PenaltyKick,
+                    Reason = "Offensive side illegal move,switch the penalty side"
+                };
+            }
+            else
+            {
+                judgeResult = new JudgeResult
                 {
-                    UpdatePenaltyState(ref judgeResult);
-                }
-
-                return judgeResult;
+                    Actor = penaltySide.ToAnother(),
+                    ResultType = ResultType.PenaltyKick,
+                    Reason = "Defensive side illegal move,offensive get score and switch penalty side",
+                    WhoGoal = penaltySide  
+                };
+            }
+            UpdateNewPenalty();
+        }
+        //未踢球且在限制时间内，寻找踢球球员
+        else if (!penaltyTouchBall && penaltyTime<penaltyLimitTime)
+        {
+            if (BlueRobotSquare[penaltyAttackID].OverlapWithCircle(BallPos))
+            {
+                penaltyTouchBall = true;
+            }
+            penaltyTime++;
+        }
+        //超过限制时间内仍未踢球
+        else if(!penaltyTouchBall && penaltyTime>=penaltyLimitTime)
+        {
+            judgeResult = new JudgeResult
+            {
+                Actor = penaltySide.ToAnother(),
+                ResultType = ResultType.PenaltyKick,
+                Reason = "overtime with penalty and switch the penalty side"
+            };
+            UpdateNewPenalty();
+                    }
+        //已踢球，但未到规定时间,判断有没有进球
+        else if(penaltyTouchBall && penaltyTime < penaltyLimitTime)
+        {
+            if(offensivePenaltySmallState.ContainsPoint(BallPos))
+            {
+                judgeResult = new JudgeResult
+                {
+                    Actor = penaltySide.ToAnother(),
+                    ResultType = ResultType.PenaltyKick,
+                    Reason = "offensive team goal and switch the peanlty side",
+                    WhoGoal = penaltySide
+                };
+                UpdateNewPenalty();
+            }
+            else
+            {
+                judgeResult = new JudgeResult
+                {
+                    Actor = Side.Nobody,
+                    ResultType = ResultType.NormalMatch,
+                    Reason = "Normal competition"
+                };
+                penaltyTime++;
             }
         }
+        else if(penaltyTouchBall && penaltyTime > penaltyLimitTime)
+        {
+            judgeResult = new JudgeResult
+            {
+                Actor = penaltySide.ToAnother(),
+                ResultType = ResultType.PenaltyKick,
+                Reason = "overtime with penalty and switch the penalty side"
+            };
+            UpdateNewPenalty();
+        }
+        else
+        {
+            Debug.Log("error");
+        }
+    }
+
+    //更新新一轮点球信息
+    private void UpdateNewPenalty()
+    {
+        penaltySide = penaltySide.ToAnother();
+        penaltyTime = 0;
+        if (penaltySide == Side.Blue)
+        {
+            penaltyOfNum++;
+        }
+    }
+
+    private bool JudgePenaltyOver(ref JudgeResult judgeResult)
+    {
+        if(penaltyOfNum == 5 && penaltySide == Side.Blue)
+        {
+            if(blueScore > yellowScore)
+            {
+                judgeResult = new JudgeResult
+                {
+                    Actor = Side.Blue,
+                    ResultType = ResultType.GameOver,
+                    Reason = "Blue team win the game"
+                };
+                return true;
+            }
+            else if(yellowScore > blueScore)
+            {
+                judgeResult = new JudgeResult
+                {
+                    Actor = Side.Yellow,
+                    ResultType = ResultType.GameOver,
+                    Reason = "Yellow team win the game"
+                };
+                return true;
+            }
+            else
+            {
+                judgeResult = new JudgeResult
+                {
+                    Actor = Side.Nobody,
+                    ResultType = ResultType.NormalMatch,
+                    Reason = "In the sudden death model"
+                };
+                return false;
+            }
+        }
+        return false;
     }
 
     private int FindGoalie(Side side)
@@ -313,167 +475,76 @@ public class Referee : ICloneable
                 }
             }
         }
-
         return id;
     }
-
-
-    //第五轮点球，且黄方已经点完，进行判断是否该结束比赛,同时更新数据
-    private void JudgeFiveRoundPenalty(ref JudgeResult judgeResult)
+    
+    //判断有没有非法移动，点球大战除了一个进攻球员和一个守门员可以移动，其余球员不可以移动
+    private bool JudgePenaltyIllegalMove(ref Side IllegalMoveSide,Side OffensiveSide)
     {
-        if (blueScore > yellowScore)
+        Side defensiveSide = OffensiveSide.ToAnother(); 
+        Robot[] offensiveRobots, defensiveRobots;
+        if(OffensiveSide == Side.Blue)
         {
-            judgeResult = new JudgeResult
-            {
-                ResultType = ResultType.GameOver,
-                Reason = "Blue team win the game",
-                Actor = Side.Nobody
-            };
-        }
-        else if (blueScore < yellowScore)
-        {
-            judgeResult = new JudgeResult
-            {
-                ResultType = ResultType.GameOver,
-                Reason = "Yellow team win the game",
-                Actor = Side.Nobody
-            };
+            offensiveRobots = blueRobots;
+            defensiveRobots = yellowRobots;
         }
         else
         {
-            penaltyTime = 0;
-            penaltySide = Side.Blue;
-            penaltyOfNum = penaltyOfNum + 1;
-            judgeResult = new JudgeResult
-            {
-                ResultType = ResultType.PenaltyKick,
-                Actor = Side.Blue,
-                Reason = "Over 5 second and turn to Blue penalty"
-            };
+            offensiveRobots = yellowRobots;
+            defensiveRobots = blueRobots;
         }
+        IllegalMoveSide = Side.Nobody;
+        for (int i = 0; i < Const.RobotsPerTeam; i++)
+        {
+            if (i == penaltyAttackID)
+            {
+                continue;
+            }
+            if (offensiveRobots[i].wheel.right != 0 || offensiveRobots[i].wheel.left != 0)
+            {
+                IllegalMoveSide = OffensiveSide;
+                return true;
+            }
+        }
+        for (int i = 0; i < Const.RobotsPerTeam; i++)
+        {
+            if (i == penaltyGoalID)
+            {
+                continue;
+            }
+            if (defensiveRobots[i].wheel.right != 0 || defensiveRobots[i].wheel.left != 0)
+            {
+                IllegalMoveSide = defensiveSide;
+                return true;
+            }
+        }
+        return false;
     }
 
-    private void UpdatePenaltyState(ref JudgeResult judgeResult)
+    private int FindPenaltyAttackID(Side side)
     {
-        penaltyTime = 0;
-        if (penaltySide == Side.Blue)
+        if(side == Side.Blue)
         {
-            penaltySide = Side.Yellow;
-            judgeResult = new JudgeResult
+            for(int i = 0; i<Const.RobotsPerTeam;i++)
             {
-                ResultType = ResultType.PenaltyKick,
-                Actor = Side.Yellow,
-                Reason = "Over 5 second and turn to yellow penalty"
-            };
+                if(yellowHalfState.ContainsPoint(blueRobots[i].pos))
+                {
+                    penaltyAttackID = i;
+                }
+            }
         }
         else
         {
-            penaltySide = Side.Blue;
-            penaltyOfNum = penaltyOfNum + 1;
-            judgeResult = new JudgeResult
+            for(int i =0; i<Const.RobotsPerTeam;i++)
             {
-                ResultType = ResultType.PenaltyKick,
-                Actor = Side.Blue,
-                Reason = "Over 5 second and turn to Blue penalty"
-            };
+                if(blueHalfState.ContainsPoint(yellowRobots[i].pos))
+                {
+                    penaltyAttackID = i;
+                }
+            }
         }
+        return penaltyAttackID;
     }
-
-    private bool JudgePenaltyGoal(ref JudgeResult judgeResult)
-    {
-        //若比赛超过五轮后，采用“突然死亡法”，先进球者先获胜
-        if (yellowGoalState.ContainsPoint(matchInfo.Ball.pos))
-        {
-            //点球大战超过五轮后，进球直接胜利
-            if (penaltyOfNum > 5)
-            {
-                judgeResult = new JudgeResult
-                {
-                    ResultType = ResultType.GameOver,
-                    Reason = "In penalty , Blue team win the game",
-                    Actor = Side.Nobody
-                };
-            }
-            else
-            {
-                judgeResult = new JudgeResult
-                {
-                    ResultType = ResultType.PenaltyKick,
-                    Reason = "Blue penalty successfully and turn to yellow penalty",
-                    Actor = Side.Yellow
-                };
-            }
-
-            penaltyTime = 0;
-            penaltySide = Side.Yellow;
-            judgeResult.WhoGoal = Side.Blue;
-            return true;
-        }
-        else if (blueGoalState.ContainsPoint(matchInfo.Ball.pos))
-        {
-            //点球大战超过五轮后，进球直接胜利
-            if (penaltyOfNum > 5)
-            {
-                judgeResult = new JudgeResult
-                {
-                    ResultType = ResultType.GameOver,
-                    Reason = "In penalty , Yellow team win the game",
-                    Actor = Side.Nobody
-                };
-            }
-
-            //特殊情况：黄方点球时，且为第五轮点球，进行结算
-            if (penaltyOfNum == 5)
-            {
-                if (blueScore > yellowScore)
-                {
-                    judgeResult = new JudgeResult
-                    {
-                        ResultType = ResultType.GameOver,
-                        Reason = "Blue team win the game",
-                        Actor = Side.Nobody
-                    };
-                }
-                else if (blueScore < yellowScore)
-                {
-                    judgeResult = new JudgeResult
-                    {
-                        ResultType = ResultType.GameOver,
-                        Reason = "Yellow team win the game",
-                        Actor = Side.Nobody
-                    };
-                }
-                else
-                {
-                    judgeResult = new JudgeResult
-                    {
-                        ResultType = ResultType.PenaltyKick,
-                        Reason = "Yellow penalty successfully and trun to Blue penalty",
-                        Actor = Side.Blue
-                    };
-                }
-            }
-            else
-            {
-                judgeResult = new JudgeResult
-                {
-                    ResultType = ResultType.PenaltyKick,
-                    Reason = "Yellow penalty successfully and trun to Blue penalty",
-                    Actor = Side.Blue
-                };
-            }
-
-            penaltyTime = 0;
-            penaltySide = Side.Blue;
-            judgeResult.WhoGoal = Side.Yellow;
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-
     private bool JudgePlace(ref JudgeResult judgeResult)
     {
         //首拍，执行开球
@@ -535,17 +606,17 @@ public class Referee : ICloneable
 
     private bool JudgePenalty(ref JudgeResult judgeResult)
     {
-        //考虑进入点球大战中，且首拍为0.进行点球
-        if (matchInfo.MatchPhase == MatchPhase.Penalty && matchInfo.TickPhase == 0)
-        {
-            judgeResult = new JudgeResult
-            {
-                ResultType = ResultType.PenaltyKick,
-                Actor = Side.Blue,
-                Reason = "Penalty start and blue penalty"
-            };
-            return true;
-        }
+        ////考虑进入点球大战中，且首拍为0.进行点球
+        //if (matchInfo.MatchPhase == MatchPhase.Penalty && matchInfo.TickPhase == 0)
+        //{
+        //    judgeResult = new JudgeResult
+        //    {
+        //        ResultType = ResultType.PenaltyKick,
+        //        Actor = Side.Blue,
+        //        Reason = "Penalty shoot-out start and blue first penalty"
+        //    };
+        //    return true;
+        //}
 
         if (matchInfo.Ball.pos.x > 0)
         {
@@ -952,7 +1023,6 @@ public class Referee : ICloneable
             square = new Square(Pos, angle);
         }
     }
-
 
     private void JudgePenaltyPlacement(JudgeResult judgeResult)
     {

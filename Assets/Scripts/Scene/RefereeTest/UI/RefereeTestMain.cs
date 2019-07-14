@@ -29,7 +29,7 @@ public class RefereeTestMain : MonoBehaviour
         objectManager = new ObjectManager();
         objectManager.RebindObject(entity);
         objectManager.RebindMatchInfo(matchInfo);
-        objectManager.DisablePhysics();
+        //objectManager.DisablePhysics();
         mouseDrag.dragEnabled = true;
     }
 
