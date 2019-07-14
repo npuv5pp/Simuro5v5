@@ -45,12 +45,15 @@ public class ControlRobot : MonoBehaviour
     Collider Collider;
     Rigidbody rb;
 
+    private Vector3 DefaultRotation;
+
     void Start()
     {
         _physicsEnabled = true;
         Collider = GetComponent<Collider>();
         rb = GetComponent<Rigidbody>();
         InitParameter();
+        DefaultRotation = transform.eulerAngles;
     }
 
     private int tick;
@@ -73,7 +76,7 @@ public class ControlRobot : MonoBehaviour
         // 线速度
         var velocity = rb.velocity;
         // 角速度
-        var angularVelocity = rb.angularVelocity;
+        var angularVelocity = new Vector3 {y = rb.angularVelocity.y};
         // 左轮中点速度
         var leftPointVelocity = leftWheelPosition - prevLeftPosition;
         // 右轮中点速度
@@ -81,8 +84,6 @@ public class ControlRobot : MonoBehaviour
 
         prevLeftPosition = leftWheelPosition;
         prevRightPosition = rightWheelPosition;
-
-        MyDebugWarning($"{LeftVelocity}, {RightVelocity}");
 
         if (LeftVelocity == 0 && RightVelocity == 0)
         {
@@ -164,6 +165,17 @@ public class ControlRobot : MonoBehaviour
     {
         LeftVelocity = left;
         RightVelocity = right;
+    }
+
+    private void LateUpdate()
+    {
+//        if (transform.eulerAngles.x != DefaultRotation.x)
+//            Debug.LogError($"Error rotation x {transform.eulerAngles.x}, except {DefaultRotation.x}", this.gameObject);
+//        if (transform.eulerAngles.z != DefaultRotation.z)
+//            Debug.LogError($"Error rotation z {transform.eulerAngles.z}, except {DefaultRotation.z}", this.gameObject);
+        var rotation = DefaultRotation;
+        rotation.y = transform.eulerAngles.y;
+        transform.eulerAngles = rotation;
     }
 
     /// <summary>
