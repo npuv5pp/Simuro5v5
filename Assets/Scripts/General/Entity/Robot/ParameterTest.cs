@@ -2,6 +2,7 @@
 using Simuro5v5;
 using UnityEngine;
 using System.IO;
+using Simuro5v5.Config;
 using UnityEditor;
 
 public class ParameterTest : MonoBehaviour
@@ -20,7 +21,6 @@ public class ParameterTest : MonoBehaviour
     public float RightVelocity;
 
     Vector3 forward_force, forward_drag, sideway_drag;
-    Vector3 forward_left_drag, forward_right_drag;
     Vector3 torque, angular_drag;
 
     Collider Collider;
@@ -185,12 +185,6 @@ public class ParameterTest : MonoBehaviour
         }
     }
 
-    private void LateUpdate()
-    {
-        Debug.DrawRay(rightWheelPosition, forward_right_drag);
-        Debug.DrawRay(leftWheelPosition, forward_left_drag);
-    }
-
     float prevA = 0;
     private float prevZ = 0;
     float maxX, maxY, minX, minY;
@@ -280,6 +274,6 @@ public class ParameterTest : MonoBehaviour
         if (Time.timeScale != 0)
             Time.timeScale = 0;
         else
-            Time.timeScale = Const.DefaultTimeScale;
+            Time.timeScale = GeneralConfig.TimeScale;
     }
 }

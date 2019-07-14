@@ -15,8 +15,6 @@ namespace Simuro5v5
         // 模拟频率的倒数，即一拍的时间。为了减小模型陷入的概率，以两倍帧率运行，但只在奇数拍调用策略
         public readonly static float FixedDeltaTime = 1.0f / FramePerSecond / 2;
 
-        // 默认时间流速
-        public readonly static float DefaultTimeScale = 1f;
         public readonly static float inch2cm = 2.54f;
         public readonly static float cm2inch = 1.0f / 2.54f;
 

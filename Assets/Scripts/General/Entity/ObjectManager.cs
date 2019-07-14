@@ -1,4 +1,5 @@
 ﻿using System;
+using Simuro5v5.Config;
 using UnityEngine;
 
 namespace Simuro5v5
@@ -289,7 +290,7 @@ namespace Simuro5v5
         /// </summary>
         public void Resume()
         {
-            Time.timeScale = Const.DefaultTimeScale;
+            Time.timeScale = GeneralConfig.TimeScale;
         }
 
         /// <summary>

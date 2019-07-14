@@ -38,6 +38,13 @@ namespace Simuro5v5.Config
     [ConfigGroup]
     public static class GeneralConfig
     {
+        public static float TimeScale { get; set; }
+
+        static GeneralConfig()
+        {
+            // 默认时间流速
+            TimeScale = 1.0f;
+        }
     }
 
     [ConfigGroup]

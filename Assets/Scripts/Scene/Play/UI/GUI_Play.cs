@@ -1,11 +1,4 @@
-﻿/// <summary>
-/// Play场景的UI。
-/// 主要通过PlayMain脚本操作比赛，同时将其中的信息显示在UI上
-/// GUI_Play --> PlayMain --> StrategyManager
-///                      \--> ObjectManager
-/// </summary>
-
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.Collections.Generic;
@@ -19,6 +12,12 @@ using System.Linq;
 using Simuro5v5.Strategy;
 using UnityEngine.TestTools;
 
+/// <summary>
+/// Play场景的UI。
+/// 主要通过PlayMain脚本操作比赛，同时将其中的信息显示在UI上
+/// GUI_Play --> PlayMain --> StrategyManager
+///                      \--> ObjectManager
+/// </summary>
 public class GUI_Play : MonoBehaviour
 {
     /// <summary>
@@ -222,25 +221,28 @@ public class GUI_Play : MonoBehaviour
             switch (playMain.GlobalMatchInfo.MatchPhase)
             {
                 case MatchPhase.FirstHalf:
-                    {
-                        SetStatusInfo("First Half In Playing");
-                        break;
-                    }
+                {
+                    SetStatusInfo("First Half In Playing");
+                    break;
+                }
+
                 case MatchPhase.SecondHalf:
-                    {
-                        SetStatusInfo("Second Half In Playing");
-                        break;
-                    }
+                {
+                    SetStatusInfo("Second Half In Playing");
+                    break;
+                }
+
                 case MatchPhase.OverTime:
-                    {
-                        SetStatusInfo("Over Time In Playing");
-                        break;
-                    }
+                {
+                    SetStatusInfo("Over Time In Playing");
+                    break;
+                }
+
                 case MatchPhase.Penalty:
-                    {
-                        SetStatusInfo("Penalty Shootout In Playing");
-                        break;
-                    }
+                {
+                    SetStatusInfo("Penalty Shootout In Playing");
+                    break;
+                }
             }
         }
     }
@@ -292,6 +294,7 @@ public class GUI_Play : MonoBehaviour
         {
             MenuStack.Pop();
         }
+
         // 如果栈上还有菜单，就打开它
         if (MenuOpen)
         {
@@ -320,6 +323,7 @@ public class GUI_Play : MonoBehaviour
         {
             MenuStack.Peek().SetActive(false);
         }
+
         menuBackground.SetActive(false);
     }
 
@@ -345,7 +349,7 @@ public class GUI_Play : MonoBehaviour
 
     void SetRefereeInfo(object obj)
     {
-        var info = (string)obj;
+        var info = (string) obj;
         SetRefereeInfo(info);
     }
 
@@ -378,7 +382,7 @@ public class GUI_Play : MonoBehaviour
         cameraAnim.OutGame();
     }
 
-    
+
     // 以下为在编辑器中绑定的函数
 
     public void LoadMainScene()
@@ -398,7 +402,7 @@ public class GUI_Play : MonoBehaviour
     /// 停止比赛并尝试移除策略
     /// </summary>
     /// <param name="willNotifyStrategies">是否向策略发送通知，如果是由于策略出现错误需要停止比赛，可以指定为false。默认为true</param>
-    public void StopMatchAndRemoveStrategy(bool willNotifyStrategies=true)
+    public void StopMatchAndRemoveStrategy(bool willNotifyStrategies = true)
     {
         AnimOutGame();
         recorder.Stop();
@@ -476,6 +480,7 @@ public class GUI_Play : MonoBehaviour
             recorder.Stop();
             recorder.Clear();
         }
+
         recorder.Start();
         playMain.StartMatch();
     }

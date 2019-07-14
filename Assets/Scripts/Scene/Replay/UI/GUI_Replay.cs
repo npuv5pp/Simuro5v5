@@ -15,6 +15,7 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using TMPro;
 using Simuro5v5;
+using Simuro5v5.Config;
 using UnityEditor;
 using UnityEngine.EventSystems;
 
@@ -286,16 +287,16 @@ public class GUI_Replay : MonoBehaviour
         switch (SpeedDropdown.value)
         {
             case 0:
-                Time.timeScale = Const.DefaultTimeScale;
+                Time.timeScale = GeneralConfig.TimeScale;
                 break;
             case 1:
-                Time.timeScale = Const.DefaultTimeScale / 2;
+                Time.timeScale = GeneralConfig.TimeScale / 2;
                 break;
             case 2:
-                Time.timeScale = Const.DefaultTimeScale / 5;
+                Time.timeScale = GeneralConfig.TimeScale / 5;
                 break;
             case 3:
-                Time.timeScale = Const.DefaultTimeScale / 10;
+                Time.timeScale = GeneralConfig.TimeScale / 10;
                 break;
         }
     }
