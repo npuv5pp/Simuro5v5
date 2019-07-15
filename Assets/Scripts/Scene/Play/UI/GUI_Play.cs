@@ -50,6 +50,7 @@ public class GUI_Play : MonoBehaviour
     public Button replayButton;
     public Button loadButton;
     public Button unloadButton;
+    public Button exitButton;
 
     // strategy menu items
     public TMP_InputField blueInputField;
@@ -253,6 +254,8 @@ public class GUI_Play : MonoBehaviour
         newMatchButton.interactable = playMain.LoadSucceed;
         resumeButton.interactable = playMain.Started && playMain.Paused;
         unloadButton.interactable = playMain.LoadSucceed;
+        replayButton.interactable = !playMain.TimedPausing;
+        exitButton.interactable = !playMain.TimedPausing;
     }
 
     void UpdateTimeText()

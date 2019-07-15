@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -439,7 +439,7 @@ public class PlayMain : MonoBehaviour
     /// <summary>
     /// 是否正在定时暂停。
     /// </summary>
-    bool timedPausing;
+    public bool TimedPausing { get; private set; }
 
     /// <summary>
     /// 如果比赛开始则暂停比赛。
@@ -461,7 +461,6 @@ public class PlayMain : MonoBehaviour
     /// </item>
     /// </list>
     /// </remarks>
-    /// TODO: 处理多个PauseForSeconds并行的情况。
     public void PauseMatch()
     {
         externalPausing = true;
@@ -476,7 +475,7 @@ public class PlayMain : MonoBehaviour
     {
         if (ManualPlacing) throw new InvalidOperationException("manual placing");
 
-        if (!timedPausing)
+        if (!TimedPausing)
         {
             ResumeMatchClearly();
             externalPausing = false;
@@ -490,7 +489,8 @@ public class PlayMain : MonoBehaviour
     {
         IEnumerator _PauseCoroutine()
         {
-            timedPausing = true;
+            TimedPausing = true;
+            Debug.Log("TimedPausing = true");
             yield return new WaitForSecondsRealtime(sec);
             try
             {
@@ -498,7 +498,8 @@ public class PlayMain : MonoBehaviour
             }
             finally
             {
-                timedPausing = false;
+                TimedPausing = false;
+                Debug.Log("TimedPausing = false");
             }
 
             // 外部没有主动暂停，则可以继续比赛
