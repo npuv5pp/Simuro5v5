@@ -69,19 +69,19 @@ namespace Simuro5v5
                 ForwardForceFactor = 102.89712678726376f;
                 DragFactor = 79.81736047779975f;
                 DoubleZeroDragFactor = 760;
-                SidewayDragFactor = 30000;
+                SidewayDragFactor = 1000;
 
                 // angular
                 TorqueFactor = 1156.1817018313f;
                 AngularDragFactor = 3769.775104018879f;
-                ZeroAngularDragFactor = 305500;
+                ZeroAngularDragFactor = 2097.9773f;
             }
         }
 
         #region Stub objects
-        [JsonProperty] private static StrategyConfig strategyConfig;
-        [JsonProperty] private static ParameterConfig parameterConfig;
-        [JsonProperty] private static GeneralConfig generalConfig;
+        [JsonProperty] private static StrategyConfig strategyConfig = new StrategyConfig();
+        [JsonProperty] private static ParameterConfig parameterConfig = new ParameterConfig();
+        [JsonProperty] private static GeneralConfig generalConfig = new GeneralConfig();
         #endregion
 
         public static void ReadFromFileOrCreate(string fileName)

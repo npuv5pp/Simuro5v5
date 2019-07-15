@@ -267,13 +267,14 @@ public class ControlRobot : MonoBehaviour
                          RigidbodyConstraints.FreezeRotationY;
         rb.maxAngularVelocity = Const.Robot.maxAngularVelocity;
 
-        ForwardFactor = Const.Robot.ForwardForceFactor;
-        TorqueFactor = Const.Robot.TorqueFactor;
-        ForwardDrag = Const.Robot.DragFactor;
-        SidewayDrag = Const.Robot.SidewayDragFactor;
-        AngularDrag = Const.Robot.AngularDragFactor;
-        DoubleZeroDrag = Const.Robot.DoubleZeroDragFactor;
-        ZeroAngularDrag = Const.Robot.ZeroAngularDragFactor;
+        ForwardFactor = Configuration.ParameterConfig.ForwardForceFactor;
+        TorqueFactor = Configuration.ParameterConfig.TorqueFactor;
+        ForwardDrag = Configuration.ParameterConfig.DragFactor;
+        SidewayDrag = Configuration.ParameterConfig.SidewayDragFactor;
+
+        AngularDrag = Configuration.ParameterConfig.AngularDragFactor;
+        DoubleZeroDrag = Configuration.ParameterConfig.DoubleZeroDragFactor;
+        ZeroAngularDrag = Configuration.ParameterConfig.ZeroAngularDragFactor;
     }
 
     private Vector3 rightWheelPosition => transform.position + transform.right * Const.Robot.HRL;
