@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Simuro5v5;
+using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
@@ -7,7 +8,8 @@ public class GUI_MainMenu : MonoBehaviour {
 	void Start ()
     {
         Screen.fullScreen = false;
-        Simuro5v5.Config.ConfigManager.ReadConfigFile("config.json");
+        Configuration.ReadFromFileOrCreate("config.json");
+        //Simuro5v5.Config.ConfigManager.ReadConfigFile("config.json");
 	}
 
     public void OnGameButtonClicked()

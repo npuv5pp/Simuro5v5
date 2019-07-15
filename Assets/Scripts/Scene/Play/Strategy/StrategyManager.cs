@@ -34,7 +34,7 @@ namespace Simuro5v5.Strategy
         {
             client = new StrategyClient(endPoint)
             {
-                Timeout = Config.StrategyConfig.ConnectTimeout
+                Timeout = Configuration.StrategyConfig.ConnectTimeout
             };
         }
 

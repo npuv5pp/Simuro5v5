@@ -2,8 +2,8 @@
 using Simuro5v5;
 using UnityEngine;
 using System.IO;
-using Simuro5v5.Config;
 using UnityEditor;
+using static Simuro5v5.Configuration;
 
 public class ParameterTest : MonoBehaviour
 {

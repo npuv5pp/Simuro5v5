@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using Simuro5v5.Config;
 using Simuro5v5.Strategy;
 using System.Collections.Generic;
 using System;

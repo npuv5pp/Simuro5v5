@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Simuro5v5;
-using Simuro5v5.Config;
 using Simuro5v5.Strategy;
 using Event = Simuro5v5.EventSystem.Event;
 
@@ -95,7 +94,7 @@ public class PlayMain : MonoBehaviour
     IEnumerator Start()
     {
         Time.fixedDeltaTime = Const.FixedDeltaTime;
-        ConfigManager.ReadConfigFile("config.json");
+        Configuration.ReadFromFileOrCreate("config.json");
 
         if (gameObject.name != "Entity") throw new ArgumentException("PlayMain is not binding in an Entity");
         Singleton = gameObject;

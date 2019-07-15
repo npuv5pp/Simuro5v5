@@ -1,6 +1,6 @@
 ﻿using System;
-using Simuro5v5.Config;
 using UnityEngine;
+using static Simuro5v5.Configuration;
 
 namespace Simuro5v5
 {

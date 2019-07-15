@@ -15,9 +15,9 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using TMPro;
 using Simuro5v5;
-using Simuro5v5.Config;
 using UnityEditor;
 using UnityEngine.EventSystems;
+using static Simuro5v5.Configuration;
 
 public class GUI_Replay : MonoBehaviour
 {

@@ -3,7 +3,6 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.Collections.Generic;
 using Simuro5v5;
-using Simuro5v5.Config;
 using TMPro;
 using Event = Simuro5v5.EventSystem.Event;
 using System;
@@ -11,6 +10,7 @@ using System.Collections;
 using System.Linq;
 using Simuro5v5.Strategy;
 using UnityEngine.TestTools;
+using static Simuro5v5.Configuration;
 
 /// <summary>
 /// Play场景的UI。
