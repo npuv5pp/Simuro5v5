@@ -664,8 +664,8 @@ MonoBehaviour:
   tickText: {fileID: 852626698}
   PhaseText: {fileID: 1874336598}
   JudgeResultText: {fileID: 1864093917}
-  BlueScore: {fileID: 1196885847}
-  YellowScore: {fileID: 602344700}
+  BlueScore: {fileID: 602344700}
+  YellowScore: {fileID: 1196885847}
 --- !u!1 &80081819
 GameObject:
   m_ObjectHideFlags: 0
