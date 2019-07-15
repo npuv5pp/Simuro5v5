@@ -118,7 +118,7 @@ public class GUI_Play : MonoBehaviour
         if (e != null)
         {
             Debug.LogError(e);
-            PauseMatchAndPushMenu(false);
+            PauseMatchAndPushMenu();
             Win32Dialog.ShowMessageBox("策略连接异常", "Strategy Connection");
             playMain.FatalException = null;
         }
@@ -405,7 +405,28 @@ public class GUI_Play : MonoBehaviour
     /// 停止比赛并尝试移除策略
     /// </summary>
     /// <param name="willNotifyStrategies">是否向策略发送通知，如果是由于策略出现错误需要停止比赛，可以指定为false。默认为true</param>
-    private void PauseMatchAndPushMenu(bool willNotifyStrategies = true)
+    public void StopMatchAndRemoveStrategy(bool willNotifyStrategies = true)
+    {
+        AnimOutGame();
+        recorder.Stop();
+        recorder.Clear();
+
+        try
+        {
+            playMain.StopMatch(willNotifyStrategies);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError(e.Message);
+            Win32Dialog.ShowMessageBox("通讯失败，强制卸载", "Remove Failed");
+        }
+        finally
+        {
+            playMain.RemoveStrategy();
+        }
+    }
+    
+    private void PauseMatchAndPushMenu()
     {
         playMain.PauseMatch();
         PushMenu(menuMain);
