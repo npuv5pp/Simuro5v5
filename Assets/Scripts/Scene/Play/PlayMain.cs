@@ -497,6 +497,8 @@ public class PlayMain : MonoBehaviour
                 TimedPausing = false;
                 Debug.Log("TimedPausing = false");
             }
+            
+            yield return new WaitForSecondsRealtime(sec);
 
             // 外部没有主动暂停，则可以继续比赛
             if (!externalPausing) ResumeMatchClearly();
