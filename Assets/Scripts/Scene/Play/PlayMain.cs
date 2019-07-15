@@ -132,7 +132,7 @@ public class PlayMain : MonoBehaviour
         }
         catch (TimeoutException e)
         {
-            StopMatch(false);
+            // StopMatch(false);
             FatalException = e;
         }
     }
