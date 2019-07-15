@@ -5,7 +5,6 @@ using V5RPC;
 
 namespace Simuro5v5.Strategy
 {
-
     public interface IStrategy
     {
         bool IsConnected { get; }
@@ -13,6 +12,10 @@ namespace Simuro5v5.Strategy
         void Close();
         void OnMatchStart();
         void OnMatchStop();
+        void OnFirstHalfStart();
+        void OnSecondHalfStart();
+        void OnOvertimeStart();
+        void OnPenaltyShootoutHalfStart();
         void OnJudgeResult(JudgeResult result);
         TeamInfo GetTeamInfo();
         WheelInfo GetInstruction(SideInfo sideInfo);
@@ -54,6 +57,7 @@ namespace Simuro5v5.Strategy
             {
                 return false;
             }
+
             IsConnected = true;
             return true;
         }
@@ -75,6 +79,26 @@ namespace Simuro5v5.Strategy
             client.OnEvent(V5RPC.Proto.EventType.MatchStop, new V5RPC.Proto.EventArguments());
         }
 
+        public void OnFirstHalfStart()
+        {
+            client.OnEvent(V5RPC.Proto.EventType.FirstHalfStart, new V5RPC.Proto.EventArguments());
+        }
+
+        public void OnSecondHalfStart()
+        {
+            client.OnEvent(V5RPC.Proto.EventType.SecondHalfStart, new V5RPC.Proto.EventArguments());
+        }
+
+        public void OnOvertimeStart()
+        {
+            client.OnEvent(V5RPC.Proto.EventType.OvertimeStart, new V5RPC.Proto.EventArguments());
+        }
+
+        public void OnPenaltyShootoutHalfStart()
+        {
+            client.OnEvent(V5RPC.Proto.EventType.PenaltyShootoutStart, new V5RPC.Proto.EventArguments());
+        }
+
         public TeamInfo GetTeamInfo()
         {
             if (cachedTeamInfo == null)
@@ -85,7 +109,7 @@ namespace Simuro5v5.Strategy
         public WheelInfo GetInstruction(SideInfo sideInfo)
         {
             var wheels = client.GetInstruction(sideInfo.ToProto());
-            return new WheelInfo { Wheels = (from w in wheels select w.ToNative()).ToArray() };
+            return new WheelInfo {Wheels = (from w in wheels select w.ToNative()).ToArray()};
         }
 
         public PlacementInfo GetPlacement(SideInfo sideInfo)
@@ -100,7 +124,8 @@ namespace Simuro5v5.Strategy
 
         public void OnJudgeResult(JudgeResult result)
         {
-            client.OnEvent(V5RPC.Proto.EventType.JudgeResult, new V5RPC.Proto.EventArguments { JudgeResult = result.ToProto() });
+            client.OnEvent(V5RPC.Proto.EventType.JudgeResult,
+                new V5RPC.Proto.EventArguments {JudgeResult = result.ToProto()});
         }
 
         //throws exceptions
@@ -119,6 +144,7 @@ namespace Simuro5v5.Strategy
                 addr = endPoint.Substring(0, colonIndex);
                 port = int.Parse(endPoint.Substring(colonIndex + 1));
             }
+
             return new IPEndPoint(IPAddress.Parse(addr), port);
         }
     }
@@ -142,22 +168,43 @@ namespace Simuro5v5.Strategy
         public IStrategy Yellow { get; private set; }
         public IStrategyFactory StrategyFactory { get; set; }
 
-        public bool IsBlueReady { get => Blue != null && Blue.IsConnected; }
-        public bool IsYellowReady { get => Yellow != null && Yellow.IsConnected; }
-        public bool IsReady { get => IsBlueReady && IsYellowReady; }
+        public bool IsBlueReady
+        {
+            get => Blue != null && Blue.IsConnected;
+        }
 
-        public StrategyManager() { }
+        public bool IsYellowReady
+        {
+            get => Yellow != null && Yellow.IsConnected;
+        }
+
+        public bool IsReady
+        {
+            get => IsBlueReady && IsYellowReady;
+        }
+
+        public StrategyManager()
+        {
+        }
 
         public bool ConnectBlue()
         {
-            if (Blue != null) { Blue.Close(); }
+            if (Blue != null)
+            {
+                Blue.Close();
+            }
+
             Blue = StrategyFactory.CreateBlue();
             return Blue.Connect();
         }
 
         public bool ConnectYellow()
         {
-            if (Yellow != null) { Yellow.Close(); }
+            if (Yellow != null)
+            {
+                Yellow.Close();
+            }
+
             Yellow = StrategyFactory.CreateYellow();
             return Yellow.Connect();
         }
@@ -171,6 +218,7 @@ namespace Simuro5v5.Strategy
             {
                 throw new StrategyException(Side.Blue, "blue strategy is not ready");
             }
+
             if (!IsYellowReady)
             {
                 throw new StrategyException(Side.Blue, "blue strategy is not ready");
@@ -197,5 +245,4 @@ namespace Simuro5v5.Strategy
             this.side = side;
         }
     }
-
 }

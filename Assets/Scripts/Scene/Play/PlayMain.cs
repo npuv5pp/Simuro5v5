@@ -61,13 +61,14 @@ public class PlayMain : MonoBehaviour
     public Action OnMatchStart;
 
     #region 对暂停的补丁
+
     // 由于有时暂停会无效，所以需要补丁
 
     private int placementCount = 0;
     private int callbackCount = 0;
     private int lastPlacementId = 0;
     private Queue<int> placementToIgnore = new Queue<int>();
-    
+
     #endregion
 
     /// <summary>
@@ -86,6 +87,7 @@ public class PlayMain : MonoBehaviour
             {
                 ObjectManager.Pause();
             }
+
             // 激活单例
             Singleton.SetActive(true);
         }
@@ -189,10 +191,10 @@ public class PlayMain : MonoBehaviour
 
                 StopMatch();
                 break;
-            
+
             case ResultType.NextPhase:
                 // 阶段结束
-                // 这之后的物理引擎运行的一拍无意义，不用触发事件
+                // 这之后的物理引擎运行的一拍无意义，不用触发MatchInfoUpdate事件
                 Debug.Log("next phase");
                 if (GlobalMatchInfo.MatchPhase == MatchPhase.FirstHalf)
                 {
@@ -203,13 +205,34 @@ public class PlayMain : MonoBehaviour
                 GlobalMatchInfo.MatchPhase = GlobalMatchInfo.MatchPhase.NextPhase();
                 GlobalMatchInfo.TickPhase = 0; // 时间指定为0，使得下一拍的裁判得知新阶段的开始
                 OnNextPhase();
+                // 通知策略
+                switch (GlobalMatchInfo.MatchPhase)
+                {
+                    case MatchPhase.FirstHalf:
+                        break;
+                    case MatchPhase.SecondHalf:
+                        StrategyManager.Blue.OnSecondHalfStart();
+                        StrategyManager.Yellow.OnSecondHalfStart();
+                        break;
+                    case MatchPhase.OverTime:
+                        StrategyManager.Blue.OnOvertimeStart();
+                        StrategyManager.Yellow.OnOvertimeStart();
+                        break;
+                    case MatchPhase.Penalty:
+                        StrategyManager.Blue.OnPenaltyShootoutHalfStart();
+                        StrategyManager.Yellow.OnPenaltyShootoutHalfStart();
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+
                 break;
 
             case ResultType.NormalMatch:
                 // 正常比赛，输入轮速
                 UpdateWheelsToScene();
                 break;
-            
+
             default:
                 // 判断是否进球
                 switch (judgeResult.WhoGoal)
@@ -250,7 +273,7 @@ public class PlayMain : MonoBehaviour
                         }
 
                         #endregion
-                        
+
                         BoardcastJudgeResult(judgeResult);
                         Debug.Log("callback placement " + callbackId);
                         UpdatePlacementToScene(judgeResult);
@@ -259,8 +282,6 @@ public class PlayMain : MonoBehaviour
 
                         // PauseForSeconds(2, () => { });
                     }
-
-                    // TODO 考虑连续出现摆位的情况
 
                     #region Patch to placement
 
@@ -274,9 +295,9 @@ public class PlayMain : MonoBehaviour
                     {
                         placementToIgnore.Enqueue(placementId);
                     }
-                
+
                     #endregion
-                    
+
                     if (GlobalMatchInfo.TickMatch > 1)
                     {
                         Debug.Log("Will stop at " + GlobalMatchInfo.TickMatch + " " + placementId);
@@ -309,6 +330,7 @@ public class PlayMain : MonoBehaviour
     public bool manualPlaceEnabled = false;
 
     bool _manualPlacing;
+
     /// <summary>
     /// 是否正在手动摆位。
     /// 手动摆位已启用且正在处于手动摆位状态时为真；仅当手动摆位已经启动时可以设置。
@@ -378,6 +400,8 @@ public class PlayMain : MonoBehaviour
 
         StrategyManager.Blue.OnMatchStart();
         StrategyManager.Yellow.OnMatchStart();
+        StrategyManager.Blue.OnFirstHalfStart();
+        StrategyManager.Yellow.OnFirstHalfStart();
 
         Started = true;
         Paused = true;
@@ -391,7 +415,7 @@ public class PlayMain : MonoBehaviour
     /// 暂时保留赛场信息，等到下次StartMatch会重置赛场。
     /// </summary>
     /// <param name="willNotifyStrategies">是否向策略发送通知，如果是由于策略出现错误需要停止比赛，可以指定为false。默认为true</param>
-    public void StopMatch(bool willNotifyStrategies=true)
+    public void StopMatch(bool willNotifyStrategies = true)
     {
         Started = false;
         Paused = true;
@@ -403,6 +427,7 @@ public class PlayMain : MonoBehaviour
             StrategyManager.Blue.OnMatchStop();
             StrategyManager.Yellow.OnMatchStop();
         }
+
         Event.Send(Event.EventType1.MatchStop, GlobalMatchInfo);
     }
 
@@ -410,7 +435,7 @@ public class PlayMain : MonoBehaviour
     /// 是否正在被外部暂停。
     /// </summary>
     bool externalPausing;
-    
+
     /// <summary>
     /// 是否正在定时暂停。
     /// </summary>
@@ -475,6 +500,7 @@ public class PlayMain : MonoBehaviour
             {
                 timedPausing = false;
             }
+
             // 外部没有主动暂停，则可以继续比赛
             if (!externalPausing) ResumeMatchClearly();
         }
@@ -503,7 +529,7 @@ public class PlayMain : MonoBehaviour
     /// </summary>
     private void ResumeMatchClearly()
     {
-        if (Started)    // 比赛已经开始
+        if (Started) // 比赛已经开始
         {
             Paused = false;
             ObjectManager.Resume();
@@ -523,8 +549,8 @@ public class PlayMain : MonoBehaviour
         WheelInfo wheelsYellow = StrategyManager.Yellow.GetInstruction(
             GlobalMatchInfo.GetSide(Side.Yellow));
 
-        wheelsBlue.Normalize();     //轮速规整化
-        wheelsYellow.Normalize();   //轮速规整化
+        wheelsBlue.Normalize(); //轮速规整化
+        wheelsYellow.Normalize(); //轮速规整化
 
         ObjectManager.SetBlueWheels(wheelsBlue);
         ObjectManager.SetYellowWheels(wheelsYellow);
@@ -537,7 +563,7 @@ public class PlayMain : MonoBehaviour
     /// <param name="judgeResult">摆位的原因信息</param>
     void UpdatePlacementToScene(JudgeResult judgeResult)
     {
-        var currentMatchInfo = (MatchInfo)GlobalMatchInfo.Clone();
+        var currentMatchInfo = (MatchInfo) GlobalMatchInfo.Clone();
         PlacementInfo blueInfo;
         PlacementInfo yellowInfo;
 
@@ -643,7 +669,7 @@ public class PlayMain : MonoBehaviour
 
     void OnGetGoal(object obj)
     {
-        Side who = (Side)obj;
+        Side who = (Side) obj;
         switch (who)
         {
             case Side.Blue:
@@ -669,6 +695,7 @@ public class PlayMain : MonoBehaviour
     {
         public string BlueEP { get; set; }
         public string YellowEP { get; set; }
+
         public IStrategy CreateBlue()
         {
             try

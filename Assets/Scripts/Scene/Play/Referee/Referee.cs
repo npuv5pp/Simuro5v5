@@ -99,11 +99,6 @@ public class Referee : ICloneable
     private int penaltyOfNum;
 
     /// <summary>
-    /// 是否进入突然死亡模式
-    /// </summary>
-    private bool penaltySuddenDeath;
-
-    /// <summary>
     /// 点球大战中点球球员的序号
     /// </summary>
     private int penaltyAttackID;
@@ -152,7 +147,6 @@ public class Referee : ICloneable
         ObjectManager.FindObjects(out BlueObject, out YellowObject, out BallObject);
 
         penaltySide = Side.Nobody;
-        penaltySuddenDeath = false;
         savedJudge = new JudgeResult
         {
             Actor = Side.Nobody,
