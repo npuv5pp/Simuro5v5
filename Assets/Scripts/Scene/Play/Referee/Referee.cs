@@ -355,7 +355,7 @@ public class Referee : ICloneable
                 Reason = "overtime with penalty and switch the penalty side"
             };
             UpdateNewPenalty();
-                    }
+        }
         //已踢球，但未到规定时间,判断有没有进球
         else if(penaltyTouchBall && penaltyTime < penaltyLimitTime)
         {
@@ -393,7 +393,7 @@ public class Referee : ICloneable
         }
         else
         {
-            Debug.Log("error");
+            Debug.LogError("Unreachable code");
         }
     }
 

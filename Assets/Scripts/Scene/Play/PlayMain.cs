@@ -176,7 +176,6 @@ public class PlayMain : MonoBehaviour
             // 执行动作，更新输入
             case ResultType.GameOver:
                 // 整场比赛结束
-                Debug.Log("Game Over");
 
                 // 可能最后一拍正好进球，需要判断
                 switch (judgeResult.WhoGoal)
@@ -195,10 +194,8 @@ public class PlayMain : MonoBehaviour
             case ResultType.NextPhase:
                 // 阶段结束
                 // 这之后的物理引擎运行的一拍无意义，不用触发MatchInfoUpdate事件
-                Debug.Log("next phase");
                 if (GlobalMatchInfo.MatchPhase == MatchPhase.FirstHalf)
                 {
-                    Debug.Log("switch role");
                     SwitchRole();
                 }
 
@@ -250,7 +247,6 @@ public class PlayMain : MonoBehaviour
                 if (manualPlaceEnabled)
                 {
                     BoardcastJudgeResult(judgeResult);
-                    Debug.Log("manual placing");
                     BeginManualPlace();
                 }
                 else
