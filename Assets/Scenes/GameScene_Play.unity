@@ -2917,6 +2917,7 @@ MonoBehaviour:
   replayButton: {fileID: 289315123}
   loadButton: {fileID: 1922974554}
   unloadButton: {fileID: 2025270404}
+  exitButton: {fileID: 271336608}
   blueInputField: {fileID: 1650552699}
   yellowInputField: {fileID: 124780751}
   refereeAnim: {fileID: 1606302433}

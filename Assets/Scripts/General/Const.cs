@@ -92,7 +92,7 @@ namespace Simuro5v5
             public static Color UIRed = new Color(242, 12, 0);
 
             // 有关队伍的颜色
-            public static Color SideBlue = new Color(0, 87, 255);
+            public static Color SideBlue = new Color(0, 159, 255);
             public static Color SideYellow = new Color(248, 255, 0);
         }
 

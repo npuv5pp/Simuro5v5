@@ -110,15 +110,20 @@ public struct JudgeResult
 
     public string ToRichText()
     {
+        if (Actor == Side.Nobody)
+        {
+            return $"<color=\"green\">{Reason}";
+        }
 
         var rv = $"Foul: {ResultType}, ";
-        if (Actor == Side.Blue)
+        switch (Actor)
         {
-            rv += $"<color=#{Const.Style.SideBlue.ToHex()}>{Actor}<color=#F20C00> team is actor.\nReason: <color=\"green\">{Reason}";
-        }
-        else
-        {
-            rv += $"<color=#{Const.Style.SideYellow.ToHex()}>{Actor}<color=#F20C00> team is actor.\nReason: <color=\"green\">{Reason}";
+            case Side.Blue:
+                rv += $"<color=#{Const.Style.SideBlue.ToHex()}>{Actor}<color=#F20C00> team is actor.\nReason: <color=\"green\">{Reason}";
+                break;
+            case Side.Yellow:
+                rv += $"<color=#{Const.Style.SideYellow.ToHex()}>{Actor}<color=#F20C00> team is actor.\nReason: <color=\"green\">{Reason}";
+                break;
         }
         return rv;
     }
