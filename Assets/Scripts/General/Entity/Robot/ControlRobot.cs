@@ -69,6 +69,10 @@ public class ControlRobot : MonoBehaviour
         if (tick % 2 == 0)
             return;
 
+        var rot = DefaultRotation;
+        rot.y = rb.rotation.eulerAngles.y;
+        rb.rotation = Quaternion.Euler(rot);
+
         // 前向
         var forwardDir = -transform.up;
         // 右边
@@ -173,9 +177,9 @@ public class ControlRobot : MonoBehaviour
 //            Debug.LogError($"Error rotation x {transform.eulerAngles.x}, except {DefaultRotation.x}", this.gameObject);
 //        if (transform.eulerAngles.z != DefaultRotation.z)
 //            Debug.LogError($"Error rotation z {transform.eulerAngles.z}, except {DefaultRotation.z}", this.gameObject);
-        var rotation = DefaultRotation;
-        rotation.y = transform.eulerAngles.y;
-        transform.eulerAngles = rotation;
+//        var rotation = DefaultRotation;
+//        rotation.y = transform.eulerAngles.y;
+//        transform.eulerAngles = rotation;
     }
 
     /// <summary>
