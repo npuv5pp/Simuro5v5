@@ -26,9 +26,9 @@ namespace Simuro5v5
                 BlueStrategyPort = 20000;
                 YellowStrategyPort = 20001;
 
-            ConnectTimeout = 3000;
+                ConnectTimeout = 3000;
+            }
         }
-    }
 
         public class GeneralConfig
         {
