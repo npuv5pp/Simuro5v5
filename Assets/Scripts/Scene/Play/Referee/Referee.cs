@@ -643,9 +643,7 @@ public class Referee : ICloneable
         {
             int smallStateNum = 0;
             int bigStateNum = 0;
-            //test three attack
-            //忽略黄方小禁区
-            for (int i = 0; i < 2 ; i++)
+            for (int i = 0; i < 5 ; i++)
                 //for(int i = 0 ;i<5;i++)
             {
                 if (yellowBigState.ContainsPoint(yellowRobots[i].pos))
