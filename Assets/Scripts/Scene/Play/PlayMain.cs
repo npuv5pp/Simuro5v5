@@ -364,7 +364,7 @@ public class PlayMain : MonoBehaviour
 
         // 此时手动摆位已经完成，从场地中拉取信息
         ObjectManager.UpdateFromScene();
-//        GlobalMatchInfo.Referee.JudgeAutoPlacement(GlobalMatchInfo, GlobalMatchInfo.Referee.savedJudge);
+        //        GlobalMatchInfo.Referee.JudgeAutoPlacement(GlobalMatchInfo, GlobalMatchInfo.Referee.savedJudge);
         ObjectManager.SetBluePlacement(GlobalMatchInfo.BlueRobots);
         ObjectManager.SetYellowPlacement(GlobalMatchInfo.YellowRobots);
         ObjectManager.SetBallPlacement(GlobalMatchInfo.Ball);
@@ -493,7 +493,7 @@ public class PlayMain : MonoBehaviour
             {
                 TimedPausing = false;
             }
-            
+
             yield return new WaitForSecondsRealtime(sec);
 
             // 外部没有主动暂停，则可以继续比赛
@@ -558,47 +558,62 @@ public class PlayMain : MonoBehaviour
     /// <param name="judgeResult">摆位的原因信息</param>
     void UpdatePlacementToScene(JudgeResult judgeResult)
     {
-        var currentMatchInfo = (MatchInfo) GlobalMatchInfo.Clone();
+        var currentMatchInfo = (MatchInfo)GlobalMatchInfo.Clone();
         PlacementInfo blueInfo;
         PlacementInfo yellowInfo;
 
         switch (judgeResult.WhoisFirst)
         {
             case Side.Blue:
-                // 蓝方先摆位
-                blueInfo = StrategyManager.Blue.GetPlacement(currentMatchInfo.GetSide(Side.Blue));
-                // 将蓝方返回的数据同步到currMi
-                currentMatchInfo.UpdateFrom(blueInfo.Robots, Side.Blue);
-                // 黄方后摆位
-                yellowInfo = StrategyManager.Yellow.GetPlacement(currentMatchInfo.GetSide(Side.Yellow));
+                {
+                    // 蓝方先摆位
+                    blueInfo = StrategyManager.Blue.GetPlacement(currentMatchInfo.GetSide(Side.Blue));
+                    // 将蓝方返回的数据同步到currMi
+                    currentMatchInfo.UpdateFrom(blueInfo.Robots, Side.Blue);
+                    //先进行第一次摆位判罚
+                    GlobalMatchInfo.Referee.JudgeAutoPlacement(currentMatchInfo, judgeResult, Side.Blue);
+                    // 黄方后摆位
+                    yellowInfo = StrategyManager.Yellow.GetPlacement(currentMatchInfo.GetSide(Side.Yellow));
+                    // 黄方策略认为自己是蓝方，所以返回数据之后需要转换
+                    yellowInfo.ConvertToAnotherSide();
 
-                // 黄方策略认为自己是蓝方，所以返回数据之后需要转换
-                yellowInfo.ConvertToAnotherSide();
+                    // 从两方数据拼接MatchInfo，球的数据取决于judgeResult
+                    currentMatchInfo = new MatchInfo(blueInfo, yellowInfo, judgeResult.Actor);
 
-                break;
+                    //进行第二次裁判判罚
+                    GlobalMatchInfo.Referee.JudgeAutoPlacement(currentMatchInfo, judgeResult, Side.Yellow);
+
+                    break;
+                }
             case Side.Yellow:
-                // 黄方先摆位
-                yellowInfo = StrategyManager.Yellow.GetPlacement(currentMatchInfo.GetSide(Side.Yellow));
-                // 由于右攻假设，黄方认为自己是蓝方，返回的数据是其作为蓝方的数据，需要转换
-                yellowInfo.ConvertToAnotherSide();
+                {
+                    // 黄方先摆位
+                    yellowInfo = StrategyManager.Yellow.GetPlacement(currentMatchInfo.GetSide(Side.Yellow));
+                    // 由于右攻假设，黄方认为自己是蓝方，返回的数据是其作为蓝方的数据，需要转换
+                    yellowInfo.ConvertToAnotherSide();
+                    // 将黄方返回的数据同步到currMi
+                    currentMatchInfo.UpdateFrom(yellowInfo.Robots, Side.Yellow);
+                    //进行第一次摆位判罚
+                    GlobalMatchInfo.Referee.JudgeAutoPlacement(currentMatchInfo, judgeResult, Side.Blue);
+                    // 蓝方后摆位
+                    blueInfo = StrategyManager.Blue.GetPlacement(currentMatchInfo.GetSide(Side.Blue));
 
-                // 将黄方返回的数据同步到currMi
-                currentMatchInfo.UpdateFrom(yellowInfo.Robots, Side.Yellow);
-                // 蓝方后摆位
-                blueInfo = StrategyManager.Blue.GetPlacement(currentMatchInfo.GetSide(Side.Blue));
+                    // 从两方数据拼接MatchInfo，球的数据取决于judgeResult
+                    currentMatchInfo = new MatchInfo(blueInfo, yellowInfo, judgeResult.Actor);
+                    //进行第二次裁判判罚
+                    GlobalMatchInfo.Referee.JudgeAutoPlacement(currentMatchInfo, judgeResult, Side.Blue);
+                }
+
                 break;
             default:
                 throw new ArgumentException("Side cannot be Nobody");
         }
 
-        // 从两方数据拼接MatchInfo，球的数据取决于judgeResult
-        var mi = new MatchInfo(blueInfo, yellowInfo, judgeResult.Actor);
-        GlobalMatchInfo.Referee.JudgeAutoPlacement(mi, judgeResult);
 
         // 设置场地
-        ObjectManager.SetBluePlacement(mi.BlueRobots);
-        ObjectManager.SetYellowPlacement(mi.YellowRobots);
-        ObjectManager.SetBallPlacement(mi.Ball);
+        ObjectManager.SetBluePlacement(currentMatchInfo.BlueRobots);
+        ObjectManager.SetYellowPlacement(currentMatchInfo.YellowRobots);
+        ObjectManager.SetBallPlacement(currentMatchInfo.Ball);
     }
 
     /// <summary>
@@ -664,7 +679,7 @@ public class PlayMain : MonoBehaviour
 
     void OnGetGoal(object obj)
     {
-        Side who = (Side) obj;
+        Side who = (Side)obj;
         switch (who)
         {
             case Side.Blue:

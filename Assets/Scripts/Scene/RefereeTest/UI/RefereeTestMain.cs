@@ -138,122 +138,122 @@ public class RefereeTestMain : MonoBehaviour
         objectManager.RevertScene(preMatchInfo);
     }
 
-    public void PenaltyBluePlace()
-    {
-        objectManager.UpdateFromScene();
-        JudgeResult judgeResult = new JudgeResult
-        {
-            Actor = Side.Blue,
-            ResultType = ResultType.PenaltyKick
-        };
-        matchInfo.Referee.JudgeAutoPlacement(matchInfo, judgeResult);
-        objectManager.RevertScene(matchInfo);
-    }
+    //public void PenaltyBluePlace()
+    //{
+    //    objectManager.UpdateFromScene();
+    //    JudgeResult judgeResult = new JudgeResult
+    //    {
+    //        Actor = Side.Blue,
+    //        ResultType = ResultType.PenaltyKick
+    //    };
+    //    matchInfo.Referee.JudgeAutoPlacement(matchInfo, judgeResult);
+    //    objectManager.RevertScene(matchInfo);
+    //}
 
-    public void PenaltyYellowPlace()
-    {
-        objectManager.UpdateFromScene();
-        JudgeResult judgeResult = new JudgeResult
-        {
-            Actor = Side.Yellow,
-            ResultType = ResultType.PenaltyKick
-        };
-        matchInfo.Referee.JudgeAutoPlacement(matchInfo, judgeResult);
-        objectManager.RevertScene(matchInfo);
-    }
+    //public void PenaltyYellowPlace()
+    //{
+    //    objectManager.UpdateFromScene();
+    //    JudgeResult judgeResult = new JudgeResult
+    //    {
+    //        Actor = Side.Yellow,
+    //        ResultType = ResultType.PenaltyKick
+    //    };
+    //    matchInfo.Referee.JudgeAutoPlacement(matchInfo, judgeResult);
+    //    objectManager.RevertScene(matchInfo);
+    //}
 
-    public void PlaceBluePlace()
-    {
-        objectManager.UpdateFromScene();
-        JudgeResult judgeResult = new JudgeResult
-        {
-            Actor = Side.Blue,
-            ResultType = ResultType.PlaceKick
-        };
-        matchInfo.Referee.JudgeAutoPlacement(matchInfo, judgeResult);
-        objectManager.RevertScene(matchInfo);
-    }
+    //public void PlaceBluePlace()
+    //{
+    //    objectManager.UpdateFromScene();
+    //    JudgeResult judgeResult = new JudgeResult
+    //    {
+    //        Actor = Side.Blue,
+    //        ResultType = ResultType.PlaceKick
+    //    };
+    //    matchInfo.Referee.JudgeAutoPlacement(matchInfo, judgeResult);
+    //    objectManager.RevertScene(matchInfo);
+    //}
 
-    public void PlaceYellowPlace()
-    {
-        objectManager.UpdateFromScene();
-        JudgeResult judgeResult = new JudgeResult
-        {
-            Actor = Side.Yellow,
-            ResultType = ResultType.PlaceKick
-        };
-        matchInfo.Referee.JudgeAutoPlacement(matchInfo, judgeResult);
-        objectManager.RevertScene(matchInfo);
-    }
+    //public void PlaceYellowPlace()
+    //{
+    //    objectManager.UpdateFromScene();
+    //    JudgeResult judgeResult = new JudgeResult
+    //    {
+    //        Actor = Side.Yellow,
+    //        ResultType = ResultType.PlaceKick
+    //    };
+    //    matchInfo.Referee.JudgeAutoPlacement(matchInfo, judgeResult);
+    //    objectManager.RevertScene(matchInfo);
+    //}
 
-    public void GoalieBluePlace()
-    {
-        objectManager.UpdateFromScene();
-        JudgeResult judgeResult = new JudgeResult
-        {
-            Actor = Side.Blue,
-            ResultType = ResultType.GoalKick
-        };
-        matchInfo.Referee.JudgeAutoPlacement(matchInfo, judgeResult);
-        objectManager.RevertScene(matchInfo);
-    }
+    //public void GoalieBluePlace()
+    //{
+    //    objectManager.UpdateFromScene();
+    //    JudgeResult judgeResult = new JudgeResult
+    //    {
+    //        Actor = Side.Blue,
+    //        ResultType = ResultType.GoalKick
+    //    };
+    //    matchInfo.Referee.JudgeAutoPlacement(matchInfo, judgeResult);
+    //    objectManager.RevertScene(matchInfo);
+    //}
 
-    public void GoalieYellowPlace()
-    {
-        objectManager.UpdateFromScene();
-        JudgeResult judgeResult = new JudgeResult
-        {
-            Actor = Side.Yellow,
-            ResultType = ResultType.GoalKick
-        };
-        matchInfo.Referee.JudgeAutoPlacement(matchInfo, judgeResult);
-        objectManager.RevertScene(matchInfo);
-    }
+    //public void GoalieYellowPlace()
+    //{
+    //    objectManager.UpdateFromScene();
+    //    JudgeResult judgeResult = new JudgeResult
+    //    {
+    //        Actor = Side.Yellow,
+    //        ResultType = ResultType.GoalKick
+    //    };
+    //    matchInfo.Referee.JudgeAutoPlacement(matchInfo, judgeResult);
+    //    objectManager.RevertScene(matchInfo);
+    //}
 
-    public void FreeLeftBotPlace()
-    {
-        objectManager.UpdateFromScene();
-        JudgeResult judgeResult = new JudgeResult
-        {
-            Actor = Side.Yellow,
-            ResultType = ResultType.FreeKickLeftBot
-        };
-        matchInfo.Referee.JudgeAutoPlacement(matchInfo, judgeResult);
-        objectManager.RevertScene(matchInfo);
-    }
+    //public void FreeLeftBotPlace()
+    //{
+    //    objectManager.UpdateFromScene();
+    //    JudgeResult judgeResult = new JudgeResult
+    //    {
+    //        Actor = Side.Yellow,
+    //        ResultType = ResultType.FreeKickLeftBot
+    //    };
+    //    matchInfo.Referee.JudgeAutoPlacement(matchInfo, judgeResult);
+    //    objectManager.RevertScene(matchInfo);
+    //}
 
-    public void FreeLeftTopPlace()
-    {
-        objectManager.UpdateFromScene();
-        JudgeResult judgeResult = new JudgeResult
-        {
-            Actor = Side.Yellow,
-            ResultType = ResultType.FreeKickLeftTop
-        };
-        matchInfo.Referee.JudgeAutoPlacement(matchInfo, judgeResult);
-        objectManager.RevertScene(matchInfo);
-    }
-    public void FreeRiBotPlace()
-    {
-        objectManager.UpdateFromScene();
-        JudgeResult judgeResult = new JudgeResult
-        {
-            Actor = Side.Blue,
-            ResultType = ResultType.FreeKickRightBot
-        };
-        matchInfo.Referee.JudgeAutoPlacement(matchInfo, judgeResult);
-        objectManager.RevertScene(matchInfo);
-    }
+    //public void FreeLeftTopPlace()
+    //{
+    //    objectManager.UpdateFromScene();
+    //    JudgeResult judgeResult = new JudgeResult
+    //    {
+    //        Actor = Side.Yellow,
+    //        ResultType = ResultType.FreeKickLeftTop
+    //    };
+    //    matchInfo.Referee.JudgeAutoPlacement(matchInfo, judgeResult);
+    //    objectManager.RevertScene(matchInfo);
+    //}
+    //public void FreeRiBotPlace()
+    //{
+    //    objectManager.UpdateFromScene();
+    //    JudgeResult judgeResult = new JudgeResult
+    //    {
+    //        Actor = Side.Blue,
+    //        ResultType = ResultType.FreeKickRightBot
+    //    };
+    //    matchInfo.Referee.JudgeAutoPlacement(matchInfo, judgeResult);
+    //    objectManager.RevertScene(matchInfo);
+    //}
 
-    public void FreeRiTopPlace()
-    {
-        objectManager.UpdateFromScene();
-        JudgeResult judgeResult = new JudgeResult
-        {
-            Actor = Side.Blue,
-            ResultType = ResultType.FreeKickRightTop
-        };
-        matchInfo.Referee.JudgeAutoPlacement(matchInfo, judgeResult);
-        objectManager.RevertScene(matchInfo);
-    }
+    //public void FreeRiTopPlace()
+    //{
+    //    objectManager.UpdateFromScene();
+    //    JudgeResult judgeResult = new JudgeResult
+    //    {
+    //        Actor = Side.Blue,
+    //        ResultType = ResultType.FreeKickRightTop
+    //    };
+    //    matchInfo.Referee.JudgeAutoPlacement(matchInfo, judgeResult);
+    //    objectManager.RevertScene(matchInfo);
+    //}
 }
