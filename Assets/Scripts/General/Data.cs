@@ -289,6 +289,22 @@ namespace Simuro5v5
         public Robot[] Robots = new Robot[Const.RobotsPerTeam];
         public Ball Ball = new Ball();
 
+        public  void PlacementInfoFromMatchInfo(MatchInfo matchInfo,Side side)
+        {
+            Ball = matchInfo.Ball;
+            if(side == Side.Blue)
+            {
+                Robots = (Robot[])matchInfo.BlueRobots.Clone();
+            }
+            else if(side == Side.Yellow)
+            {
+                Robots = (Robot[])matchInfo.YellowRobots.Clone();
+            }
+            else
+            {
+                Debug.Log("flase");
+            }
+        }
         public void Normalize()
         {
             // TODO 保证不会出界、不会重叠

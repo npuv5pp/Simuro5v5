@@ -572,6 +572,8 @@ public class PlayMain : MonoBehaviour
                     currentMatchInfo.UpdateFrom(blueInfo.Robots, Side.Blue);
                     //先进行第一次摆位判罚
                     GlobalMatchInfo.Referee.JudgeAutoPlacement(currentMatchInfo, judgeResult, Side.Blue);
+                    //判罚后将蓝方信息更新
+                    blueInfo.PlacementInfoFromMatchInfo(currentMatchInfo, Side.Blue);
                     // 黄方后摆位
                     yellowInfo = StrategyManager.Yellow.GetPlacement(currentMatchInfo.GetSide(Side.Yellow));
                     // 黄方策略认为自己是蓝方，所以返回数据之后需要转换
@@ -582,7 +584,8 @@ public class PlayMain : MonoBehaviour
 
                     //进行第二次裁判判罚
                     GlobalMatchInfo.Referee.JudgeAutoPlacement(currentMatchInfo, judgeResult, Side.Yellow);
-
+                    //判罚后对黄方信息更新
+                    yellowInfo.PlacementInfoFromMatchInfo(currentMatchInfo, Side.Yellow);
                     break;
                 }
             case Side.Yellow:
@@ -594,7 +597,9 @@ public class PlayMain : MonoBehaviour
                     // 将黄方返回的数据同步到currMi
                     currentMatchInfo.UpdateFrom(yellowInfo.Robots, Side.Yellow);
                     //进行第一次摆位判罚
-                    GlobalMatchInfo.Referee.JudgeAutoPlacement(currentMatchInfo, judgeResult, Side.Blue);
+                    GlobalMatchInfo.Referee.JudgeAutoPlacement(currentMatchInfo, judgeResult, Side.Yellow);
+                    //判罚之后将黄方信息更新
+                    yellowInfo.PlacementInfoFromMatchInfo(currentMatchInfo,Side.Yellow);
                     // 蓝方后摆位
                     blueInfo = StrategyManager.Blue.GetPlacement(currentMatchInfo.GetSide(Side.Blue));
 
@@ -602,6 +607,8 @@ public class PlayMain : MonoBehaviour
                     currentMatchInfo = new MatchInfo(blueInfo, yellowInfo, judgeResult.Actor);
                     //进行第二次裁判判罚
                     GlobalMatchInfo.Referee.JudgeAutoPlacement(currentMatchInfo, judgeResult, Side.Blue);
+                    //判罚之后将蓝方信息更新
+                    blueInfo.PlacementInfoFromMatchInfo(currentMatchInfo, Side.Blue);
                 }
 
                 break;
