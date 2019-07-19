@@ -257,56 +257,16 @@ public class Referee : ICloneable
                                                          || matchInfo.MatchPhase == MatchPhase.OverTime)
         {
             if (JudgePlace(ref judgeResult))
-            {
-                return new JudgeResult
-                {
-                    ResultType = ResultType.GoalKick,
-                    Actor = Side.Yellow,
-                    Reason = "real placekick"
-                };
-
-            }
-            //return judgeResult;
+                return judgeResult;
 
             if (JudgePenalty(ref judgeResult))
-            {
-                return new JudgeResult
-                {
-                    ResultType = ResultType.PenaltyKick,
-                    Actor = Side.Yellow,
-                    Reason = "real penalty"
-                };
-
-            }
-            //return judgeResult;
+                return judgeResult;
 
             if (JudgeGoalie(ref judgeResult))
-            {
-                {
-                    return new JudgeResult
-                    {
-                        ResultType = ResultType.PenaltyKick,
-                        Actor = Side.Yellow,
-                        Reason = "real goaliekick"
-                    };
-
-                }
-            }
-            //    return judgeResult;
+                return judgeResult;
 
             if (JudgeFree(ref judgeResult))
-            {
-                {
-                    return new JudgeResult
-                    {
-                        ResultType = ResultType.GoalKick,
-                        Actor = Side.Yellow,
-                        Reason = "real freekick"
-                    };
-
-                }
-            }
-            //    return judgeResult;
+                return judgeResult;
 
             //判断上下半场、加时赛结束，如果此时游戏分出胜负，则返回gameover
             if (JudgeHalfOrGameEnd(ref judgeResult))
