@@ -1822,8 +1822,16 @@ public class Referee : ICloneable
         {
             //再寻找守门员
             if (GoalieId == -1)
-            {
-                GoalieId = 0;
+           {
+                //如果争球球员是0号，则不选择0号为守门员
+                if(OffensiveFreeId == 0)
+                {
+                    GoalieId = 1;
+                }
+                else
+                {
+                    GoalieId = 0;
+                }
                 FreeOffensivePosSquare[GoalieId].GetNewPosSquare(FreeOffensiveGoaliePos);
                 JudgeSafePosSquare(FreeSafePosSquare, FreeOffensivePosSquare, FreeDefenderPosSquare);
             }
