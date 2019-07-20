@@ -580,7 +580,7 @@ public class PlayMain : MonoBehaviour
                     yellowInfo.ConvertToAnotherSide();
 
                     // 从两方数据拼接MatchInfo，球的数据取决于judgeResult
-                    currentMatchInfo = new MatchInfo(blueInfo, yellowInfo, judgeResult.Actor);
+                    currentMatchInfo = new MatchInfo(blueInfo, yellowInfo, judgeResult.WhosBall);
 
                     //进行第二次裁判判罚
                     GlobalMatchInfo.Referee.JudgeAutoPlacement(currentMatchInfo, judgeResult, Side.Yellow);
@@ -604,7 +604,7 @@ public class PlayMain : MonoBehaviour
                     blueInfo = StrategyManager.Blue.GetPlacement(currentMatchInfo.GetSide(Side.Blue));
 
                     // 从两方数据拼接MatchInfo，球的数据取决于judgeResult
-                    currentMatchInfo = new MatchInfo(blueInfo, yellowInfo, judgeResult.Actor);
+                    currentMatchInfo = new MatchInfo(blueInfo, yellowInfo, judgeResult.WhosBall);
                     //进行第二次裁判判罚
                     GlobalMatchInfo.Referee.JudgeAutoPlacement(currentMatchInfo, judgeResult, Side.Blue);
                     //判罚之后将蓝方信息更新

@@ -87,7 +87,9 @@ namespace Simuro5v5
                     Ball = yellow.Ball;
                     break;
                 default:
-                    throw new ArgumentException("whosball cannot be Nobody");
+                    //假设是Nobaby，黄蓝方球的坐标是一样
+                    Ball = blue.Ball;
+                    break;
             }
         }
 

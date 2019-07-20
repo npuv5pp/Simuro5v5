@@ -1782,10 +1782,44 @@ public class Referee : ICloneable
             UpdateOffAndDefInfo(FreeDefenderPosSquare, FreeOffensivePosSquare, Side.Blue);
             JudgeSafePosSquare(FreeSafePosSquare, FreeOffensivePosSquare, FreeDefenderPosSquare);
         }
-        if(judgeResult.WhoisFirst == target)
+        //先对球进行摆位
+        BallPos = FreeBallPos;
+        if (judgeResult.WhoisFirst == target)
         {
-            //先对球进行摆位
-            BallPos = FreeBallPos;
+            //再对防守方进行摆位判断
+            //先寻找是否有争球球员
+            if (DefenderFreeId == -1)
+            {
+                DefenderFreeId = 1;
+                FreeDefenderPosSquare[DefenderFreeId].GetNewPosSquare(FreeDefenderPos);
+                JudgeSafePosSquare(FreeSafePosSquare, FreeOffensivePosSquare, FreeDefenderPosSquare);
+            }
+
+            //如果在争球半场内但没有在争球点
+            if (FreeDefenderPosSquare[DefenderFreeId].Pos.IsNotNear(FreeDefenderPos))
+            {
+                FreeDefenderPosSquare[DefenderFreeId].GetNewPosSquare(FreeDefenderPos);
+                JudgeSafePosSquare(FreeSafePosSquare, FreeOffensivePosSquare, FreeDefenderPosSquare);
+            }
+
+            for (int i = 0; i < Const.RobotsPerTeam; i++)
+            {
+                if (i == DefenderFreeId) continue;
+                //三种不规范情况
+                //1.除了进攻球员在争球区域内 2. 未在球场内 3. 与自身队伍球员重叠 
+                if (FreeDefenderPosSquare[i].square.IsOverlapWithRectangle(FreeState)
+                    || !FreeDefenderPosSquare[i].square.IsOverlapWithRectangle(stadiumState)
+                    || RobotCrossByRobots(FreeDefenderPosSquare[i], FreeDefenderPosSquare, true, i)
+                    )
+                {
+                    ChangeRobotSafePos(ref FreeDefenderPosSquare[i], FreeSafePosSquare);
+                    JudgeSafePosSquare(FreeSafePosSquare, FreeOffensivePosSquare, FreeDefenderPosSquare);
+                }
+            }
+        }
+        //TODO考虑第一次有没有规范争取
+        else
+        {
             //再寻找守门员
             if (GoalieId == -1)
             {
@@ -1816,47 +1850,13 @@ public class Referee : ICloneable
                 //1.除了进攻球员在争球区域内 2. 未在球场内 3. 与自身队伍球员重叠
                 if (FreeOffensivePosSquare[i].square.IsOverlapWithRectangle(FreeState)
                     || !FreeOffensivePosSquare[i].square.IsOverlapWithRectangle(stadiumState)
-                    || RobotCrossByRobots(FreeOffensivePosSquare[i], FreeOffensivePosSquare, true, i))
+                    || RobotCrossByRobots(FreeOffensivePosSquare[i], FreeOffensivePosSquare, true, i)
+                    || RobotCrossByRobots(FreeOffensivePosSquare[i], FreeOffensivePosSquare))
                 {
                     ChangeRobotSafePos(ref FreeOffensivePosSquare[i], FreeSafePosSquare);
                     JudgeSafePosSquare(FreeSafePosSquare, FreeOffensivePosSquare, FreeDefenderPosSquare);
                 }
             }
-        }
-        //TODO考虑第一次有没有规范争取
-        else
-        {
-            //再对防守方进行摆位判断
-            //先寻找是否有争球球员
-            if (DefenderFreeId == -1)
-            {
-                DefenderFreeId = 1;
-                FreeDefenderPosSquare[DefenderFreeId].GetNewPosSquare(FreeDefenderPos);
-                JudgeSafePosSquare(FreeSafePosSquare, FreeOffensivePosSquare, FreeDefenderPosSquare);
-            }
-
-            //如果在争球半场内但没有在争球点
-            if (FreeDefenderPosSquare[DefenderFreeId].Pos.IsNotNear(FreeDefenderPos))
-            {
-                FreeDefenderPosSquare[DefenderFreeId].GetNewPosSquare(FreeDefenderPos);
-                JudgeSafePosSquare(FreeSafePosSquare, FreeOffensivePosSquare, FreeDefenderPosSquare);
-            }
-
-            for (int i = 0; i < Const.RobotsPerTeam; i++)
-            {
-                if (i == DefenderFreeId) continue;
-                //三种不规范情况
-                //1.除了进攻球员在争球区域内 2. 未在球场内 3. 与自身队伍球员重叠 4.与敌方球员重叠
-                if (FreeDefenderPosSquare[i].square.IsOverlapWithRectangle(FreeState)
-                    || !FreeDefenderPosSquare[i].square.IsOverlapWithRectangle(stadiumState)
-                    || RobotCrossByRobots(FreeDefenderPosSquare[i], FreeDefenderPosSquare, true, i)
-                    || RobotCrossByRobots(FreeDefenderPosSquare[i], FreeOffensivePosSquare))
-                {
-                    ChangeRobotSafePos(ref FreeDefenderPosSquare[i], FreeSafePosSquare);
-                    JudgeSafePosSquare(FreeSafePosSquare, FreeOffensivePosSquare, FreeDefenderPosSquare);
-                }
-            }
-
         }
         if (judgeResult.Actor == Side.Blue)
         {
