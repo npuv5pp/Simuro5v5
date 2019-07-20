@@ -126,6 +126,11 @@ public class Referee : ICloneable
     /// </summary>
     [JsonProperty] public JudgeResult savedJudge;
 
+    /// <summary>
+    /// 保存争球过去十秒的坐标 
+    /// </summary>
+    public BallQueue ballQueue;
+
     public Referee()
     {
         //// 编辑器中调试的时候将时间设置短一点
@@ -137,7 +142,6 @@ public class Referee : ICloneable
         penaltyLimitTime = 3 * Const.FramePerSecond;
         penaltyTime = 0;
         standoffTime = 0;
-        //test three attack
         maxStandoffTime = 10 * Const.FramePerSecond;
 
         BlueRobotsPos = new Vector2D[Const.RobotsPerTeam];
@@ -146,6 +150,8 @@ public class Referee : ICloneable
         YellowRobotSquare = new Square[Const.RobotsPerTeam];
 
         ObjectManager.FindObjects(out BlueObject, out YellowObject, out BallObject);
+
+        ballQueue = new BallQueue();
 
         penaltySide = Side.Nobody;
         savedJudge = new JudgeResult
@@ -265,7 +271,7 @@ public class Referee : ICloneable
             if (JudgeGoalie(ref judgeResult))
                 return judgeResult;
 
-            if (JudgeFree(ref judgeResult))
+            if (JudgeFree(ref judgeResult,matchInfo.Ball.pos))
                 return judgeResult;
 
             //判断上下半场、加时赛结束，如果此时游戏分出胜负，则返回gameover
@@ -798,65 +804,110 @@ public class Referee : ICloneable
         return false;
     }
 
-    private bool JudgeFree(ref JudgeResult judgeResult)
+    private bool JudgeFree(ref JudgeResult judgeResult,Vector2D ballPos)
     {
-        if (matchInfo.Ball.linearVelocity.GetUnityVector2().magnitude < 50)
+        ballQueue.Enqueue(ballPos);
+        if(ballQueue.IsInFree(ballPos))
         {
-            standoffTime++;
-            if (standoffTime > maxStandoffTime)
+            if (matchInfo.Ball.pos.x > 0 && matchInfo.Ball.pos.y > 0)
             {
-                standoffTime = 0;
-                if (matchInfo.Ball.pos.x > 0 && matchInfo.Ball.pos.y > 0)
+                judgeResult = new JudgeResult
                 {
-                    judgeResult = new JudgeResult
-                    {
-                        ResultType = ResultType.FreeKickRightTop,
-                        Actor = Side.Blue,
-                        Reason = "RightTop Standoff time longer than 10 seconds in game"
-                    };
-                    return true;
-                }
-                else if (matchInfo.Ball.pos.x > 0 && matchInfo.Ball.pos.y < 0)
+                    ResultType = ResultType.FreeKickRightTop,
+                    Actor = Side.Blue,
+                    Reason = "RightTop Standoff time longer than 10 seconds in game"
+                };
+                return true;
+            }
+            else if (matchInfo.Ball.pos.x > 0 && matchInfo.Ball.pos.y < 0)
+            {
+                judgeResult = new JudgeResult
                 {
-                    judgeResult = new JudgeResult
-                    {
-                        ResultType = ResultType.FreeKickRightBot,
-                        Actor = Side.Blue,
-                        Reason = "RightBot Standoff time longer than 10 seconds in game"
-                    };
-                    return true;
-                }
-                else if (matchInfo.Ball.pos.x < 0 && matchInfo.Ball.pos.y > 0)
+                    ResultType = ResultType.FreeKickRightBot,
+                    Actor = Side.Blue,
+                    Reason = "RightBot Standoff time longer than 10 seconds in game"
+                };
+                return true;
+            }
+            else if (matchInfo.Ball.pos.x < 0 && matchInfo.Ball.pos.y > 0)
+            {
+                judgeResult = new JudgeResult
                 {
-                    judgeResult = new JudgeResult
-                    {
-                        ResultType = ResultType.FreeKickLeftTop,
-                        Actor = Side.Yellow,
-                        Reason = "LeftTop Standoff time longer than 10 seconds in game"
-                    };
-                    return true;
-                }
-                else
-                {
-                    judgeResult = new JudgeResult
-                    {
-                        ResultType = ResultType.FreeKickLeftBot,
-                        Actor = Side.Yellow,
-                        Reason = "LeftBot Standoff time longer than 10 seconds in game"
-                    };
-                    return true;
-                }
+                    ResultType = ResultType.FreeKickLeftTop,
+                    Actor = Side.Yellow,
+                    Reason = "LeftTop Standoff time longer than 10 seconds in game"
+                };
+                return true;
             }
             else
             {
-                return false;
+                judgeResult = new JudgeResult
+                {
+                    ResultType = ResultType.FreeKickLeftBot,
+                    Actor = Side.Yellow,
+                    Reason = "LeftBot Standoff time longer than 10 seconds in game"
+                };
+                return true;
             }
         }
-        else
-        {
-            standoffTime = 0;
-            return false;
-        }
+        return false;
+        //if (matchInfo.Ball.linearVelocity.GetUnityVector2().magnitude < 50)
+        //{
+        //    standoffTime++;
+        //    if (standoffTime > maxStandoffTime)
+        //    {
+        //        standoffTime = 0;
+        //        if (matchInfo.Ball.pos.x > 0 && matchInfo.Ball.pos.y > 0)
+        //        {
+        //            judgeResult = new JudgeResult
+        //            {
+        //                ResultType = ResultType.FreeKickRightTop,
+        //                Actor = Side.Blue,
+        //                Reason = "RightTop Standoff time longer than 10 seconds in game"
+        //            };
+        //            return true;
+        //        }
+        //        else if (matchInfo.Ball.pos.x > 0 && matchInfo.Ball.pos.y < 0)
+        //        {
+        //            judgeResult = new JudgeResult
+        //            {
+        //                ResultType = ResultType.FreeKickRightBot,
+        //                Actor = Side.Blue,
+        //                Reason = "RightBot Standoff time longer than 10 seconds in game"
+        //            };
+        //            return true;
+        //        }
+        //        else if (matchInfo.Ball.pos.x < 0 && matchInfo.Ball.pos.y > 0)
+        //        {
+        //            judgeResult = new JudgeResult
+        //            {
+        //                ResultType = ResultType.FreeKickLeftTop,
+        //                Actor = Side.Yellow,
+        //                Reason = "LeftTop Standoff time longer than 10 seconds in game"
+        //            };
+        //            return true;
+        //        }
+        //        else
+        //        {
+        //            judgeResult = new JudgeResult
+        //            {
+        //                ResultType = ResultType.FreeKickLeftBot,
+        //                Actor = Side.Yellow,
+        //                Reason = "LeftBot Standoff time longer than 10 seconds in game"
+        //            };
+        //            return true;
+        //        }
+        //    }
+        //    else
+        //    {
+        //        return false;
+        //    }
+        //}
+        //else
+        //{
+        //    standoffTime = 0;
+        //    return false;
+        //}
     }
 
     private bool JudgeHalfOrGameEnd(ref JudgeResult judgeResult)
