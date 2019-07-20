@@ -184,6 +184,11 @@ namespace Simuro5v5
             }
         }
 
+        public void UpdateFrom(Ball ball)
+        {
+            Ball = ball;
+        }
+
         public void UpdateFrom(GameObject ball, GameObject[] blue, GameObject[] yellow)
         {
             for (int i = 0; i < Const.RobotsPerTeam; i++)

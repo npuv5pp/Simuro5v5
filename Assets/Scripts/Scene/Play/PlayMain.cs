@@ -570,6 +570,8 @@ public class PlayMain : MonoBehaviour
                     blueInfo = StrategyManager.Blue.GetPlacement(currentMatchInfo.GetSide(Side.Blue));
                     // 将蓝方返回的数据同步到currMi
                     currentMatchInfo.UpdateFrom(blueInfo.Robots, Side.Blue);
+                    // 将蓝方的球的坐标同步到currMi
+                    currentMatchInfo.UpdateFrom(blueInfo.Ball);
                     //先进行第一次摆位判罚
                     GlobalMatchInfo.Referee.JudgeAutoPlacement(currentMatchInfo, judgeResult, Side.Blue);
                     //判罚后将蓝方信息更新
@@ -584,8 +586,6 @@ public class PlayMain : MonoBehaviour
 
                     //进行第二次裁判判罚
                     GlobalMatchInfo.Referee.JudgeAutoPlacement(currentMatchInfo, judgeResult, Side.Yellow);
-                    //判罚后对黄方信息更新
-                    yellowInfo.PlacementInfoFromMatchInfo(currentMatchInfo, Side.Yellow);
                     break;
                 }
             case Side.Yellow:
@@ -596,6 +596,8 @@ public class PlayMain : MonoBehaviour
                     yellowInfo.ConvertToAnotherSide();
                     // 将黄方返回的数据同步到currMi
                     currentMatchInfo.UpdateFrom(yellowInfo.Robots, Side.Yellow);
+                    //再将球进行更新
+                    currentMatchInfo.UpdateFrom(yellowInfo.Ball);
                     //进行第一次摆位判罚
                     GlobalMatchInfo.Referee.JudgeAutoPlacement(currentMatchInfo, judgeResult, Side.Yellow);
                     //判罚之后将黄方信息更新
@@ -607,8 +609,6 @@ public class PlayMain : MonoBehaviour
                     currentMatchInfo = new MatchInfo(blueInfo, yellowInfo, judgeResult.WhosBall);
                     //进行第二次裁判判罚
                     GlobalMatchInfo.Referee.JudgeAutoPlacement(currentMatchInfo, judgeResult, Side.Blue);
-                    //判罚之后将蓝方信息更新
-                    blueInfo.PlacementInfoFromMatchInfo(currentMatchInfo, Side.Blue);
                 }
 
                 break;
