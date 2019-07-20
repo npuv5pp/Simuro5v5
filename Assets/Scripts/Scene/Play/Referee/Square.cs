@@ -59,6 +59,13 @@ namespace Simuro5v5.Util
             var cb = -bc;
             var da = -ad;
             var db = -bd;
+            
+            // 判断共线的情况
+            if (Mathf.Abs(ac.Cross(ad)) < 1e-6 && Mathf.Abs(bc.Cross(bd)) < 1e-6)
+            {
+                return (ac * bc <= 0) || (ad * bd) <= 0 ||
+                       (ca * da <= 0) || (cb * db) <= 0;
+            }
 
             return (ac.Cross(ad)) * (bc.Cross(bd)) <= 0 &&
                    (ca.Cross(cb)) * (da.Cross(db)) <= 0;    
@@ -253,6 +260,12 @@ namespace Simuro5v5.Util
             
             var square3 = new Square(new Vector2D(0.2f, 0.2f), new Vector2D(0.8f, 0.8f));
             Assert.IsFalse(square1.IsCrossedBy(square3));
+
+            var square4 = new Square(new Vector2D(0, 2), new Vector2D(1, 3));
+            Assert.IsFalse(square1.IsCrossedBy(square4));
+
+            var square5 = new Square(new Vector2D(-2, -1), new Vector2D(1, 2));
+            Assert.IsTrue(square1.IsCrossedBy(square5));
         }
     }
 
