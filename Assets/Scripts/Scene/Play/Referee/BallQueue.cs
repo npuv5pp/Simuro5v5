@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using UnityEngine;
 using Simuro5v5;
 
 public class BallQueue
@@ -6,12 +7,18 @@ public class BallQueue
     public Queue<Vector2D> BallPosQueue;
 
     //争球十秒的拍数
-    private int Capacity = 660;
+    //private int Capacity = 10 * Const.FramePerSecond;
+    //test
+    public int Capacity = 5 * Const.FramePerSecond;
+    private float LimitMove = 2 * Const.Robot.RL;
+
+    Vector2D[] testpos;
 
     public BallQueue()
     {
         //660拍，10秒的
         BallPosQueue = new Queue<Vector2D>(Capacity);
+        testpos = new Vector2D[Capacity];
     }
 
     public void Enqueue(Vector2D ballPos)
@@ -22,7 +29,10 @@ public class BallQueue
         }
         else
         {
-            BallPosQueue.Dequeue();
+            if(BallPosQueue.Count!=0)
+            {
+                BallPosQueue.Dequeue();
+            }
             BallPosQueue.Enqueue(ballPos);
         }
     }
@@ -42,11 +52,38 @@ public class BallQueue
     /// <returns></returns>
     public bool IsInFree(Vector2D newBallPos)
     {
+        //int test = 0;
+        //int second = 1;
+        //if (BallPosQueue.Count < Capacity)
+        //    return false;
+        //foreach (var pos in BallPosQueue)
+        //{
+        //    testpos[--Capacity] = pos;
+        //}
+        //for(int i = 0; i<Capacity;i++)
+        //{
+        //    if (Vector2D.Distance(testpos[i], newBallPos) > LimitMove)
+        //    {
+        //        return false;
+        //    }
+        //    test++;
+        //    if (test / (second * Const.FramePerSecond) == 1)
+        //    {
+        //        Debug.Log("slow is " + second + "seconds");
+        //        second++;
+        //    }
+        //}
+        ////此时判罚是进入争球，进行清空
+        //BallPosQueue.Clear();
+        //return true;
+
+
+        //real code
         if (BallPosQueue.Count < Capacity)
             return false;
         foreach (var pos in BallPosQueue)
         {
-            if (Vector2D.Distance(pos, newBallPos) > 2 * Const.Robot.HRL)
+            if (Vector2D.Distance(pos, newBallPos) > LimitMove)
             {
                 return false;
             }

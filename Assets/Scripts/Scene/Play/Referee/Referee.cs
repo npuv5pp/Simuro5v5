@@ -1085,16 +1085,16 @@ public class Referee : ICloneable
         {
             SafePosSquare = new RobotPosSquare[10]
             {
-                new RobotPosSquare(new Vector2D(5f, 6f)),
-                new RobotPosSquare(new Vector2D(5f, 16f)),
-                new RobotPosSquare(new Vector2D(5f, 26f)),
-                new RobotPosSquare(new Vector2D(5f, 36f)),
-                new RobotPosSquare(new Vector2D(5f, 46f)),
                 new RobotPosSquare(new Vector2D(5f, -6f)),
                 new RobotPosSquare(new Vector2D(5f, -16f)),
                 new RobotPosSquare(new Vector2D(5f, -26f)),
                 new RobotPosSquare(new Vector2D(5f, -36f)),
-                new RobotPosSquare(new Vector2D(5f, -46f))
+                new RobotPosSquare(new Vector2D(5f, -46f)),
+                new RobotPosSquare(new Vector2D(5f, 6f)),
+                new RobotPosSquare(new Vector2D(5f, 16f)),
+                new RobotPosSquare(new Vector2D(5f, 26f)),
+                new RobotPosSquare(new Vector2D(5f, 36f)),
+                new RobotPosSquare(new Vector2D(5f, 46f))
             };
             //蓝方执行点球时相关坐标
             PenaltyBallPos = new Vector2D(-72.5f, 0f); //点球坐标
@@ -1123,16 +1123,16 @@ public class Referee : ICloneable
         {
             SafePosSquare = new RobotPosSquare[10]
             {
-                new RobotPosSquare(new Vector2D(-5f, 5f)),
-                new RobotPosSquare(new Vector2D(-5f, 20f)),
-                new RobotPosSquare(new Vector2D(-5f, 35f)),
-                new RobotPosSquare(new Vector2D(-5f, 50f)),
-                new RobotPosSquare(new Vector2D(-5f, 65f)),
                 new RobotPosSquare(new Vector2D(-5f, -5f)),
                 new RobotPosSquare(new Vector2D(-5f, -20f)),
                 new RobotPosSquare(new Vector2D(-5f, -35f)),
                 new RobotPosSquare(new Vector2D(-5f, -50f)),
-                new RobotPosSquare(new Vector2D(-5f, -65f))
+                new RobotPosSquare(new Vector2D(-5f, -65f)),
+                new RobotPosSquare(new Vector2D(-5f, 5f)),
+                new RobotPosSquare(new Vector2D(-5f, 20f)),
+                new RobotPosSquare(new Vector2D(-5f, 35f)),
+                new RobotPosSquare(new Vector2D(-5f, 50f)),
+                new RobotPosSquare(new Vector2D(-5f, 65f))
             };
             //黄方执行点球时相关坐标
             PenaltyBallPos = new Vector2D(72.5f, 0f); //点球坐标
@@ -1906,11 +1906,11 @@ public class Referee : ICloneable
                 if (i == GoalieId) continue;
                 if (i == OffensiveFreeId) continue;
                 //三种不规范情况
-                //1.除了进攻球员在争球区域内 2. 未在球场内 3. 与自身队伍球员重叠
+                //1.除了进攻球员在争球区域内 2. 未在球场内 3. 与自身队伍球员重叠 4.与地方球员判断是否重叠
                 if (FreeOffensivePosSquare[i].square.IsOverlapWithRectangle(FreeState)
                     || !FreeOffensivePosSquare[i].square.IsOverlapWithRectangle(stadiumState)
                     || RobotCrossByRobots(FreeOffensivePosSquare[i], FreeOffensivePosSquare, true, i)
-                    || RobotCrossByRobots(FreeOffensivePosSquare[i], FreeOffensivePosSquare))
+                    || RobotCrossByRobots(FreeOffensivePosSquare[i], FreeDefenderPosSquare))
                 {
                     ChangeRobotSafePos(ref FreeOffensivePosSquare[i], FreeSafePosSquare);
                     JudgeSafePosSquare(FreeSafePosSquare, FreeOffensivePosSquare, FreeDefenderPosSquare);

@@ -271,7 +271,7 @@ public class PlayMain : MonoBehaviour
                         #endregion
 
                         BoardcastJudgeResult(judgeResult);
-                        Debug.Log($"callback placement {callbackId}");
+                        //Debug.Log($"callback placement {callbackId}");
                         UpdatePlacementToScene(judgeResult);
                         ObjectManager.SetStill();
                         Event.Send(Event.EventType1.AutoPlacement, GlobalMatchInfo);
@@ -294,7 +294,7 @@ public class PlayMain : MonoBehaviour
 
                     if (GlobalMatchInfo.TickMatch > 1)
                     {
-                        Debug.Log($"Will stop at {GlobalMatchInfo.TickMatch} {placementId}");
+                        //Debug.Log($"Will stop at {GlobalMatchInfo.TickMatch} {placementId}");
                         PauseForSeconds(2, Callback);
                     }
                     else
