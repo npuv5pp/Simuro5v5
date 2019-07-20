@@ -1,16 +1,15 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using Simuro5v5;
+using UnityEditor;
 
 public class BallQueue
 {
     public Queue<Vector2D> BallPosQueue;
 
     //争球十秒的拍数
-    //private int Capacity = 10 * Const.FramePerSecond;
-    //test
-    public int Capacity = 5 * Const.FramePerSecond;
-    private float LimitMove = 2 * Const.Robot.RL;
+    private readonly int Capacity = 10 * Const.FramePerSecond;
+    private float LimitMove = Const.Robot.RL;
 
     Vector2D[] testpos;
 
@@ -29,7 +28,7 @@ public class BallQueue
         }
         else
         {
-            if(BallPosQueue.Count!=0)
+            if (BallPosQueue.Count != 0)
             {
                 BallPosQueue.Dequeue();
             }
@@ -52,25 +51,26 @@ public class BallQueue
     /// <returns></returns>
     public bool IsInFree(Vector2D newBallPos)
     {
+        //test for limitcapacity
+
         //int test = 0;
-        //int second = 1;
+        //int testCap = Capacity;
         //if (BallPosQueue.Count < Capacity)
         //    return false;
         //foreach (var pos in BallPosQueue)
         //{
-        //    testpos[--Capacity] = pos;
+        //    testpos[--testCap] = pos;
         //}
-        //for(int i = 0; i<Capacity;i++)
+        //for (int i = 0; i < Capacity; i++)
         //{
         //    if (Vector2D.Distance(testpos[i], newBallPos) > LimitMove)
         //    {
         //        return false;
         //    }
         //    test++;
-        //    if (test / (second * Const.FramePerSecond) == 1)
+        //    if (test == 3* Const.FramePerSecond)
         //    {
-        //        Debug.Log("slow is " + second + "seconds");
-        //        second++;
+        //        Time.timeScale = 0;
         //    }
         //}
         ////此时判罚是进入争球，进行清空
