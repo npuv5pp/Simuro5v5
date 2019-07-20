@@ -45,7 +45,7 @@ public class GUI_Replay : MonoBehaviour
 
     private int SliderPosition
     {
-        get => (int) Slider.value;
+        get => (int)Slider.value;
         set => Slider.value = value;
     }
 
@@ -143,7 +143,64 @@ public class GUI_Replay : MonoBehaviour
         {
             OnNextClicked();
         }
+
+        if ((Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
+            && Input.GetKey(KeyCode.LeftArrow))
+        {
+            OnQuickPreviousClicked();
+        }
+
+        if ((Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
+            && Input.GetKey(KeyCode.RightArrow))
+        {
+            OnQuickNextClicked();
+        }
+
     }
+
+    /// <summary>
+    /// Quicknext按钮点击。播放前一百拍场景并暂停。
+    /// </summary>
+    public void OnQuickNextClicked()
+    {
+        QuickNext();
+        Paused = true;
+    }
+
+    private void QuickNext()
+    {
+        if (SliderPosition < Recorder.DataLength - 101)
+        {
+            SliderPosition += 100;
+        }
+        else if(SliderPosition < Recorder.DataLength - 1 && SliderPosition > Recorder.DataLength - 101)
+        {
+            SliderPosition = Recorder.DataLength - 1;
+        }
+    }
+
+
+    /// <summary>
+    /// QuickPrevios按钮点击。播放前一百拍场景并暂停。
+    /// </summary>
+    public void OnQuickPreviousClicked()
+    {
+        QuickPrevious();
+        Paused = true;
+    }
+
+    private void QuickPrevious()
+    {
+        if (SliderPosition > 100)
+        {
+            SliderPosition -= 100;
+        }
+        else if(SliderPosition <= 100 && SliderPosition > 0)
+        {
+            SliderPosition = 0;
+        }
+    }
+
 
     /// <summary>
     /// 渲染一拍的数据到场景中，包括：机器人和球的坐标，数据板
@@ -163,28 +220,28 @@ public class GUI_Replay : MonoBehaviour
         switch (mp)
         {
             case MatchPhase.FirstHalf:
-            {
-                PhaseText.text = "First Half";
-                break;
-            }
+                {
+                    PhaseText.text = "First Half";
+                    break;
+                }
 
             case MatchPhase.SecondHalf:
-            {
-                PhaseText.text = "Second Half";
-                break;
-            }
+                {
+                    PhaseText.text = "Second Half";
+                    break;
+                }
 
             case MatchPhase.OverTime:
-            {
-                PhaseText.text = "Over Time";
-                break;
-            }
+                {
+                    PhaseText.text = "Over Time";
+                    break;
+                }
 
             case MatchPhase.Penalty:
-            {
-                PhaseText.text = "Penalty Shootout";
-                break;
-            }
+                {
+                    PhaseText.text = "Penalty Shootout";
+                    break;
+                }
         }
     }
 
@@ -253,7 +310,7 @@ public class GUI_Replay : MonoBehaviour
     public void OnSliderScrolled(BaseEventData _data)
     {
         var data = _data as PointerEventData;
-        SliderPosition += (int) data.scrollDelta.y;
+        SliderPosition += (int)data.scrollDelta.y;
     }
 
     /// <summary>
@@ -310,8 +367,8 @@ public class GUI_Replay : MonoBehaviour
     /// <param name="data"></param>
     public void OnSpeedScrolled(BaseEventData data)
     {
-        var pointerEventData = (PointerEventData) data;
-        SpeedDropdown.value -= (int) pointerEventData.scrollDelta.y;
+        var pointerEventData = (PointerEventData)data;
+        SpeedDropdown.value -= (int)pointerEventData.scrollDelta.y;
     }
 
     public void ExportDataRecord()
