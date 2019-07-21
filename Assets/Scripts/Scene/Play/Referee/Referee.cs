@@ -596,7 +596,7 @@ public class Referee : ICloneable
             judgeResult = new JudgeResult
             {
                 Actor = Side.Blue,
-                Reason = matchState + " start and first PlaceKick",
+                Reason = matchState + " Start and first placekick",
                 ResultType = ResultType.PlaceKick
             };
             return true;
@@ -608,7 +608,7 @@ public class Referee : ICloneable
             judgeResult = new JudgeResult
             {
                 Actor = Side.Yellow,
-                Reason = "Be scored and PlaceKick again",
+                Reason = "Be scored and placekick again",
                 ResultType = ResultType.PlaceKick,
                 WhoGoal = Side.Blue
             };
@@ -620,7 +620,7 @@ public class Referee : ICloneable
             judgeResult = new JudgeResult
             {
                 Actor = Side.Blue,
-                Reason = "Be scored and PlaceKick again",
+                Reason = "Be scored and placekick again",
                 ResultType = ResultType.PlaceKick,
                 WhoGoal = Side.Yellow
             };
@@ -655,7 +655,7 @@ public class Referee : ICloneable
                 {
                     ResultType = ResultType.PenaltyKick,
                     Actor = Side.Yellow,
-                    Reason = "Defenders have four robots in BigState"
+                    Reason = "Defenders have four robots in bigstate"
                 };
                 return true;
             }
@@ -666,7 +666,7 @@ public class Referee : ICloneable
                 {
                     ResultType = ResultType.PenaltyKick,
                     Actor = Side.Yellow,
-                    Reason = "Defenders have two robots in SmallState"
+                    Reason = "Defenders have two robots in smallstate"
                 };
                 return true;
             }
@@ -696,7 +696,7 @@ public class Referee : ICloneable
                 {
                     ResultType = ResultType.PenaltyKick,
                     Actor = Side.Blue,
-                    Reason = "Defenders have four robots in BigState"
+                    Reason = "Defenders have four robots in bigstate"
                 };
                 return true;
             }
@@ -707,7 +707,7 @@ public class Referee : ICloneable
                 {
                     ResultType = ResultType.PenaltyKick,
                     Actor = Side.Blue,
-                    Reason = "Defenders have two robots in SmallState"
+                    Reason = "Defenders have two robots in smallstate"
                 };
                 return true;
             }
@@ -731,7 +731,7 @@ public class Referee : ICloneable
                     {
                         ResultType = ResultType.GoalKick,
                         Actor = Side.Blue,
-                        Reason = "Attacker hit the Goalie"
+                        Reason = "Attacker hit the goalie"
                     };
                     return true;
                 }
@@ -753,7 +753,7 @@ public class Referee : ICloneable
                 {
                     ResultType = ResultType.GoalKick,
                     Actor = Side.Blue,
-                    Reason = "Attacker have four robots in BigState"
+                    Reason = "Attacker have four robots in bigstate"
                 };
                 return true;
             }
@@ -764,7 +764,7 @@ public class Referee : ICloneable
                 {
                     ResultType = ResultType.GoalKick,
                     Actor = Side.Blue,
-                    Reason = "Attacker have two robots in SmallState"
+                    Reason = "Attacker have two robots in smallstate"
                 };
                 return true;
             }
@@ -782,7 +782,7 @@ public class Referee : ICloneable
                     {
                         ResultType = ResultType.GoalKick,
                         Actor = Side.Yellow,
-                        Reason = "Attacker hit the Goalie"
+                        Reason = "Attacker hit the goalie"
                     };
                     return true;
                 }
@@ -804,7 +804,7 @@ public class Referee : ICloneable
                 {
                     ResultType = ResultType.GoalKick,
                     Actor = Side.Yellow,
-                    Reason = "Attacker have four robots in BigState"
+                    Reason = "Attacker have four robots in bigstate"
                 };
                 return true;
             }
@@ -815,7 +815,7 @@ public class Referee : ICloneable
                 {
                     ResultType = ResultType.GoalKick,
                     Actor = Side.Yellow,
-                    Reason = "Attacker have two robots in SmallState"
+                    Reason = "Attacker have two robots in smallstate"
                 };
                 return true;
             }
@@ -835,7 +835,7 @@ public class Referee : ICloneable
                 {
                     ResultType = ResultType.FreeKickRightTop,
                     Actor = Side.Blue,
-                    Reason = "RightTop Standoff time longer than 10 seconds in game"
+                    Reason = "RightTop standoff time longer than 10 seconds in game"
                 };
                 return true;
             }
@@ -845,7 +845,7 @@ public class Referee : ICloneable
                 {
                     ResultType = ResultType.FreeKickRightBot,
                     Actor = Side.Blue,
-                    Reason = "RightBot Standoff time longer than 10 seconds in game"
+                    Reason = "RightBot standoff time longer than 10 seconds in game"
                 };
                 return true;
             }
@@ -855,7 +855,7 @@ public class Referee : ICloneable
                 {
                     ResultType = ResultType.FreeKickLeftTop,
                     Actor = Side.Yellow,
-                    Reason = "LeftTop Standoff time longer than 10 seconds in game"
+                    Reason = "LeftTop standoff time longer than 10 seconds in game"
                 };
                 return true;
             }
@@ -865,7 +865,7 @@ public class Referee : ICloneable
                 {
                     ResultType = ResultType.FreeKickLeftBot,
                     Actor = Side.Yellow,
-                    Reason = "LeftBot Standoff time longer than 10 seconds in game"
+                    Reason = "LeftBot standoff time longer than 10 seconds in game"
                 };
                 return true;
             }
@@ -941,7 +941,7 @@ public class Referee : ICloneable
                 {
                     ResultType = ResultType.NextPhase,
                     Actor = Side.Nobody,
-                    Reason = "FirstHalf Game end"
+                    Reason = "FirstHalf game end"
                 };
                 return true;
             }
@@ -978,7 +978,7 @@ public class Referee : ICloneable
                     {
                         ResultType = ResultType.NextPhase,
                         Actor = Side.Nobody,
-                        Reason = "SecondHalf Game end and start"
+                        Reason = "SecondHalf game end and start"
                     };
                 }
 
@@ -998,7 +998,7 @@ public class Referee : ICloneable
                     judgeResult = new JudgeResult
                     {
                         ResultType = ResultType.GameOver,
-                        Reason = "Game over, Blue team win the game",
+                        Reason = "Game over, blue team win the game",
                         Actor = Side.Nobody
                     };
                 }
@@ -1007,7 +1007,7 @@ public class Referee : ICloneable
                     judgeResult = new JudgeResult
                     {
                         ResultType = ResultType.GameOver,
-                        Reason = "Game over, Yellow team win the game",
+                        Reason = "Game over, yellow team win the game",
                         Actor = Side.Nobody
                     };
                 }
@@ -1018,7 +1018,7 @@ public class Referee : ICloneable
                     {
                         ResultType = ResultType.NextPhase,
                         Actor = Side.Nobody,
-                        Reason = "Overtime Game end ,and start Penalty game"
+                        Reason = "Overtime game end ,and start penalty game"
                     };
                 }
                 return true;
