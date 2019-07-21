@@ -1,8 +1,5 @@
 [中文裁判文档](https://github.com/npuv5pp/Simuro5v5/blob/master/Documents/Referee_zh.md)
 
-
-[TOC]
-
 # Referee document
 
 This platform adopts a new ruling method, relying on automatic referee judgments, penalizing the foul situation in the game, and outputting the ruling results below the platform.
