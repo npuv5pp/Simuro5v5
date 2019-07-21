@@ -71,7 +71,7 @@ public class Referee : ICloneable
     //点球大战有关信息开始
 
     /// <summary>
-    /// 点球大战中每次罚球点球限制时间3秒
+    /// 点球大战中每次罚球点球限制时间1秒
     /// </summary>
     private int penaltyLimitTime;
 
@@ -324,13 +324,13 @@ public class Referee : ICloneable
             //未结束的话更新相关信息
             if (penaltySide == Side.Blue)
             {
-                offensivePenaltyGoalState = blueSmallState;
-                defenderPenaltyGoalState = yellowSmallState;
+                offensivePenaltyGoalState = blueGoalState;
+                defenderPenaltyGoalState = yellowGoalState;
             }
             else
             {
-                offensivePenaltyGoalState = yellowSmallState;
-                defenderPenaltyGoalState = blueSmallState;
+                offensivePenaltyGoalState = yellowGoalState;
+                defenderPenaltyGoalState = blueGoalState;
             }
             penaltyAttackID = FindPenaltyAttackID(penaltySide);
             penaltyGoalID = FindGoalie(penaltySide.ToAnother());
