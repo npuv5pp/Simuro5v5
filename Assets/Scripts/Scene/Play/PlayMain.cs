@@ -11,7 +11,7 @@ using Event = Simuro5v5.EventSystem.Event;
 /// 
 /// 裁判的判定：
 /// 裁判共有3类判定结果：结束一个阶段（NextPhase和GameOver）、正常比赛（NormalMatch）以及摆位（xxxKick）；
-/// 另外要注意的是，裁判不会主动修改MatchInfo中的任何信息，所有信息由JudgeResult返回。<br/>
+/// 另外要注意的是，裁判中Judge函数不会主动修改MatchInfo中的任何信息，所有信息由JudgeResult返回。<br/>
 ///
 /// 判定结果的执行：
 /// 结束一个阶段则结束一个阶段，并将时间设置为0；
@@ -313,7 +313,7 @@ public class PlayMain : MonoBehaviour
         StrategyManager.Yellow.OnJudgeResult(new JudgeResult
         {
             Actor = judgeResult.Actor.ToAnother(),
-            ResultType = judgeResult.ResultType,
+            ResultType = judgeResult.ResultType.ToAnother(),
             Reason = judgeResult.Reason
         });
     }

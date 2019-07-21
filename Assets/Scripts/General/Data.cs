@@ -615,6 +615,23 @@ namespace Simuro5v5
             }
         }
 
+        public static ResultType ToAnother(this ResultType resultType)
+        {
+            switch(resultType)
+            {
+                case ResultType.FreeKickLeftBot:
+                    return ResultType.FreeKickRightTop;
+                case ResultType.FreeKickRightTop:
+                    return ResultType.FreeKickLeftBot;
+                case ResultType.FreeKickLeftTop:
+                    return ResultType.FreeKickRightBot;
+                case ResultType.FreeKickRightBot:
+                    return ResultType.FreeKickLeftTop;
+                default:
+                    return resultType;
+            }
+        }
+
         public static MatchPhase NextPhase(this MatchPhase phase)
         {
             switch (phase)

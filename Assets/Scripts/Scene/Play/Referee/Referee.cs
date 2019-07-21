@@ -76,12 +76,6 @@ public class Referee : ICloneable
     private int penaltyLimitTime;
 
     /// <summary>
-    /// 点球大战根据踢一次球后判断有没有进球，保存是否进行了踢球
-    /// </summary>
-    private bool penaltyTouchBall;
-
-
-    /// <summary>
     /// 点球大战中点球方，依次交换顺序
     /// TODO: 将这些信息暴露出去，显示在UI上
     /// </summary>
@@ -99,6 +93,11 @@ public class Referee : ICloneable
     private int penaltyOfNum;
 
     /// <summary>
+    /// 点球大战中默认先进行点球次数
+    /// </summary>
+    private readonly int penaltyRound = 5;
+
+    /// <summary>
     /// 点球大战中点球球员的序号
     /// </summary>
     private int penaltyAttackID;
@@ -107,8 +106,8 @@ public class Referee : ICloneable
     /// 点球大战中进攻方守门员的序号
     /// </summary>
     private int penaltyGoalID;
-    private UprightRectangle defenderPenaltySmallState;
-    private UprightRectangle offensivePenaltySmallState;
+    private UprightRectangle defenderPenaltyGoalState;
+    private UprightRectangle offensivePenaltyGoalState;
     ///点球大战有关信息结束 
 
     /// <summary>
@@ -142,8 +141,9 @@ public class Referee : ICloneable
         //endOfOverGameTime = 20 * Const.FramePerSecond;
         endOfHalfGameTime = Configuration.GeneralConfig.EndOfHalfGameTime;
         endOfOverGameTime = Configuration.GeneralConfig.EndOfOverGameTime;
-        penaltyLimitTime = 3 * Const.FramePerSecond;
+        penaltyLimitTime = 1 * Const.FramePerSecond;
         penaltyTime = 0;
+        penaltyOfNum = 0;
         standoffTime = 0;
         maxStandoffTime = 10 * Const.FramePerSecond;
 
@@ -308,8 +308,15 @@ public class Referee : ICloneable
             if (penaltySide == Side.Nobody)
             {
                 penaltySide = Side.Blue;
+                judgeResult = new JudgeResult
+                {
+                    Actor = Side.Blue,
+                    ResultType = ResultType.PenaltyKick,
+                    Reason = "Penaltyshoot start and blue team first"
+                };
+                return;
             }
-            //判罚发现点球大战结束
+            //判罚是否点球大战结束
             if (JudgePenaltyOver(ref judgeResult))
             {
                 return;
@@ -317,17 +324,16 @@ public class Referee : ICloneable
             //未结束的话更新相关信息
             if (penaltySide == Side.Blue)
             {
-                offensivePenaltySmallState = blueSmallState;
-                defenderPenaltySmallState = yellowSmallState;
+                offensivePenaltyGoalState = blueSmallState;
+                defenderPenaltyGoalState = yellowSmallState;
             }
             else
             {
-                offensivePenaltySmallState = yellowSmallState;
-                defenderSmallState = blueSmallState;
+                offensivePenaltyGoalState = yellowSmallState;
+                defenderPenaltyGoalState = blueSmallState;
             }
-            penaltyTouchBall = false;
             penaltyAttackID = FindPenaltyAttackID(penaltySide);
-            penaltyGoalID = FindGoalie(penaltySide);
+            penaltyGoalID = FindGoalie(penaltySide.ToAnother());
             penaltyTime++;
         }
         //判断有没有非法移动
@@ -354,30 +360,10 @@ public class Referee : ICloneable
             }
             UpdateNewPenalty();
         }
-        //未踢球且在限制时间内，寻找踢球球员
-        else if (!penaltyTouchBall && penaltyTime < penaltyLimitTime)
+        //未到规定时间,判断有没有进球
+        else if (penaltyTime < penaltyLimitTime)
         {
-            if (BlueRobotSquare[penaltyAttackID].OverlapWithCircle(BallPos))
-            {
-                penaltyTouchBall = true;
-            }
-            penaltyTime++;
-        }
-        //超过限制时间内仍未踢球
-        else if (!penaltyTouchBall && penaltyTime >= penaltyLimitTime)
-        {
-            judgeResult = new JudgeResult
-            {
-                Actor = penaltySide.ToAnother(),
-                ResultType = ResultType.PenaltyKick,
-                Reason = "overtime with penalty and switch the penalty side"
-            };
-            UpdateNewPenalty();
-        }
-        //已踢球，但未到规定时间,判断有没有进球
-        else if (penaltyTouchBall && penaltyTime < penaltyLimitTime)
-        {
-            if (offensivePenaltySmallState.ContainsPoint(BallPos))
+            if (defenderPenaltyGoalState.ContainsPoint(BallPos))
             {
                 judgeResult = new JudgeResult
                 {
@@ -399,14 +385,28 @@ public class Referee : ICloneable
                 penaltyTime++;
             }
         }
-        else if (penaltyTouchBall && penaltyTime > penaltyLimitTime)
+        //到规定时间更改相对判罚
+        else if (penaltyTime >= penaltyLimitTime)
         {
-            judgeResult = new JudgeResult
+            //超过点球默认次数后，进入突然死亡法
+            if (penaltyOfNum >= penaltyRound-1 && penaltySide == Side.Yellow)
             {
-                Actor = penaltySide.ToAnother(),
-                ResultType = ResultType.PenaltyKick,
-                Reason = "overtime with penalty and switch the penalty side"
-            };
+                judgeResult = new JudgeResult
+                {
+                    Actor = penaltySide.ToAnother(),
+                    ResultType = ResultType.PenaltyKick,
+                    Reason = "In sudden death overtime with penalty and switch the penalty side"
+                };
+            }
+            else
+            {
+                judgeResult = new JudgeResult
+                {
+                    Actor = penaltySide.ToAnother(),
+                    ResultType = ResultType.PenaltyKick,
+                    Reason = "overtime with penalty and switch the penalty side"
+                };
+            }
             UpdateNewPenalty();
         }
         else
@@ -428,7 +428,7 @@ public class Referee : ICloneable
 
     private bool JudgePenaltyOver(ref JudgeResult judgeResult)
     {
-        if (penaltyOfNum == 5 && penaltySide == Side.Blue)
+        if (penaltyOfNum >= penaltyRound)
         {
             if (blueScore > yellowScore)
             {
@@ -945,7 +945,6 @@ public class Referee : ICloneable
                 };
                 return true;
             }
-
             return false;
         }
 
@@ -1022,13 +1021,10 @@ public class Referee : ICloneable
                         Reason = "Overtime Game end ,and start Penalty game"
                     };
                 }
-
                 return true;
             }
-
             return false;
         }
-
         return false;
     }
 

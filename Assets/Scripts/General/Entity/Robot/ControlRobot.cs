@@ -34,8 +34,8 @@ public class ControlRobot : MonoBehaviour
         }
     }
 
-    private float LeftVelocity;
-    private float RightVelocity;
+    public float LeftVelocity;
+    public float RightVelocity;
 
     Vector3 forward_force, forward_drag, sideway_drag;
     Vector3 forward_left_drag, forward_right_drag;
