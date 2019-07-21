@@ -131,6 +131,10 @@ public class Referee : ICloneable
     /// </summary>
     public BallQueue ballQueue;
 
+    // 保存上一拍的守门员ID
+    private int lastBlueGoalID;
+    private int lastYellowGoalID;
+
     public Referee()
     {
         //// 编辑器中调试的时候将时间设置短一点
@@ -147,6 +151,9 @@ public class Referee : ICloneable
         YellowRobotsPos = new Vector2D[Const.RobotsPerTeam];
         BlueRobotSquare = new Square[Const.RobotsPerTeam];
         YellowRobotSquare = new Square[Const.RobotsPerTeam];
+
+        lastYellowGoalID = -1;
+        lastBlueGoalID = -1;
 
         ObjectManager.FindObjects(out BlueObject, out YellowObject, out BallObject);
 
@@ -467,8 +474,15 @@ public class Referee : ICloneable
                 if (blueSmallState.ContainsPoint(blueRobots[i].pos))
                 {
                     id = i;
+                    if (id == lastBlueGoalID)
+                        break;
                 }
             }
+            //if (id != lastBlueGoalID)
+            //{
+            //    Debug.Log("blue goal is change,last goal id = " + lastBlueGoalID + "now the id = " + id);
+            //}
+            lastBlueGoalID = id;
         }
         else
         {
@@ -477,8 +491,15 @@ public class Referee : ICloneable
                 if (yellowSmallState.ContainsPoint(yellowRobots[i].pos))
                 {
                     id = i;
+                    if (id == lastYellowGoalID)
+                        break;
                 }
             }
+            //if (id != lastYellowGoalID)
+            //{
+            //    Debug.Log("yellow goal is change,last goal id = " + lastYellowGoalID + "now the id = " + id);
+            //}
+            lastYellowGoalID = id;
         }
         return id;
     }
@@ -1905,7 +1926,7 @@ public class Referee : ICloneable
                 if (i == GoalieId) continue;
                 if (i == OffensiveFreeId) continue;
                 //三种不规范情况
-                //1.除了进攻球员在争球区域内 2. 未在球场内 3. 与自身队伍球员重叠 4.与地方球员判断是否重叠
+                //1.除了进攻球员在争球区域内 2. 未在球场内 3. 与自身队伍球员重叠 4.与敌方球员判断是否重叠
                 if (FreeOffensivePosSquare[i].square.IsOverlapWithRectangle(FreeState)
                     || !FreeOffensivePosSquare[i].square.IsOverlapWithRectangle(stadiumState)
                     || RobotCrossByRobots(FreeOffensivePosSquare[i], FreeOffensivePosSquare, true, i)
