@@ -35,10 +35,18 @@ namespace Simuro5v5
             [JsonProperty]
             public static float TimeScale { get; set; }
 
+            [JsonProperty]
+            public static int EndOfHalfGameTime { get; set; }
+
+            [JsonProperty]
+            public static int EndOfOverGameTime { get; set; }
+
             static GeneralConfig()
             {
                 // 默认时间流速
                 TimeScale = 1.0f;
+                EndOfHalfGameTime = 5 * 60 * 66;
+                EndOfOverGameTime = 3 * 60 * 66;
             }
         }
 
