@@ -155,6 +155,38 @@ public class GUI_Replay : MonoBehaviour
         {
             OnNextKeyFrame();
         }
+
+        if ((Input.GetKey(KeyCode.Home)))
+        {
+            OnHomeClicked();
+        }
+         
+        if ((Input.GetKey(KeyCode.End)))
+        {
+            OnEndClicked();
+        }
+    }
+
+    private void OnEndClicked()
+    {
+        End();
+        Paused = true;
+    }
+
+    private void End()
+    {
+        SliderPosition = Recorder.DataLength - 1;
+    }
+
+    private void OnHomeClicked()
+    {
+        Home();
+        Paused = true;
+    }
+
+    private void Home()
+    {
+        SliderPosition = 0;
     }
 
     /// <summary>
@@ -195,7 +227,7 @@ public class GUI_Replay : MonoBehaviour
 
     private void PreviousKeyFrame()
     {
-        if (SliderPosition == 1)
+        if (SliderPosition == 0)
         {
             return;
         }
@@ -207,7 +239,7 @@ public class GUI_Replay : MonoBehaviour
                 return;
             }
         }
-        SliderPosition = 1;
+        SliderPosition = 0;
     }
    
     /// <summary>
