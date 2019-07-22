@@ -147,61 +147,69 @@ public class GUI_Replay : MonoBehaviour
         if ((Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
             && Input.GetKey(KeyCode.LeftArrow))
         {
-            OnQuickPreviousClicked();
+            OnPreviousKeyFrame();
         }
 
         if ((Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
             && Input.GetKey(KeyCode.RightArrow))
         {
-            OnQuickNextClicked();
+            OnNextKeyFrame();
         }
-
     }
 
     /// <summary>
-    /// Quicknext按钮点击。播放前一百拍场景并暂停。
+    /// 寻找下一个关键帧 
     /// </summary>
-    public void OnQuickNextClicked()
+    public void OnNextKeyFrame()
     {
-        QuickNext();
+        NextKeyFrame();
         Paused = true;
     }
 
-    private void QuickNext()
+    private void NextKeyFrame()
     {
-        if (SliderPosition < Recorder.DataLength - 101)
+        if (SliderPosition == Recorder.DataLength - 1 )
         {
-            SliderPosition += 100;
+            return;
         }
-        else if(SliderPosition < Recorder.DataLength - 1 && SliderPosition > Recorder.DataLength - 101)
+        for (int tmp = SliderPosition + 1; tmp <= Recorder.DataLength - 1; tmp++)
         {
-            SliderPosition = Recorder.DataLength - 1;
+            if (Recorder.IndexOf(tmp).matchInfo.Referee.savedJudge.ResultType != ResultType.NormalMatch)
+            {
+                SliderPosition = tmp;
+                return;
+            }
         }
+        SliderPosition = Recorder.DataLength - 1;
     }
 
 
     /// <summary>
-    /// QuickPrevios按钮点击。播放前一百拍场景并暂停。
+    /// 寻找上一个关键帧。
     /// </summary>
-    public void OnQuickPreviousClicked()
+    public void OnPreviousKeyFrame()
     {
-        QuickPrevious();
+        PreviousKeyFrame();
         Paused = true;
     }
 
-    private void QuickPrevious()
+    private void PreviousKeyFrame()
     {
-        if (SliderPosition > 100)
+        if (SliderPosition == 1)
         {
-            SliderPosition -= 100;
+            return;
         }
-        else if(SliderPosition <= 100 && SliderPosition > 0)
+        for (int tmp = SliderPosition - 1; tmp >= 1; tmp--)
         {
-            SliderPosition = 0;
+            if (Recorder.IndexOf(tmp).matchInfo.Referee.savedJudge.ResultType != ResultType.NormalMatch)
+            {
+                SliderPosition = tmp;
+                return;
+            }
         }
+        SliderPosition = 1;
     }
-
-
+   
     /// <summary>
     /// 渲染一拍的数据到场景中，包括：机器人和球的坐标，数据板
     /// </summary>

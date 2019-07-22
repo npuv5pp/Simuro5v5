@@ -1185,7 +1185,7 @@ GameObject:
   - component: {fileID: 210241760}
   - component: {fileID: 210241759}
   m_Layer: 5
-  m_Name: quciknext
+  m_Name: nextkeyframe
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1255,7 +1255,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 71035322}
-        m_MethodName: OnQuickNextClicked
+        m_MethodName: OnNextKeyFrame
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -5466,7 +5466,7 @@ GameObject:
   - component: {fileID: 1430828444}
   - component: {fileID: 1430828443}
   m_Layer: 5
-  m_Name: qucikprevious
+  m_Name: previouskeyframe
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5536,7 +5536,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 71035322}
-        m_MethodName: OnQuickPreviousClicked
+        m_MethodName: OnPreviousKeyFrame
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
