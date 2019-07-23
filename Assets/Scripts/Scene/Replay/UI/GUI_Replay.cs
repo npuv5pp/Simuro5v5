@@ -5,17 +5,13 @@
 ********************************************************************************/
 
 using System;
-using System.CodeDom;
-using System.Globalization;
 using System.IO;
-using System.Linq;
 using SFB;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using TMPro;
 using Simuro5v5;
-using UnityEditor;
 using UnityEngine.EventSystems;
 using static Simuro5v5.Configuration;
 
@@ -41,11 +37,16 @@ public class GUI_Replay : MonoBehaviour
     public static DataRecorder Recorder { get; set; }
     private ObjectManager ObjectManager { get; set; }
 
-    bool Paused;
+    private DelayRepeatKey _leftArrow = new DelayRepeatKey(KeyCode.LeftArrow);
+    private DelayRepeatKey _rightArrow = new DelayRepeatKey(KeyCode.RightArrow);
+    private DelayRepeatKey _pageUp = new DelayRepeatKey(KeyCode.PageUp);
+    private DelayRepeatKey _pageDown = new DelayRepeatKey(KeyCode.PageDown);
+
+    private bool _paused;
 
     private int SliderPosition
     {
-        get => (int)Slider.value;
+        get => (int) Slider.value;
         set => Slider.value = value;
     }
 
@@ -53,18 +54,6 @@ public class GUI_Replay : MonoBehaviour
     {
         ObjectManager = new ObjectManager();
         ShowRecord();
-        //var eventHistory = Recorder.data
-        //    .Where(item => item.matchInfo.Referee.savedJudge.ResultType != ResultType.NormalMatch)
-        //    .Select(a => new FormGUI.EventLog()
-        //    {
-        //        Frame = a.matchInfo.TickMatch,
-        //        Info = a.matchInfo.Referee.savedJudge.Reason,
-        //    })
-        //    .ToList();
-        //var form = Launcher.Launcher.Launch(eventHistory);
-        //form.Show();
-        //
-        // Launcher.Launcher.Main();
     }
 
     private void ShowRecord()
@@ -83,13 +72,22 @@ public class GUI_Replay : MonoBehaviour
         Slider.value = 0;
         Render(Recorder.IndexOf(0));
 
-        Paused = true;
+        _paused = true;
+
+        _leftArrow.AddDownListener(OnPreviousClicked);
+        _leftArrow.AddRepeatListener(times => { OnPreviousClicked(); });
+        _rightArrow.AddDownListener(OnNextClicked);
+        _rightArrow.AddRepeatListener(times => { OnNextClicked(); });
+        _pageDown.AddDownListener(OnPreviousKeyFrame);
+        _pageDown.AddRepeatListener(times => { OnPreviousKeyFrame(); });
+        _pageUp.AddDownListener(OnNextKeyFrame);
+        _pageUp.AddRepeatListener(times => { OnNextKeyFrame(); });
     }
 
     void Update()
     {
         DataTag.SetText(Recorder.Name);
-        PauseButtonImage.sprite = Paused ? PauseButtonPaused : PauseButtonNonPaused;
+        PauseButtonImage.sprite = _paused ? PauseButtonPaused : PauseButtonNonPaused;
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
@@ -109,68 +107,50 @@ public class GUI_Replay : MonoBehaviour
         {
             SpeedDropdown.value += 1;
         }
+
+        if (Input.GetKeyDown(KeyCode.Home))
+        {
+            OnHomeClicked();
+        }
+
+        if (Input.GetKeyDown(KeyCode.End))
+        {
+            OnEndClicked();
+        }
     }
 
-    int tick = 0;
+    private int _tick = 0;
 
     void FixedUpdate()
     {
-        tick++;
-        if (tick % 2 == 0)
+        _tick++;
+        if (_tick % 2 == 0)
         {
             return;
         }
 
-        if (!Paused)
+        if (!_paused)
         {
             if (SliderPosition == Recorder.DataLength - 1)
             {
-                Paused = true;
+                _paused = true;
             }
             else
             {
                 Next();
             }
         }
-
-        // 先放到FixedUpdate中，避免回放进行太快
-        if (Input.GetKey(KeyCode.LeftArrow))
-        {
-            OnPreviousClicked();
-        }
-
-        if (Input.GetKey(KeyCode.RightArrow))
-        {
-            OnNextClicked();
-        }
-
-        if ((Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
-            && Input.GetKey(KeyCode.LeftArrow))
-        {
-            OnPreviousKeyFrame();
-        }
-
-        if ((Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
-            && Input.GetKey(KeyCode.RightArrow))
-        {
-            OnNextKeyFrame();
-        }
-
-        if ((Input.GetKey(KeyCode.Home)))
-        {
-            OnHomeClicked();
-        }
-         
-        if ((Input.GetKey(KeyCode.End)))
-        {
-            OnEndClicked();
-        }
+        
+        _rightArrow.UpdateState();
+        _leftArrow.UpdateState();
+        _pageUp.UpdateState();
+        _pageDown.UpdateState();
     }
 
     private void OnEndClicked()
     {
         End();
-        Paused = true;
+        _paused = true;
     }
 
     private void End()
@@ -181,7 +161,7 @@ public class GUI_Replay : MonoBehaviour
     private void OnHomeClicked()
     {
         Home();
-        Paused = true;
+        _paused = true;
     }
 
     private void Home()
@@ -195,15 +175,16 @@ public class GUI_Replay : MonoBehaviour
     public void OnNextKeyFrame()
     {
         NextKeyFrame();
-        Paused = true;
+        _paused = true;
     }
 
     private void NextKeyFrame()
     {
-        if (SliderPosition == Recorder.DataLength - 1 )
+        if (SliderPosition == Recorder.DataLength - 1)
         {
             return;
         }
+
         for (int tmp = SliderPosition + 1; tmp <= Recorder.DataLength - 1; tmp++)
         {
             if (Recorder.IndexOf(tmp).matchInfo.Referee.savedJudge.ResultType != ResultType.NormalMatch)
@@ -212,6 +193,7 @@ public class GUI_Replay : MonoBehaviour
                 return;
             }
         }
+
         SliderPosition = Recorder.DataLength - 1;
     }
 
@@ -222,7 +204,7 @@ public class GUI_Replay : MonoBehaviour
     public void OnPreviousKeyFrame()
     {
         PreviousKeyFrame();
-        Paused = true;
+        _paused = true;
     }
 
     private void PreviousKeyFrame()
@@ -231,6 +213,7 @@ public class GUI_Replay : MonoBehaviour
         {
             return;
         }
+
         for (int tmp = SliderPosition - 1; tmp >= 1; tmp--)
         {
             if (Recorder.IndexOf(tmp).matchInfo.Referee.savedJudge.ResultType != ResultType.NormalMatch)
@@ -239,9 +222,10 @@ public class GUI_Replay : MonoBehaviour
                 return;
             }
         }
+
         SliderPosition = 0;
     }
-   
+
     /// <summary>
     /// 渲染一拍的数据到场景中，包括：机器人和球的坐标，数据板
     /// </summary>
@@ -260,28 +244,28 @@ public class GUI_Replay : MonoBehaviour
         switch (mp)
         {
             case MatchPhase.FirstHalf:
-                {
-                    PhaseText.text = "First Half";
-                    break;
-                }
+            {
+                PhaseText.text = "First Half";
+                break;
+            }
 
             case MatchPhase.SecondHalf:
-                {
-                    PhaseText.text = "Second Half";
-                    break;
-                }
+            {
+                PhaseText.text = "Second Half";
+                break;
+            }
 
             case MatchPhase.OverTime:
-                {
-                    PhaseText.text = "Over Time";
-                    break;
-                }
+            {
+                PhaseText.text = "Over Time";
+                break;
+            }
 
             case MatchPhase.Penalty:
-                {
-                    PhaseText.text = "Penalty Shootout";
-                    break;
-                }
+            {
+                PhaseText.text = "Penalty Shootout";
+                break;
+            }
         }
     }
 
@@ -290,7 +274,7 @@ public class GUI_Replay : MonoBehaviour
     /// </summary>
     void TogglePause()
     {
-        Paused = !Paused;
+        _paused = !_paused;
     }
 
     /// <summary>
@@ -340,7 +324,7 @@ public class GUI_Replay : MonoBehaviour
     /// </summary>
     public void OnSliderClicked()
     {
-        Paused = true;
+        _paused = true;
     }
 
     /// <summary>
@@ -350,7 +334,7 @@ public class GUI_Replay : MonoBehaviour
     public void OnSliderScrolled(BaseEventData _data)
     {
         var data = _data as PointerEventData;
-        SliderPosition += (int)data.scrollDelta.y;
+        SliderPosition += (int) data.scrollDelta.y;
     }
 
     /// <summary>
@@ -367,7 +351,7 @@ public class GUI_Replay : MonoBehaviour
     public void OnNextClicked()
     {
         Next();
-        Paused = true;
+        _paused = true;
     }
 
     /// <summary>
@@ -376,7 +360,7 @@ public class GUI_Replay : MonoBehaviour
     public void OnPreviousClicked()
     {
         Previous();
-        Paused = true;
+        _paused = true;
     }
 
     /// <summary>
@@ -407,8 +391,8 @@ public class GUI_Replay : MonoBehaviour
     /// <param name="data"></param>
     public void OnSpeedScrolled(BaseEventData data)
     {
-        var pointerEventData = (PointerEventData)data;
-        SpeedDropdown.value -= (int)pointerEventData.scrollDelta.y;
+        var pointerEventData = (PointerEventData) data;
+        SpeedDropdown.value -= (int) pointerEventData.scrollDelta.y;
     }
 
     public void ExportDataRecord()
@@ -446,5 +430,94 @@ public class GUI_Replay : MonoBehaviour
         string json = File.ReadAllText(path[0]);
         Recorder = new DataRecorder(json);
         ShowRecord();
+    }
+}
+
+internal class DelayRepeatKey
+{
+    private KeyCode _bindKey;
+
+    private enum KeyState
+    {
+        Up, // 抬起
+        Wait, // 刚按下，延迟中，等待重复
+        Repeat // 重复中
+    }
+
+    private KeyState _keyState;
+    private Action _downAction;
+    private Action<int> _repeatAction;
+
+    /// <summary>
+    /// 已按下保持时间
+    /// </summary>
+    private float _holdTime;
+
+    /// <summary>
+    /// 上次按下时间
+    /// </summary>
+    private float _lastDownTime;
+
+    /// <summary>
+    /// 重复次数
+    /// </summary>
+    private int _repeatTimes;
+
+    /// <summary>
+    /// 最小等待时间，按下保持超过该时间则开始触发重复事件
+    /// </summary>
+    public float MinWaitTime { get; set; }
+
+    public DelayRepeatKey(KeyCode keyCode, float waitTime = 0.5f)
+    {
+        _bindKey = keyCode;
+        MinWaitTime = waitTime;
+    }
+
+    public void AddDownListener(Action func)
+    {
+        _downAction += func;
+    }
+
+    public void AddRepeatListener(Action<int> func)
+    {
+        _repeatAction += func;
+    }
+
+    public void UpdateState()
+    {
+        var down = Input.GetKey(_bindKey);
+
+        if (!down)
+        {
+            _keyState = KeyState.Up;
+            _holdTime = 0;
+            _repeatTimes = 0;
+            return;
+        }
+
+        switch (_keyState)
+        {
+            case KeyState.Up:
+                // 当前是抬起状态，第一次按下
+                _keyState = KeyState.Wait;
+                _lastDownTime = Time.realtimeSinceStartup;
+                _holdTime = 0;
+                _repeatTimes = 0;
+                _downAction();
+                break;
+            case KeyState.Wait:
+                _holdTime += Time.realtimeSinceStartup - _lastDownTime;
+                _lastDownTime = Time.realtimeSinceStartup;
+                if (_holdTime >= MinWaitTime)
+                    _keyState = KeyState.Repeat;
+                break;
+            case KeyState.Repeat:
+                _holdTime += Time.realtimeSinceStartup - _lastDownTime;
+                _lastDownTime = Time.realtimeSinceStartup;
+                _repeatTimes++;
+                _repeatAction(_repeatTimes);
+                break;
+        }
     }
 }
