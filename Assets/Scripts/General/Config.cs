@@ -8,7 +8,7 @@ using UnityEngine;
 namespace Simuro5v5
 {
 
-    // 平台运行时的配置
+    /// 平台运行时的配置
     class Configuration
     {
         public class StrategyConfig
@@ -102,10 +102,8 @@ namespace Simuro5v5
                 string json = File.ReadAllText(fileName);
                 JsonConvert.DeserializeObject<Configuration>(json);
             }
-            else
-            {
-                SaveToFile(fileName);
-            }
+            // 总是将配置写回
+            SaveToFile(fileName);
         }
 
         public static void SaveToFile(string fileName)
