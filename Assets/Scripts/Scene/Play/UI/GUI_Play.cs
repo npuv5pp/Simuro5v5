@@ -109,7 +109,7 @@ public class GUI_Play : MonoBehaviour
     void PhaseSwitched()
     {
         phaseSwitchAnim.Notify(playMain.GlobalMatchInfo.MatchPhase);
-        playMain.PauseMatch();
+        PauseMatchAndPushMenu();
     }
 
     void FixedUpdate()
