@@ -95,12 +95,25 @@ namespace Simuro5v5
         #endif
         #endregion
 
+        /// <summary>
+        /// 读取配置并总是写回。如果配置不存在，则创建一个空的
+        /// </summary>
+        /// <param name="fileName">配置文件名</param>
         public static void ReadFromFileOrCreate(string fileName)
         {
             if (File.Exists(fileName))
             {
                 string json = File.ReadAllText(fileName);
-                JsonConvert.DeserializeObject<Configuration>(json);
+                try
+                {
+                    JsonConvert.DeserializeObject<Configuration>(json);
+                }
+                catch (JsonReaderException e)
+                {
+                    Debug.LogError(e);
+                    Win32Dialog.ShowMessageBox($"Config file parse error: \n{e.Message}", "Config Error");
+                    return;
+                }
             }
             // 总是将配置写回
             SaveToFile(fileName);
