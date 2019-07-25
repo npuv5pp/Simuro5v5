@@ -246,7 +246,7 @@ public class PlayMain : MonoBehaviour
                 // 手动摆位
                 if (manualPlaceEnabled)
                 {
-                    BoardcastJudgeResult(judgeResult);
+                    BroadcastJudgeResult(judgeResult);
                     BeginManualPlace();
                 }
                 else
@@ -270,7 +270,7 @@ public class PlayMain : MonoBehaviour
 
                         #endregion
 
-                        BoardcastJudgeResult(judgeResult);
+                        BroadcastJudgeResult(judgeResult);
                         //Debug.Log($"callback placement {callbackId}");
                         UpdatePlacementToScene(judgeResult);
                         ObjectManager.SetStill();
@@ -307,7 +307,7 @@ public class PlayMain : MonoBehaviour
         }
     }
 
-    private void BoardcastJudgeResult(JudgeResult judgeResult)
+    private void BroadcastJudgeResult(JudgeResult judgeResult)
     {
         StrategyManager.Blue.OnJudgeResult(judgeResult);
         StrategyManager.Yellow.OnJudgeResult(new JudgeResult

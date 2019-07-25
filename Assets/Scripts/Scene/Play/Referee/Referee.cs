@@ -301,7 +301,7 @@ public class Referee : ICloneable
 
     private void JudgePenaltyShootOut(ref JudgeResult judgeResult)
     {
-        Side IllegalMoveSide = Side.Nobody;
+        Side illegalMoveSide = Side.Nobody;
         //刚开始罚球的第一拍
         if (penaltyTime == 0)
         {
@@ -312,7 +312,7 @@ public class Referee : ICloneable
                 {
                     Actor = Side.Blue,
                     ResultType = ResultType.PenaltyKick,
-                    Reason = "Penaltyshoot start and blue team first"
+                    Reason = "Penalty shoot start and blue team first"
                 };
                 return;
             }
@@ -337,9 +337,9 @@ public class Referee : ICloneable
             penaltyTime++;
         }
         //判断有没有非法移动
-        else if (JudgePenaltyIllegalMove(ref IllegalMoveSide, penaltySide))
+        else if (JudgePenaltyIllegalMove(ref illegalMoveSide, penaltySide))
         {
-            if (IllegalMoveSide == penaltySide)
+            if (illegalMoveSide == penaltySide)
             {
                 judgeResult = new JudgeResult
                 {
