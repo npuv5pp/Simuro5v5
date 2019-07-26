@@ -268,6 +268,11 @@ public class Referee : ICloneable
         if (matchInfo.MatchPhase == MatchPhase.FirstHalf || matchInfo.MatchPhase == MatchPhase.SecondHalf
                                                          || matchInfo.MatchPhase == MatchPhase.OverTime)
         {
+            //先判断半场结束，再判断犯规情况
+            //判断上下半场、加时赛结束，如果此时游戏分出胜负，则返回gameover
+            if (JudgeHalfOrGameEnd(ref judgeResult))
+                return judgeResult;
+
             if (JudgePlace(ref judgeResult))
                 return judgeResult;
 
@@ -280,9 +285,7 @@ public class Referee : ICloneable
             if (JudgeFree(ref judgeResult,matchInfo.Ball.pos))
                 return judgeResult;
 
-            //判断上下半场、加时赛结束，如果此时游戏分出胜负，则返回gameover
-            if (JudgeHalfOrGameEnd(ref judgeResult))
-                return judgeResult;
+            
             //默认返回正常比赛
             return new JudgeResult
             {
@@ -934,7 +937,7 @@ public class Referee : ICloneable
     {
         if (matchInfo.MatchPhase == MatchPhase.FirstHalf)
         {
-            if (matchInfo.TickPhase == endOfHalfGameTime)
+            if (matchInfo.TickPhase >= endOfHalfGameTime)
             {
                 // matchInfo.MatchPhase = MatchPhase.SecondHalf;
                 judgeResult = new JudgeResult
@@ -951,7 +954,7 @@ public class Referee : ICloneable
         if (matchInfo.MatchPhase == MatchPhase.SecondHalf)
         {
             //下半场结束，判断比分是否结束
-            if (matchInfo.TickPhase == endOfHalfGameTime)
+            if (matchInfo.TickPhase >= endOfHalfGameTime)
             {
                 if (blueScore > yellowScore)
                 {
@@ -991,7 +994,7 @@ public class Referee : ICloneable
         //加时赛结束，同样判断比分
         if (matchInfo.MatchPhase == MatchPhase.OverTime)
         {
-            if (matchInfo.TickPhase == endOfOverGameTime)
+            if (matchInfo.TickPhase >= endOfOverGameTime)
             {
                 if (blueScore > yellowScore)
                 {
