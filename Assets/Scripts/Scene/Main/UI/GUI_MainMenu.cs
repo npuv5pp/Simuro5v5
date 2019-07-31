@@ -3,18 +3,33 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
-public class GUI_MainMenu : MonoBehaviour {
+public class GUI_MainMenu : MonoBehaviour
+{
+    public GameObject aboutPage;
 
-	void Start ()
+	void Start()
     {
         Screen.fullScreen = false;
         Configuration.ReadFromFileOrCreate("config.json");
-        //Simuro5v5.Config.ConfigManager.ReadConfigFile("config.json");
+        aboutPage.SetActive(false);
 	}
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape) || Input.GetMouseButtonDown(1))
+        {
+            aboutPage.SetActive(false);
+        }
+    }
 
     public void OnGameButtonClicked()
     {
         SceneManager.LoadScene("GameScene_Play");
+    }
+
+    public void OnAboutButtonClicked()
+    {
+        aboutPage.SetActive(true);
     }
 
     public void OnExitButtonClicked()
