@@ -127,7 +127,17 @@ namespace Simuro5v5
         {
             if (obj is MatchInfo matchInfo)
             {
-                data.Add(new RecordData(type, (MatchInfo)matchInfo.Clone()));
+                var info = (MatchInfo)matchInfo.Clone();
+                // 清除轮速
+                if (!Configuration.ExportConfig.DetailExport)
+                {
+                    for (int i = 0; i < info.BlueRobots.Length; i++)
+                    {
+                        info.BlueRobots[i].wheel = new Wheel();
+                        info.YellowRobots[i].wheel = new Wheel();
+                    }
+                }
+                data.Add(new RecordData(type, info));
             }
             else
             {
