@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 using UnityEngine;
 
 namespace Simuro5v5
@@ -30,26 +31,52 @@ namespace Simuro5v5
             }
         }
 
-        public class GeneralConfig
+        public class TimeConfig
         {
             [JsonProperty]
             public static float TimeScale { get; set; }
 
             [JsonProperty]
-            public static int EndOfHalfGameTime { get; set; }
+            public static int HalfGameDuration { get; set; }
 
             [JsonProperty]
-            public static int EndOfOverGameTime { get; set; }
+            public static int OvertimeGameDuration { get; set; }
 
-            static GeneralConfig()
+            static TimeConfig()
             {
                 // 默认时间流速
                 TimeScale = 1.0f;
-                EndOfHalfGameTime = 5 * 60 * 66;
-                EndOfOverGameTime = 3 * 60 * 66;
+                HalfGameDuration = 5 * 60 * 66;
+                OvertimeGameDuration = 3 * 60 * 66;
             }
+
+            #region Obslete Properties
+
+            [JsonProperty]
+            public static int EndOfHalfGameTime
+            {
+                set => HalfGameDuration = value;
+            }
+
+            [JsonProperty]
+            public static int EndOfOverGameTime
+            {
+                set => OvertimeGameDuration = value;
+            }
+
+            #endregion
         }
 
+        public class ExportConfig
+        {
+            [JsonProperty]
+            public static bool DetailExport { get; set; }
+
+            static ExportConfig()
+            {
+                DetailExport = false;
+            }
+        }
         
         public class ParameterConfig
         {
@@ -88,7 +115,8 @@ namespace Simuro5v5
 
         #region Stub objects
         [JsonProperty] private static StrategyConfig strategyConfig = new StrategyConfig();
-        [JsonProperty] private static GeneralConfig generalConfig = new GeneralConfig();
+        [JsonProperty] private static TimeConfig generalConfig = new TimeConfig();
+        [JsonProperty] private static ExportConfig exportConfig = new ExportConfig();
         #if UNITY_EDITOR
         // 物理参数只能在开发时使用
         [JsonProperty] private static ParameterConfig parameterConfig = new ParameterConfig();

@@ -371,16 +371,16 @@ public class GUI_Replay : MonoBehaviour
         switch (SpeedDropdown.value)
         {
             case 0:
-                Time.timeScale = GeneralConfig.TimeScale;
+                Time.timeScale = TimeConfig.TimeScale;
                 break;
             case 1:
-                Time.timeScale = GeneralConfig.TimeScale / 2;
+                Time.timeScale = TimeConfig.TimeScale / 2;
                 break;
             case 2:
-                Time.timeScale = GeneralConfig.TimeScale / 5;
+                Time.timeScale = TimeConfig.TimeScale / 5;
                 break;
             case 3:
-                Time.timeScale = GeneralConfig.TimeScale / 10;
+                Time.timeScale = TimeConfig.TimeScale / 10;
                 break;
         }
     }

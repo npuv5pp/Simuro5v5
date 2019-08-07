@@ -274,6 +274,6 @@ public class ParameterTest : MonoBehaviour
         if (Time.timeScale != 0)
             Time.timeScale = 0;
         else
-            Time.timeScale = GeneralConfig.TimeScale;
+            Time.timeScale = TimeConfig.TimeScale;
     }
 }

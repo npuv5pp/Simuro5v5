@@ -139,8 +139,8 @@ public class Referee : ICloneable
         //// 编辑器中调试的时候将时间设置短一点
         //endOfHalfGameTime = 20 * Const.FramePerSecond;
         //endOfOverGameTime = 20 * Const.FramePerSecond;
-        endOfHalfGameTime = Configuration.GeneralConfig.EndOfHalfGameTime;
-        endOfOverGameTime = Configuration.GeneralConfig.EndOfOverGameTime;
+        endOfHalfGameTime = Configuration.TimeConfig.HalfGameDuration;
+        endOfOverGameTime = Configuration.TimeConfig.OvertimeGameDuration;
         penaltyLimitTime = 1 * Const.FramePerSecond;
         penaltyTime = 0;
         penaltyOfNum = 0;

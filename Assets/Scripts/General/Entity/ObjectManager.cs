@@ -290,7 +290,7 @@ namespace Simuro5v5
         /// </summary>
         public void Resume()
         {
-            Time.timeScale = GeneralConfig.TimeScale;
+            Time.timeScale = TimeConfig.TimeScale;
         }
 
         /// <summary>
