@@ -62,5 +62,9 @@
 
 平台采用右攻假设，即：无论策略加载到哪一方，都可以认为自己在蓝方（场地右侧）。
 
+## 从老平台迁移
+
+如果你准备将策略从老平台迁移到新平台，可以参考[此文档](https://github.com/npuv5pp/Simuro5v5/blob/master/Documents/Diff.md)
+
 ## Credits
 版权所有(C) 西北工业大学V5++团队。保留所有权利。
