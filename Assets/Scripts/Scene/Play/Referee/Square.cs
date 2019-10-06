@@ -144,7 +144,7 @@ namespace Simuro5v5.Util
         /// <summary>
         /// 通过机器人中心与半径以及角度来构造机器人正方形
         /// </summary>
-        public Square(Vector2D robotPosition, float angleInDegree = 0, float HRL = Const.Robot.HRL)
+        public Square(Vector2D robotPosition, float angleInDegree = 0, float HRL = 3.9341f)
         {
             float robotRadius = (float) (HRL * 1.414);
             
