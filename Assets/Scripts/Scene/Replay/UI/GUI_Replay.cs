@@ -24,7 +24,6 @@ public class GUI_Replay : MonoBehaviour
 
     // controls
     public Slider Slider;
-    public DataBoard DataBoard;
     public TMP_Dropdown SpeedDropdown;
 
     // state text
