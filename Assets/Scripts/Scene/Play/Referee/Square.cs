@@ -144,9 +144,9 @@ namespace Simuro5v5.Util
         /// <summary>
         /// 通过机器人中心与半径以及角度来构造机器人正方形
         /// </summary>
-        public Square(Vector2D robotPosition, float angleInDegree = 0, float HRL = 3.9341f)
+        public Square(Vector2D robotPosition, float angleInDegree = 0, float hrl = 3.9341f)
         {
-            float robotRadius = (float) (HRL * 1.414);
+            float robotRadius = hrl * Mathf.Sqrt(2);
             
             //角度规整
             while (angleInDegree > 45)
@@ -266,6 +266,10 @@ namespace Simuro5v5.Util
 
             var square5 = new Square(new Vector2D(-2, -1), new Vector2D(1, 2));
             Assert.IsTrue(square1.IsCrossedBy(square5));
+            
+            var square6 = new Square(new Vector2D(-105.322823f, 30.2983551f), 89.96495f);
+            var square7 = new Square(new Vector2D(-101.426735f, 21.7729015f), 169.373627f);
+            Assert.IsTrue(square6.IsCrossedBy(square7));
         }
     }
 
