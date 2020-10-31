@@ -1,3 +1,5 @@
+**关于中国机器人锦标赛仿真5V5项目仿真平台的使用问题，加QQ群`1165243759`咨询**
+
 [中文文档](https://github.com/npuv5pp/Simuro5v5/blob/master/README_ZH.md)
 
 # Introduction
