@@ -68,9 +68,9 @@
 
 ## 平台坐标
 
-![image]([Simuro5v5/platform1.png at master · ./Documents/platform1.png))
+![image]("./Documents/platform1.png")
 
-![image]([Simuro5v5/platform.png at master · ego-0102/Simuro5v5 (github.com)](https://github.com/ego-0102/Simuro5v5/blob/master/Documents/platform.png))
+![image]("./Documents/platform.png")
 
 
 ## Credits
