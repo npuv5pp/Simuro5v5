@@ -68,9 +68,9 @@
 
 ## 平台坐标
 
-![image]("../Documents/platform.png")
+![image]("https://github.com/ego-0102/Simuro5v5/raw/master/Documents/platform.png")
 
-![image]("../Documents/platform1.png")
+![image]("https://github.com/ego-0102/Simuro5v5/raw/master/Documents/platform1.png")
 
 ## 机器人方向
 
