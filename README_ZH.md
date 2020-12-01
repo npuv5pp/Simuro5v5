@@ -74,7 +74,7 @@
 
 ## 机器人方向
 
-以黑角朝向方向为正方向）
+以黑角朝向方向为正方向
 
 [V5RPC/README.zh-CN.md at master · npuv5pp/V5RPC (github.com)](https://github.com/npuv5pp/V5RPC/blob/master/README.zh-CN.md#robot)
 
