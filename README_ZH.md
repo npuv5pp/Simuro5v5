@@ -68,7 +68,7 @@
 
 ## 平台坐标
 
-![image]("./Documents/platform1.png")
+![image]("./Documents/platform.png")
 
 ![image]("./Documents/platform.png")
 
