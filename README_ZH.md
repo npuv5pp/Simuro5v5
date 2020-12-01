@@ -66,5 +66,11 @@
 
 如果你准备将策略从老平台迁移到新平台，可以参考[此文档](https://github.com/npuv5pp/Simuro5v5/blob/master/Documents/Diff.md)
 
+## 平台坐标
+
+![image-20201201210740627]([Simuro5v5/platform1.png at master · ego-0102/Simuro5v5 (github.com)](https://github.com/ego-0102/Simuro5v5/blob/master/Documents/platform1.png))
+
+
+
 ## Credits
 版权所有(C) 西北工业大学V5++团队。保留所有权利。
