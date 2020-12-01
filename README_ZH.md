@@ -66,5 +66,19 @@
 
 如果你准备将策略从老平台迁移到新平台，可以参考[此文档](https://github.com/npuv5pp/Simuro5v5/blob/master/Documents/Diff.md)
 
+## 平台坐标
+
+![Image](https://github.com/ego-0102/Simuro5v5/raw/master/Documents/platform.png)
+
+![Image](https://github.com/ego-0102/Simuro5v5/raw/master/Documents/platform1.png)
+
+## 机器人方向
+
+以黑角朝向方向为正方向
+
+[V5RPC/README.zh-CN.md at master · npuv5pp/V5RPC (github.com)](https://github.com/npuv5pp/V5RPC/blob/master/README.zh-CN.md#robot)
+
+
+
 ## Credits
 版权所有(C) 西北工业大学V5++团队。保留所有权利。
