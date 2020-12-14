@@ -1,6 +1,6 @@
 # 简介
 
-![screenshot](./Documents/screenshot.png)
+![screenshot](https://raw.githubusercontent.com/npuv5pp/Simuro5v5/c9e93546d63fe9776d34817f0733e41fba437067/Documents/screenshot.png)
 
 这个平台使用了全新的策略加载方式，但同时提供了兼容旧平台的DLL方式。旧平台DLL策略的包装器的可以在[这个仓库](https://github.com/npuv5pp/V5DLLAdapter)找到。
 
