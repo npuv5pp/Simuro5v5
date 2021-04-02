@@ -2,6 +2,8 @@
 
 if ($IsLinux) {
     $msbuild = (Get-Command 'dotnet' -ErrorAction Ignore).Source
+} elseif($IsMacOs) {
+    $msbuild = (Get-Command 'dotnet' -ErrorAction Ignore).Source
 } else {
     $msbuild = (Get-Command 'MSBuild.exe' -ErrorAction Ignore).Source
     foreach ($vsver in 2017,2019) {
