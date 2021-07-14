@@ -20,5 +20,5 @@ jobs:
           dst_key: ${{ secrets.GITEE_PRIVATE_KEY }}
           dst_token: ${{ secrets.GITEE_TOKEN }}
           account_type: org
-          static_list: V5RPC
+          static_list: Simuro5V5
           
